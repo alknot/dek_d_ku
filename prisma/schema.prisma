@@ -72,3 +72,133 @@ enum RequestStatus {
   APPROVED
   REJECTED
 }
+
+model Form{
+  form_id String @id @map("_id")
+  user_id String (fk)
+  sch_id String (fk)
+  Apv_status RequestStatus
+}
+
+enum RequestStatus {
+  PENDING_FACULTY
+  PENDING_DEAN
+  PRNDING_EDIT
+  PENDING_JUDGING
+  APPROVED
+  REJECTED
+}
+
+
+
+model Scholarship{
+  sch_id String @id @map("_id")
+  sch_name String
+  description String
+  academic_year String
+  term String
+  amount Float
+  start_date DateTime
+  end_date DateTime
+  sch_type  sch_type
+  attachment File[]
+  nisit_nameth String
+  nisit_nameen String
+  nisit_academicyear String
+  nisit_id String
+  faculty String
+  department String
+  advisor String
+  gpa Float
+  dateofBirth DateTime
+  age Int
+  phone String
+  mail String
+  address String 
+  dynamicquestion dynamicquestion
+  discount_price String //ลดค่าเทอมส่วนไหน
+}
+model dynamicquestion {
+  id String
+  queation String
+}
+
+model answer {
+  id String
+  queation_id (fk)
+  answer String
+}
+
+enum sch_type {
+  Innovation
+  Well_Beahavior
+  Extracurricular
+  Other
+}
+
+model Innovation_Question{
+  award_date DateTime
+  competition_name String
+  team_name String
+  innovation_name String
+  price_name String
+  organizer String
+  competitive_level competitive_level
+  numberofTeam Int
+  activity_hour activity_hour
+  certificate String
+  link String
+}
+
+model Well_Beahavior{
+  beahavior_detail String
+}
+
+model Extracurricular_Question{
+  extracurricular_type extracurricular_type
+  award_date DateTime
+  competition_name String
+  team_name String
+  innovation_name String
+  price_name String
+  organizer String
+  competitive_level competitive_level
+  numberofTeam Int
+  activity_hour activity_hour
+  certificate String
+  link String
+}
+enum extracurricular_type {
+  Competition
+  Position
+  Social
+}
+
+
+enum activity_hour {
+  Sport
+  Environment
+  Culture
+  Virtue
+  Other
+}
+
+enum competitive_level {
+  Tertiary
+  National
+  International
+}
+
+model termprice{
+  id String @id 
+  faculty String
+  department String
+  academic_year String
+  term String
+  program_type String //ไทย,นานาชาติ
+  study String // ปกติ,พิเศษ
+  price1 Float
+  price2 Float
+  price3 Float
+  sum_price Float //ค่าเทอมแบ่งเป็นส่วนย่อย3ส่วน
+}

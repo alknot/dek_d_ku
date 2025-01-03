@@ -13,8 +13,62 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  STUDENT // นิสิต
+  FACULTY_STAFF // เจ้าหน้าที่คณะ
+  DEAN // คณบดี
+  SA_STAFF // เจ้าหน้าที่กองกิจการนิสิต
+  DEPARTMENT_HEAD // หัวหน้าภาค
+  NOT_ASSIGNED // ไม่ได้กำหนดสิทธิ์
+}
+
 model User {
-  id    String  @id @default(auto()) @map("_id") @db.ObjectId
-  email String  @unique
-  name  String?
+  id                String  @id @default(cuid()) @map("_id") // รหัสนิสิต หรือ รหัสเจ้าหน้าที่
+  userprincipalname String  @unique
+  prenameTh         String // คำนำหน้าชื่อ
+  firstnameTh       String // ชื่อจริง ภาษาไทย
+  lastnameTh        String // นามสกุล ภาษาไทย
+  prenameEn         String
+  firstnameEn       String // ชื่อจริง ภาษาอังกฤษ
+  lastnameEn        String // นามสกุล ภาษาอังกฤษ
+  role              Role
+  major             String? // คณะ (เฉพาะนิสิต)
+  faculty           String // สังกัด, คณะ
+
+  // birthdate DateTime?
+  advisor String? // อาจารย์ที่ปรึกษา (เฉพาะนิสิต)
+  gpa     Float? // เกรดเฉลี่ย (เฉพาะนิสิต)
+
+  // เฉพาะเจ้าหน้าที่
+  position     String?
+  positionId   String?
+  department   String?
+  departmentId String?
+
+  // ข้อมูลการติดต่อ
+  email       String  @unique
+  // emailVerified DateTime?
+  mobilePhone String?
+}
+
+model Scholarship {
+  id          String        @id @default(cuid()) @map("_id")
+  name        String
+  description String?
+  amount      Float
+  deadline    DateTime
+  link        String?
+  image       String?
+  status      RequestStatus
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+enum RequestStatus {
+  PENDING_DEPARTMENT_HEAD
+  PENDING_FACULTY
+  PENDING_DEAN
+  PENDING_JUDGING
+  APPROVED
+  REJECTED
 }

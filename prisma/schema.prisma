@@ -114,6 +114,7 @@ model Extracurricular_Question{
   certificate String
   link String
 }
+
 enum extracurricular_type {
   Competition
   Position

@@ -14,6 +14,9 @@ export async function GET(req: NextRequest) {
   const id = '';
 
   const user = await db.user.findUnique({ where: { id } });
+
+  if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+
   if (user?.role !== Role.SA_STAFF)
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
 
@@ -94,6 +97,8 @@ export async function POST(req: NextRequest) {
       department: body.department,
       departmentId: body.departmentId, // Maybe not needed
       mobilePhone: body.mobilePhone,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
     // Proceed with creating the user

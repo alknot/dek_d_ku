@@ -1,4 +1,4 @@
-import { getFieldValue } from '@/app/libs/common';
+import { getFieldValue } from '@libs/common';
 import { PrismaClient, Role } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -10,8 +10,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
     // Do something to verify token and get id
-    const userid = '';
-    const user = await db.user.findUnique({ where: { id: userid } });
+    const userId = '';
+    const user = await db.user.findUnique({ where: { id: userId } });
     if (!user) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
@@ -34,6 +34,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     switch (user.role) {
       case Role.DEPARTMENT_HEAD:
+        const deptForm = await db.form.findUnique({ where: { id: formId } });
+        if (!deptForm) return NextResponse.json({ message: 'Request not found' }, { status: 404 });
+        if (deptForm.approveStatus !== 'PENDING_DEPARTMENT_HEAD')
+          return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+
         const deptHeadRequests = await db.form.update({
           where: { id: formId },
           data: { approveStatus: body.isApproved ? 'PENDING_FACULTY' : 'REJECTED' },

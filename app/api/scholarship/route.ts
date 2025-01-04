@@ -28,6 +28,18 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const token = req.headers.get('Authorization');
+
+    if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    const userId = '';
+
+    const user = await db.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+    if (user.role !== 'SA_STAFF')
+      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+
     const body = await req.json();
 
     // Validate the request body

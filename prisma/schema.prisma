@@ -124,9 +124,9 @@ model Form {
   wellBehavior    WellBehaviorQuestion?
   extracurricular ExtracurricularQuestion?
 
-  user        User        @relation("UserForm", fields: [createdBy], references: [id])
-  scholarship Scholarship @relation("ScholarshipForm", fields: [forScholarship], references: [id])
-  file        File?       @relation("FileForm", fields: [certificate], references: [id])
+  user            User        @relation("UserForm", fields: [createdBy], references: [id])
+  scholarship     Scholarship @relation("ScholarshipForm", fields: [forScholarship], references: [id])
+  certificateFile File?       @relation("FileForm", fields: [certificate], references: [id])
 }
 
 model Scholarship {

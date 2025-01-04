@@ -6,14 +6,14 @@ import { NextRequest, NextResponse } from 'next/server';
 const db = new PrismaClient();
 
 export async function GET(req: NextRequest) {
-  const token = req.headers.get('Authorization');
+  const token = req.headers.get('Authorization'); // userid
 
   if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
   // Do something to verify token and get id
-  const id = '';
+  const userId = '';
 
-  const user = await db.user.findUnique({ where: { id } });
+  const user = await db.user.findUnique({ where: { id: userId } });
 
   if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
@@ -24,6 +24,7 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({ users: users ?? [] }, { status: 200 });
 }
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();

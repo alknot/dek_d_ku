@@ -171,6 +171,9 @@ model Termprice {
   sumPrice     Float // ค่าเทอมแบ่งเป็นส่วนย่อย 3 ส่วน
 
   scholarship Scholarship[] @relation("TermpriceScholarship")
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 type Question {

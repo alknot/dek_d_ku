@@ -3,6 +3,8 @@
 
 import { useState } from "react";
 import Sidebar from "@/components/sidebar";
+import styles from "./nuebotton.module.css";
+
 
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -50,15 +52,30 @@ export default function Home() {
       </header>
 
       {/* Main Section (Full Screen) */}
-      <main className="flex-1 flex items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <h2 className="text-4xl font-bold text-gray-800">Hello, World!</h2>
-          <p className="mt-4 text-lg text-gray-600">
-            This main section is now fully stretched to cover the page.
-          </p>
-          <button className="mt-6 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-500 transition">
-            Get Started
+      <main className="flex-1 flex items-top justify-center bg-gray-100">
+        <div className="text-center bg-gray-50 px-10 py-10" >
+          <div className="text-top justify-center bg-gray-50 text-3xl">
+             เลือกประเภทโครงการ
+          </div>
+             
+          <div className="space-x-10  space-y-20">
+          <button className = {styles.button} >
+            โครงการประพฤติดี
           </button>
+
+          <button className = {styles.button} >
+            โครงการกิจกรรมนอกหลักสูตร
+          </button>
+          </div>
+
+          <div className="space-y-10 space-x-10 ">
+          <button className = {styles.button} >
+            โครงการความคิดสร้างสรรค์และนวัตกรรม
+          </button> 
+          <button className = {styles.button} >
+            โครงการอื่นๆ
+          </button>
+          </div>
         </div>
       </main>
 

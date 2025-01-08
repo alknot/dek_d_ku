@@ -1,84 +1,70 @@
+
 "use client";
 
 import { useState } from "react";
+import Sidebar from "@/components/sidebar";
+import Termpricetable from "@/components/termpricetable";
 
-export default function FinancePage() {
-  const [file, setFile] = useState<File | null>(null);
-  const [data, setData] = useState([]);
+export default function Home() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setFile(event.target.files[0]);
-    }
-  };
-
-  const handleUpload = async () => {
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await fetch("/api/termprice", {
-        method: "POST",
-        body: formData,
-      });
-      const result = await response.json();
-      setData(result.data);
-    } catch (error) {
-      console.error("Error uploading file:", error);
-      alert("Error uploading file");
-    }
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-2xl font-bold mb-4">Upload Term Prices</h1>
+    <div className="min-h-screen flex flex-col">
+      {/* Sidebar */}
+      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
-      <div className="mb-6">
-        <input type="file" accept=".csv" onChange={handleFileChange} />
-        <button
-          onClick={handleUpload}
-          className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg"
-        >
-          Upload
-        </button>
-      </div>
+      {/* Header Section */}
+      <header
+        className="shadow-md flex items-center justify-between"
+        style={{ backgroundColor: "rgb(0, 104, 95)" }}
+      >
+        <meta httpEquiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *"></meta>
+        <div className="px-4 py-4">
+          {/* Sidebar Toggle Button */}
+          <button
+            onClick={toggleSidebar}
+            className="text-white focus:outline-none"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16m-7 6h7"
+              />
+            </svg>
+          </button>
+        </div>
+        <h1 className="text-3xl font-bold text-white text-center flex-1">
+          Dek-D KU
+        </h1>
+        <div className="w-1"></div> {/* ใช้เพื่อเว้นช่องให้ Header ตรงกลาง */}
+        
+      </header>
 
-      {data.length > 0 && (
-        <table className="table-auto w-full bg-white shadow-md rounded-lg">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="px-4 py-2">Faculty</th>
-              <th className="px-4 py-2">Department</th>
-              <th className="px-4 py-2">Academic Year</th>
-              <th className="px-4 py-2">Term</th>
-              <th className="px-4 py-2">Program Type</th>
-              <th className="px-4 py-2">Study</th>
-              <th className="px-4 py-2">Price 1</th>
-              <th className="px-4 py-2">Price 2</th>
-              <th className="px-4 py-2">Price 3</th>
-              <th className="px-4 py-2">Sum Price</th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* {data.map((row, index) => (
-              <tr key={index} className="border-t">
-                <td className="px-4 py-2">{row.faculty}</td>
-                <td className="px-4 py-2">{row.department}</td>
-                <td className="px-4 py-2">{row.academicYear}</td>
-                <td className="px-4 py-2">{row.term}</td>
-                <td className="px-4 py-2">{row.programType}</td>
-                <td className="px-4 py-2">{row.study}</td>
-                <td className="px-4 py-2">{row.price1}</td>
-                <td className="px-4 py-2">{row.price2}</td>
-                <td className="px-4 py-2">{row.price3}</td>
-                <td className="px-4 py-2">{row.sumPrice}</td>
-              </tr>
-            ))} */}
-          </tbody>
-        </table>
-      )}
+      {/* Main Section (Full Screen) */}
+      <main className="flex-1 flex  justify-center bg-gray-100">
+        <Termpricetable/>
+      </main>
+
+      {/* Footer Section */}
+      <footer className="bg-gray-800 text-white py-6">
+        <div className="container mx-auto text-center">
+          <p>&copy; นายกุลชัย และผองเพื่อน.</p>
+        </div>
+      </footer>
     </div>
   );
 }
+
+

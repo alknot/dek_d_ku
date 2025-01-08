@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
             key: 'Access-Control-Allow-Headers',
             value: 'X-Requested-With, Content-Type, Authorization',
           },
+          {
+            key: "Content-Security-Policy",
+            value: "script-src 'self' 'unsafe-eval';",
+          },
         ],
       },
     ];

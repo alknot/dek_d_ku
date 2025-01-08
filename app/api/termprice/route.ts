@@ -2,6 +2,7 @@ import { getFieldValue } from '@/app/libs/common';
 import { generateCuid } from '@/app/libs/utils';
 import { PrismaClient, Role, Termprice } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
+import Papa from "papaparse";
 
 const db = new PrismaClient();
 
@@ -60,6 +61,10 @@ export async function POST(req: NextRequest) {
         { message: 'Term or price details are incomplete' },
         { status: 400 }
       );
+
+
+    const acceptableCSVFileTypes =
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .csv";
 
     const termPriceData: Termprice = {
       id: generateCuid(),

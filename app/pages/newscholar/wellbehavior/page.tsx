@@ -214,7 +214,7 @@ export default function Home() {
                   </div>
                   <div className="sm:col-span-2">
                     <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-                    <textarea id="description" rows="8" className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Your description here"></textarea>
+                    <textarea id="description" rows={8} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Your description here"></textarea>
                   </div>
                 </div>
                 {/* </form> */}
@@ -364,7 +364,7 @@ export default function Home() {
 
                   <div className="sm:col-span-2">
                     <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">รายละเอียดด้านความประพฤติดี</label>
-                    <textarea id="description" rows="8" className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 
+                    <textarea id="description" rows={8} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 
                     focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
                     dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder=""></textarea>
                   </div>
@@ -381,7 +381,7 @@ export default function Home() {
       {/* Footer Section */}
       <footer className="bg-gray-800 text-white py-6">
         <div className="container mx-auto text-center">
-          <p>&copy; นายกุลชัย</p>
+          <p>&copy; นายกุลชัย และผองเพื่อน.</p>
         </div>
       </footer>
     </div>

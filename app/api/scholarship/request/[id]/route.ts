@@ -2,7 +2,7 @@ import { PrismaClient, Role } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
 const db = new PrismaClient();
-export async function GET({ params }: { params: Promise<{ id: string }> }, req: NextRequest) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const id = (await params).id;
   try {
     const token = req.headers.get('Authorization');
@@ -29,7 +29,7 @@ export async function GET({ params }: { params: Promise<{ id: string }> }, req: 
   }
 }
 
-export async function PUT({ params }: { params: Promise<{ id: string }> }, req: NextRequest) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const id = (await params).id;
   try {
     const token = req.headers.get('Authorization');

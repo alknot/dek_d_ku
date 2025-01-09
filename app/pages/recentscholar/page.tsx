@@ -77,8 +77,8 @@ export default function Home() {
           {/* Dropdown 5 */}
           <select className="border-gray-300 rounded-lg p-2">
             <option>หลักสูตรที่เปิดรับ</option>
-            <option>นานาชาติ</option>
-            <option>ภาคปกติ</option>
+            <option>หลักสูตรนานาชาติ</option>
+            <option>หลักสูตรไทย</option>
           </select>
           {/* Dropdown 6 */}
           <select className="border-gray-300 rounded-lg p-2">

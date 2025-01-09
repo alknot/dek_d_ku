@@ -4,6 +4,7 @@
 import { useState } from "react";
 import Sidebar from "@/components/sidebar";
 import styles from "./nuebotton.module.css";
+import Link from "next/link";
 
 
 export default function Home() {
@@ -59,10 +60,11 @@ export default function Home() {
           </div>
              
           <div className="space-x-10  space-y-20">
+          <Link href="../pages/newscholar/wellbehavior">
           <button className = {styles.button} >
-            โครงการประพฤติดี
+             โครงการประพฤติดี
           </button>
-
+          </Link>
           <button className = {styles.button} >
             โครงการกิจกรรมนอกหลักสูตร
           </button>
@@ -82,7 +84,7 @@ export default function Home() {
       {/* Footer Section */}
       <footer className="bg-gray-800 text-white py-6">
         <div className="container mx-auto text-center">
-          <p>&copy; นายกุลชัย และผองเพื่อน.</p>
+          <p>&copy; นายกุลชัย</p>
         </div>
       </footer>
     </div>

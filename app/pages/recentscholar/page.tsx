@@ -46,11 +46,11 @@ export default function Home() {
         <h1 className="text-3xl font-bold text-white text-center flex-1">
           Dek-D KU
         </h1>
-        <div className="w-10"></div> {/* ใช้เพื่อเว้นช่องให้ Header ตรงกลาง */}
+        {/* <div className="w-10"></div> ใช้เพื่อเว้นช่องให้ Header ตรงกลาง */}
       </header>
 
       {/* Main Section (Full Screen) */}
-      <main className="flex-1 flex  justify-center bg-gray-100">
+      <main className=" flex-1 flex  justify-center bg-gray-100 w-full mx-auto">
       <div className="p-6 space-y-6 bg-gray-50">
       {/* หัวข้อ */}
       <h1 className="text-2xl font-bold text-center text-gray-800">
@@ -71,17 +71,9 @@ export default function Home() {
             <option>ปลาย</option>
           </select>
           {/* Dropdown 3 */}
-          <select className="border-gray-300 rounded-lg p-2">
-            <option>เลือกคณะ</option>
-            <option>วิศวกรรมศาสตร์</option>
-            <option>วิทยาศาสตร์</option>
-          </select>
+          
           {/* Dropdown 4 */}
-          <select className="border-gray-300 rounded-lg p-2">
-            <option>ภาควิชา</option>
-            <option>ปริญญาตรี</option>
-            <option>ปริญญาโท</option>
-          </select>
+          
           {/* Dropdown 5 */}
           <select className="border-gray-300 rounded-lg p-2">
             <option>หลักสูตรที่เปิดรับ</option>
@@ -90,9 +82,10 @@ export default function Home() {
           </select>
           {/* Dropdown 6 */}
           <select className="border-gray-300 rounded-lg p-2">
-            <option>ทุนการศึกษา</option>
-            <option>มีทุน</option>
-            <option>ไม่มีทุน</option>
+            <option>ประเภทโครงการ</option>
+            <option>ประพฤติดี</option>
+            <option>กิจกรรมนอกหลักสูตร</option>
+            <option>ความคิดสร้างสรรค์และนวัตกรรม</option>
           </select>
         </div>
         {/* ปุ่มค้นหา */}
@@ -110,7 +103,8 @@ export default function Home() {
             <tr>
               <th className="px-4 py-2 text-left">ที่</th>
               <th className="px-4 py-2 text-left">โครงการ</th>
-              <th className="px-4 py-2 text-left">รับสมัคร</th>
+              <th className="px-9 py-2 text-left"></th>
+              <th >รับสมัคร</th>
             </tr>
           </thead>
           <tbody>
@@ -119,23 +113,16 @@ export default function Home() {
               <td className="px-4 py-2">1</td>
               <td className="px-4 py-2">
                 <div className="font-bold text-gray-800">
-                  โครงการ Phuket International Admission
+                  โครงการ 
                 </div>
                 <div className="text-sm text-gray-600">
-                  Phuket International Admission (For foreign applicants with a
-                  passport)
+                  Description
                 </div>
-                <div className="flex gap-2 mt-2">
-                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                    ภูเก็ต
-                  </span>
-                  <button className="bg-green-100 text-green-800 px-3 py-1 rounded">
-                    รายละเอียดโครงการ
-                  </button>
-                </div>
+                
               </td>
+              <td></td>
               <td className="px-4 py-2 text-center">
-                <div>1 ต.ค. 67 - 4 ก.ค. 68</div>
+                <div>1 Oct 2025 - 4 May 2026</div>
                 <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
                   เหลือ 177 วัน
                 </span>
@@ -146,22 +133,16 @@ export default function Home() {
               <td className="px-4 py-2">2</td>
               <td className="px-4 py-2">
                 <div className="font-bold text-gray-800">
-                  โครงการรับนักศึกษาหลักสูตรเทคโนโลยีบัณฑิต
+                  โครงการ
                 </div>
                 <div className="text-sm text-gray-600">
-                  สาขาวิชาเทคโนโลยีสารสนเทศ คณะวิทยาศาสตร์
+                  description
                 </div>
-                <div className="flex gap-2 mt-2">
-                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                    หาดใหญ่
-                  </span>
-                  <button className="bg-green-100 text-green-800 px-3 py-1 rounded">
-                    รายละเอียดโครงการ
-                  </button>
-                </div>
+                
               </td>
+              <td></td>
               <td className="px-4 py-2 text-center">
-                <div>19 ธ.ค. 67 - 28 ก.พ. 68</div>
+                <div>19 Dec 2025 - 28 Feb 2026</div>
                 <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
                   เหลือ 71 วัน
                 </span>
@@ -172,17 +153,10 @@ export default function Home() {
               <td className="px-4 py-2">3</td>
               <td className="px-4 py-2">
                 <div className="font-bold text-gray-800">
-                  โครงการดาวรุ่งคอมพิวเตอร์ ปีการศึกษา 2568
-                </div>
-                <div className="flex gap-2 mt-2">
-                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                    หาดใหญ่
-                  </span>
-                  <button className="bg-green-100 text-green-800 px-3 py-1 rounded">
-                    รายละเอียดโครงการ
-                  </button>
+                  โครงการ
                 </div>
               </td>
+              <td></td>
               <td className="px-4 py-2 text-center">
                 <span className="bg-red-100 text-red-800 px-2 py-1 rounded">
                   หมดเขต
@@ -198,7 +172,7 @@ export default function Home() {
       {/* Footer Section */}
       <footer className="bg-gray-800 text-white py-6">
         <div className="container mx-auto text-center">
-          <p>&copy; นายกุลชัย และผองเพื่อน.</p>
+          <p>&copy; นายกุลชัย </p>
         </div>
       </footer>
     </div>

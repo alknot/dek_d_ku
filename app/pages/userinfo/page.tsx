@@ -71,8 +71,8 @@ export default function Home() {
             <p className="text-gray-800">{userInfo.role}</p>
           </div>
           <div className="mb-4">
-            <p className="text-lg font-semibold text-gray-600">Joined:</p>
-            <p className="text-gray-800">{userInfo.joined}</p>
+            <p className="text-lg font-semibold text-gray-600">Signature:</p>
+            <p className="text-gray-800"></p>
           </div>
           <button
             className="mt-6 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-500 transition"
@@ -86,7 +86,7 @@ export default function Home() {
       {/* Footer Section */}
       <footer className="bg-gray-800 text-white py-6">
         <div className="container mx-auto text-center">
-          <p>&copy; นายกุลชัย และผองเพื่อน.</p>
+          <p>&copy; นายกุลชัย </p>
         </div>
       </footer>
     </div>

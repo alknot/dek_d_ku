@@ -1,3 +1,4 @@
+import { handleError } from '@/app/libs/utils';
 import { PrismaClient, Role } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -24,8 +25,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
     return NextResponse.json(request, { status: 200 });
   } catch (e) {
-    console.error(e);
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+    return handleError(e);
   }
 }
 
@@ -61,7 +61,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     return NextResponse.json(request, { status: 200 });
   } catch (e) {
-    console.error(e);
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+    return handleError(e);
   }
 }

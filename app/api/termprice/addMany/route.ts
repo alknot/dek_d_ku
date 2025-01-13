@@ -1,5 +1,5 @@
 import { getFieldValue } from '@/app/libs/common';
-import { generateCuid } from '@/app/libs/utils';
+import { generateCuid, handleError } from '@/app/libs/utils';
 import { PrismaClient, Role, Termprice } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -71,7 +71,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(newTermPrices, { status: 201 });
   } catch (e: any) {
-    console.error(e);
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+    return handleError(e);
   }
 }

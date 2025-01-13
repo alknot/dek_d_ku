@@ -1,3 +1,4 @@
+import { handleError } from '@/app/libs/utils';
 import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -12,7 +13,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
   } catch (e) {
-    console.error(e);
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+    return handleError(e);
   }
 }

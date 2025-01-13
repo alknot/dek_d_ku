@@ -1,3 +1,4 @@
+import { handleError } from '@/app/libs/utils';
 import { getFieldValue } from '@libs/common';
 import { PrismaClient, Role } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
@@ -74,11 +75,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       default:
         return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
-  } catch (error: any) {
-    console.error(error.message);
-    return NextResponse.json(
-      { message: 'Internal server error', error: error.message },
-      { status: 500 }
-    );
+  } catch (e: any) {
+    return handleError(e);
   }
 }

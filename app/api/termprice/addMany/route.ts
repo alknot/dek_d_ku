@@ -2,18 +2,8 @@ import { getFieldValue } from '@/app/libs/common';
 import { generateCuid, handleError } from '@/app/libs/utils';
 import { PrismaClient, Role, Termprice } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
-import Papa from "papaparse";
 
 const db = new PrismaClient();
-
-export async function GET() {
-  try {
-    const termPrices = await db.termprice.findMany();
-    return NextResponse.json(termPrices, { status: 200 });
-  } catch (e) {
-    return handleError(e);
-  }
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -32,7 +22,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate the request body
-    if (!body || typeof body !== 'object') {
+    if (!body || !Array.isArray(body) || !body.every((item) => typeof item === 'object')) {
       return NextResponse.json({ message: 'Invalid or missing request body' }, { status: 400 });
     }
 
@@ -61,31 +51,25 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
 
-
-    const acceptableCSVFileTypes =
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .csv";
-
-    const termPriceData: Termprice = {
+    const termPriceData: Termprice[] = body.map((b) => ({
       id: generateCuid(),
-      academicYear: body.academicYear,
-      term: body.term,
-      department: body.department,
-      faculty: body.faculty,
-      price1: body.price1,
-      price2: body.price2,
-      price3: body.price3,
-      programType: body.programType,
-      study: body.study,
-      sumPrice: body.sumPrice,
-      createdAt: body.createdAt,
-      updatedAt: body.updatedAt
-    };
+      academicYear: b.academicYear,
+      term: b.term,
+      department: b.department,
+      faculty: b.faculty,
+      price1: b.price1,
+      price2: b.price2,
+      price3: b.price3,
+      programType: b.programType,
+      study: b.study,
+      sumPrice: b.sumPrice,
+    }));
 
-    const newTermPrice = await db.termprice.create({
+    const newTermPrices = await db.termprice.createMany({
       data: termPriceData,
     });
 
-    return NextResponse.json(newTermPrice, { status: 201 });
+    return NextResponse.json(newTermPrices, { status: 201 });
   } catch (e: any) {
     return handleError(e);
   }

@@ -1,6 +1,7 @@
 import { getFieldValue } from '@/app/libs/common';
+import { handleError } from '@/app/libs/utils';
 import { TypePerson } from '@/app/types/user';
-import { PrismaClient, Role, User } from '@prisma/client';
+import { Prisma, PrismaClient, Role, User } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
 const db = new PrismaClient();
@@ -111,7 +112,6 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json(user, { status: 201 });
   } catch (e: any) {
-    console.error(e.message);
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+    return handleError(e);
   }
 }

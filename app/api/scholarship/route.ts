@@ -1,5 +1,5 @@
 import { getFieldValue } from '@/app/libs/common';
-import { generateCuid } from '@/app/libs/utils';
+import { generateCuid, handleError } from '@/app/libs/utils';
 import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -21,8 +21,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ scholarships: scholarships ?? [] }, { status: 200 });
   } catch (e: any) {
-    console.error(e);
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+    return handleError(e);
   }
 }
 
@@ -135,11 +134,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(result, { status: 201 });
-  } catch (error: any) {
-    console.error(error.message);
-    return NextResponse.json(
-      { message: 'Internal server error', error: error.message },
-      { status: 500 }
-    );
+  } catch (e: any) {
+    return handleError(e);
   }
 }

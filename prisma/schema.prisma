@@ -40,9 +40,19 @@ enum SchType {
 }
 
 enum ExtracurricularType {
-  COMPETITION // การแข่งขันอะไรก็ได้ที่ไม่ใช่ innovation
+  // การแข่งขันอะไรก็ได้ที่ไม่ใช่ innovation
+  UNIVERSITY_COMPETITION // การแข่งขันระดับมหาวิทยาลัย
+  NATIONAL_COMPETITION // การแข่งขันระดับประเทศ
+  INTERNATIONAL_COMPETITION // การแข่งขันระดับนานาชาติ
+
   POSITION // ตำแหน่ง
   SOCIAL // กิจกรรมสังคม
+}
+
+enum InnovationType {
+  UNIVERSITY_COMPETITION
+  NATIONAL_COMPETITION
+  INTERNATIONAL_COMPETITION
 }
 
 enum ActivityHour {
@@ -89,7 +99,9 @@ model User {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  Form Form[] @relation("UserForm")
+  // Relationships
+  Form        Form[] @relation("UserForm")
+  CommentUser Form[] @relation("CommentedUserForm")
 }
 
 model Form {
@@ -117,13 +129,17 @@ model Form {
   certificate      String?
   activityImageUrl String?
 
-  // Relationships
   staticQuestions Question[]
 
   innovation      InnovationQuestion?
   wellBehavior    WellBehaviorQuestion?
   extracurricular ExtracurricularQuestion?
 
+  comment     String?
+  commentedBy String?
+
+  // Relationships
+  commentedUser   User?       @relation("CommentedUserForm", fields: [commentedBy], references: [id])
   user            User        @relation("UserForm", fields: [createdBy], references: [id])
   scholarship     Scholarship @relation("ScholarshipForm", fields: [forScholarship], references: [id])
   certificateFile File?       @relation("FileForm", fields: [certificate], references: [id])
@@ -153,6 +169,7 @@ model File {
   mimetype String
   data     String
 
+  // Relationships
   form        Form[]        @relation("FileForm")
   scholarship Scholarship[] @relation("ScholarshipFile")
 }
@@ -170,6 +187,7 @@ model Termprice {
   price3       Float
   sumPrice     Float // ค่าเทอมแบ่งเป็นส่วนย่อย 3 ส่วน
 
+  // Relationships
   scholarship Scholarship[] @relation("TermpriceScholarship")
 }
 
@@ -179,6 +197,8 @@ type Question {
 }
 
 type InnovationQuestion {
+  innovationType InnovationType
+
   awardDate        DateTime
   competitionName  String
   teamName         String

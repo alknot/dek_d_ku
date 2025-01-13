@@ -135,6 +135,9 @@ export async function POST(req: NextRequest) {
       wellBehavior: null,
       extracurricular: null,
       innovation: null,
+
+      comment: null,
+      commentedBy: null,
     };
 
     switch (body.schType) {

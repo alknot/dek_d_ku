@@ -73,6 +73,8 @@ export async function POST(req: NextRequest) {
       programType: body.programType,
       study: body.study,
       sumPrice: body.sumPrice,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
 
     const newTermPrice = await db.termprice.create({

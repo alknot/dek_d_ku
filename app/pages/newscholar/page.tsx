@@ -71,9 +71,11 @@ export default function Home() {
           </div>
 
           <div className="space-y-10 space-x-10 ">
+          <Link href="../pages/newscholar/innovation">
           <button className = {styles.button} >
             โครงการความคิดสร้างสรรค์และนวัตกรรม
           </button> 
+          </Link>
           <button className = {styles.button} >
             โครงการอื่นๆ
           </button>

@@ -4,77 +4,97 @@ import { useState } from "react";
 import Sidebar from "@/components/sidebar";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+
+type Question = {
+    id: number;
+    question: string;
+    type: string; // "text" | "radio" | "checkbox" | "date"
+    options: string[];
+    required: boolean; // กำหนดว่าคำถามต้องตอบหรือไม่
+    selectedDate?: Date; // สำหรับ Date Picker
+};
+
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1); // ควบคุมขั้นตอนของฟอร์ม
 
-  // State สำหรับเก็บข้อมูลฟอร์ม
-  // const [formData, setFormData] = useState({
-  //   NameTH: "",
-  //   NameEN: "",
-  //   email: "",
-
-  // });
+  const [projectData, setProjectData] = useState({
+    name: "",
+    startDate: null,
+    endDate: null,
+    academicYear: "",
+    semester: "",
+    program: "",
+    description: "",
+  }); 
 
   // ฟังก์ชันเปิด/ปิด Sidebar
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  // ฟังก์ชันอัปเดตค่าของฟอร์ม
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // const { name, value } = e.target;
-    // setFormData({
-    //   ...formData,
-    //   [name]: value,
-    // });
-  };
+  // ฟังก์ชันเปลี่ยนขั้นตอน
+  const nextStep = () => setCurrentStep((prev) => prev + 1);
+  const prevStep = () => setCurrentStep((prev) => prev - 1);
 
-  // ฟังก์ชันส่งข้อมูลไปที่ API
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
 
-    try {
-      const response = await fetch("/api/newformdata", {
-        // method: "POST",
-        // headers: {
-        //   "Content-Type": "application/json",
-        // },
-        // body: JSON.stringify(formData),
-      });
+  
+      const [questions, setQuestions] = useState<Question[]>([
+          { id: 1, question: "Your name?", type: "text", options: [], required: true },
+      ]);
+  
+      // เพิ่มคำถามใหม่
+      const addQuestion = () => {
+          setQuestions([
+              ...questions,
+              {
+                  id: questions.length + 1,
+                  question: "",
+                  type: "text",
+                  options: [],
+                  required: false,
+              },
+          ]);
+      };
+  
+      // ลบคำถาม
+      const deleteQuestion = (id: number) => {
+          setQuestions(questions.filter((q) => q.id !== id));
+      };
+  
+      // อัปเดตคำถาม
+      const updateQuestion = (id: number, field: string, value: any) => {
+          setQuestions(
+              questions.map((q) =>
+                  q.id === id ? { ...q, [field]: value } : q
+              )
+          );
+      };
+  
+      // ฟังก์ชันตรวจสอบ validation
+      const validateForm = () => {
+          for (let q of questions) {
+              if (q.required && (!q.options.length || !q.question.trim())) {
+                  alert(`Question "${q.question || 'Untitled'}" is required!`);
+                  return false;
+              }
+          }
+          return true;
+      };
+  
+      // ส่งข้อมูลฟอร์ม
+      const handleSubmit = (e: React.FormEvent) => {
+          e.preventDefault();
+  
+          if (validateForm()) {
+              console.log("Form Data:", questions);
+              alert("Form Submitted!");
+          }
+      };
 
-      //     if (response.ok) {
-      //       alert("Data submitted successfully!");
-      //       setFormData({
-      //         NameTH: "",
-      //         NameEN: "",
-      //       //   aca
-      //         email: "",
-
-      //       nisitNameTh: body.nisitNameTh,
-      //   nisitNameEn: body.nisitNameEn,
-      //   nisitAcademicyear: body.nisitAcademicyear,
-      //   nisitid: body.nisitid,
-      //   faculty: body.faculty,
-      //   department: body.department,
-      //   advisor: body.advisor,
-      //   gpa: body.gpa,
-      //   dateofBirth: body.dateofBirth,
-      //   age: body.age,
-      //   phone: body.phone,
-      //   email: body.email,
-      //   address: body.address,
-
-      //       });
-      //     } else {
-      //       const error = await response.json();
-      //       alert(`Error: ${error.message}`);
-      //     }
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      alert("An error occurred while submitting the form.");
-    }
-  };
-
+      const handleProjectChange = (field: string, value: any) => {
+        setProjectData({ ...projectData, [field]: value });
+      };
   return (
     <div className="min-h-screen flex flex-col">
       {/* Sidebar */}
@@ -85,9 +105,7 @@ export default function Home() {
         className="shadow-md flex items-center justify-between"
         style={{ backgroundColor: "rgb(0, 104, 95)" }}
       >
-        <meta httpEquiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *"></meta>
         <div className="px-4 py-4">
-          {/* Sidebar Toggle Button */}
           <button
             onClick={toggleSidebar}
             className="text-white focus:outline-none"
@@ -111,270 +129,217 @@ export default function Home() {
         <h1 className="text-3xl font-bold text-white text-center flex-1">
           Dek-D KU
         </h1>
-        <div className="w-1"></div> {/* ใช้เพื่อเว้นช่องให้ Header ตรงกลาง */}
-
+        <div className="w-1"></div>
       </header>
 
       {/* Main Section */}
-      <main className="flex-1 flex  justify-center bg-gray-100 w-full mx-auto">
-        <div >
-          <div className="grow w-1 h-8 "></div>
-          <section className="bg-white dark:bg-gray-900  max-w-8xl mx-auto px-10 lg:px-8">
-            <div className=" px-12 mx-auto max-w-5xl lg:py-6">
-              <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white text-center">
+      <main className="flex-1 flex justify-center bg-gray-100 w-full mx-auto">
+        <div className="w-full max-w-5xl bg-white p-6 rounded-lg shadow-lg">
+           {currentStep === 1 && (
+            <>
+              {/* ส่วนที่ 1: กรอกข้อมูลของโครงการ */}
+              <h2 className="mb-4 text-xl font-bold text-gray-900 text-center">
                 สร้างโครงการประพฤติดี
               </h2>
-              <h1 className="mb-4  font-bold text-gray-900 dark:text-white text-center">
+              <h1 className="mb-4 font-bold text-gray-900 text-center">
                 กรอกข้อมูลของโครงการ
               </h1>
-              <form action="#">
+              <form>
                 <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
                   <div className="sm:col-span-2">
-                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อโครงการ</label>
-                    <input type="text" name="name" id="name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="name" required />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label
-                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                      htmlFor="file_input"
-                    >
-                      ประกาศโครงการ
+                    <label className="block mb-2 text-sm font-medium text-gray-900">
+                      ชื่อโครงการ
                     </label>
                     <input
-                      className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-                      type="file"
-                      id="csvFileSelector"
-                    // accept={}
-                    // onChange={}
+                      type="text"
+                      value={projectData.name}
+                      onChange={(e) =>
+                        handleProjectChange("name", e.target.value)
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
+                      placeholder="name"
+                      required
                     />
                   </div>
                   <div className="relative max-w-sm">
                     <DatePicker
-                      // selected={selectedDate}
-                      // onChange={(date) => setSelectedDate(date)}
+                      selected={projectData.startDate}
+                      onChange={(date) => handleProjectChange("startDate", date)}
                       placeholderText="Start date"
                       dateFormat="dd/MM/yyyy"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
                     />
-                    <div className="absolute inset-y-0 h-10 start-0 flex pl-3 items-center ps-3.5 pointer-events-none ">
-                      <svg
-                        className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                      </svg>
-                    </div>
-
                   </div>
-
                   <div className="relative max-w-sm">
                     <DatePicker
-                      // selected={selectedDate}
-                      // onChange={(date) => setSelectedDate(date)}
+                      selected={projectData.endDate}
+                      onChange={(date) => handleProjectChange("endDate", date)}
                       placeholderText="End date"
                       dateFormat="dd/MM/yyyy"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
                     />
-                    <div className="absolute inset-y-0 h-10 start-0 flex pl-3 items-center ps-3.5 pointer-events-none ">
-                      <svg
-                        className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                      </svg>
-                    </div>
-
                   </div>
-
                   <div className="w-full">
-                    <label htmlFor="price" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ปีการศึกษา</label>
-                    <input type="number" name="price" id="price" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="2568" required />
-                  </div>
-                  <div>
-                    <label htmlFor="category" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ภาคการศึกษา</label>
-                    <select id="category" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                      <option selected>เลือก</option>
-                      <option value="1">ภาคต้น</option>
-                      <option value="2">ภาคปลาย</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="category" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">หลักสูตร</label>
-                    <select id="category" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                      <option selected>เลือก</option>
-                      <option value="1">หลักสูตรไทย</option>
-                      <option value="2">หลักสูตรนานาชาติ</option>
-                    </select>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-                    <textarea id="description" rows={8} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Your description here"></textarea>
+                    <label className="block mb-2 text-sm font-medium text-gray-900">
+                      ปีการศึกษา
+                    </label>
+                    <input
+                      type="number"
+                      value={projectData.academicYear}
+                      onChange={(e) =>
+                        handleProjectChange("academicYear", e.target.value)
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
+                      placeholder="2568"
+                      required
+                    />
                   </div>
                 </div>
-                {/* </form> */}
-                {/* /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */}
-                <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-                {/* /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */}
-                <h1 className="mb-4  font-bold text-gray-900 dark:text-white text-center">
-                  ส่วน ตัวอย่างคำถามเพื่อสมัครเข้าโครงการ
-                </h1>
-                {/* <form action="#"> */}
-                <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
-                  <div className="sm:col-span-2">
-                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อ-นามสกุล นิสิต (TH)</label>
-                    <input type="text" name="name" id="name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="ชื่อ-นามสกุล" />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อ-นามสกุล นิสิต (ENG)</label>
-                    <input type="text" name="name" id="name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                    focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
-                    dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Name" />
-                  </div>
-                  <div className="w-1/2">
-                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">นิสิตชั้นปีที่</label>
-                    <input type="text" name="name" id="name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                    focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
-                    dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="" />
-                  </div>
-                  <div className="w-full">
-                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">รหัสนิสิต</label>
-                    <input type="text" name="name" id="name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                    focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
-                    dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="" />
-                  </div>
-                  <div className="w-full">
-                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ภาควิชา/สาขาวิชา</label>
-                    <input type="text" name="name" id="name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                    focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
-                    dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="" />
-                  </div>
-                  <div className="w-full">
-                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">คณะ</label>
-                    <input type="text" name="name" id="name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                    focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
-                    dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="" />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อ-นามสกุล อาจารย์ที่ปรึกษา</label>
-                    <input type="text" name="name" id="name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                    focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
-                    dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Name" />
-                  </div>
-                  <div className="w-full">
-                    <label htmlFor="price" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ปีการศึกษา</label>
-                    <input type="number" name="price" id="price" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="2568" />
-                  </div>
-                  <div>
-                    <label htmlFor="category" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ภาคการศึกษา</label>
-                    <select id="category" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                      <option selected>เลือก</option>
-                      <option value="1">ภาคต้น</option>
-                      <option value="2">ภาคปลาย</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="category" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">หลักสูตร</label>
-                    <select id="category" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                      <option selected>เลือก</option>
-                      <option value="1">หลักสูตรไทย</option>
-                      <option value="2">หลักสูตรนานาชาติ</option>
-                    </select>
-                  </div>
-                  <div className="w-full">
-                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">คะแนนเฉลี่ยสะสม</label>
-                    <input type="text" name="name" id="name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                    focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
-                    dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="" />
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <div className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ท่านเรียนภาคการศึกษานี้เป็นภาคสุดท้ายหรือไม่</div>
-                    <fieldset>
-                      <legend className="sr-only">ท่านเรียนภาคการศึกษานี้เป็นภาคสุดท้ายหรือไม่</legend>
-
-                      <div className="flex items-center mb-4">
-                        <input id="option-1" type="radio" name="countries" value="USA" className="w-4 h-4 border-gray-300 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-600 dark:focus:bg-blue-600 dark:bg-gray-700 dark:border-gray-600" />
-                        <label htmlFor="country-option-1" className="block ms-2  text-sm font-medium text-gray-900 dark:text-gray-300">
-                          ใช่
-                        </label>
-                      </div>
-
-                      <div className="flex items-center mb-4">
-                        <input id="option-2" type="radio" name="countries" value="Germany" className="w-4 h-4 border-gray-300 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-600 dark:focus:bg-blue-600 dark:bg-gray-700 dark:border-gray-600" />
-                        <label htmlFor="country-option-2" className="block ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                          ไม่
-                        </label>
-                      </div>
-
-                    </fieldset>
-                  </div>
-
-                  <div className="relative max-w-sm ">
-                    <DatePicker
-                      // selected={selectedDate}
-                      // onChange={(date) => setSelectedDate(date)}
-                      placeholderText="เกิดวันที่"
-                      dateFormat="dd/MM/yyyy"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 
-                      block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-                      dark:focus:ring-blue-500 dark:focus:border-blue-500 "
-                    />
-                    <div className="absolute inset-y-0 h-10 start-0 flex pl-3 items-center ps-3.5 pointer-events-none ">
-                      <svg
-                        className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                      </svg>
-                    </div>
-
-                  </div>
-
-                  
-
-                  <div className="w-1/2">
-
-                    <input type="text" name="name" id="name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                    focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
-                    dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="อายุ (ปี)" />
-                  </div>
-
-                  <div className="w-full">
-                    <label htmlFor="category" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">โทรศัพท์</label>
-                    <input type="text" name="name" id="name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                    focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
-                    dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="" />
-                  </div>
-
-                  <div className="w-full">
-                    <label htmlFor="category" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">E-mail</label>
-                    <input type="text" name="name" id="name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                    focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
-                    dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="" />
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">รายละเอียดด้านความประพฤติดี</label>
-                    <textarea id="description" rows={8} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 
-                    focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-                    dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder=""></textarea>
-                  </div>
-                </div>
-                <button type="submit" className="inline-flex justify-right items-right px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center text-black bg-green-100 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-100">
-                  สร้าง
+                <button
+                  type="button"
+                  onClick={nextStep}
+                  className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-lg"
+                >
+                  ไปหน้าถัดไป
                 </button>
               </form>
-            </div>
-          </section>
+            </>
+          )}
+
+          {currentStep === 2 && (
+             <div className="flex justify-center items-top min-h-screen bg-white ">
+             <div className="w-full max-w-3xl bg-white p-6 rounded-lg shadow-lg space-y-4">
+               <h2 className="mb-4 text-xl font-bold text-gray-900 text-center">
+                 ตัวอย่างคำถามเพื่อสมัครเข้าโครงการ
+               </h2>
+               <form onSubmit={handleSubmit}>
+                 {questions.map((q, index) => (
+                   <div key={q.id} className="space-y-2 border-b pb-4">
+                     <div className="flex justify-between items-center">
+                       <label className="block text-sm font-medium text-gray-700">
+                         Question {index + 1}
+                       </label>
+                       <button
+                         type="button"
+                         onClick={() => deleteQuestion(q.id)}
+                         className="text-red-500 text-sm"
+                       >
+                         Delete
+                       </button>
+                     </div>
+                     <input
+                       type="text"
+                       placeholder="Enter your question"
+                       value={q.question}
+                       onChange={(e) =>
+                         updateQuestion(q.id, "question", e.target.value)
+                       }
+                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                     />
+                     <select
+                       value={q.type}
+                       onChange={(e) => updateQuestion(q.id, "type", e.target.value)}
+                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                     >
+                       <option value="text">Text</option>
+                       <option value="radio">Multiple Choice</option>
+                       <option value="checkbox">Checkbox</option>
+                       <option value="date">Date Picker</option>
+                     </select>
+                     {q.type === "radio" || q.type === "checkbox" ? (
+                       <div>
+                         <label className="block text-sm font-medium text-gray-700">
+                           Options
+                         </label>
+                         {q.options.map((option, idx) => (
+                           <div key={idx} className="flex items-center space-x-2">
+                             <input
+                               type="text"
+                               placeholder={`Option ${idx + 1}`}
+                               value={option}
+                               onChange={(e) => {
+                                 const newOptions = [...q.options];
+                                 newOptions[idx] = e.target.value;
+                                 updateQuestion(q.id, "options", newOptions);
+                               }}
+                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                             />
+                             <button
+                               type="button"
+                               onClick={() => {
+                                 const newOptions = q.options.filter((_, i) => i !== idx);
+                                 updateQuestion(q.id, "options", newOptions);
+                               }}
+                               className="text-red-500 text-sm"
+                             >
+                               Delete
+                             </button>
+                           </div>
+                         ))}
+                         <button
+                           type="button"
+                           onClick={() =>
+                             updateQuestion(q.id, "options", [...q.options, ""])
+                           }
+                           className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg"
+                         >
+                           Add Option
+                         </button>
+                       </div>
+                     ) : null}
+                     {q.type === "date" && (
+                       <div className="relative max-w-sm">
+                         <DatePicker
+                           selected={q.selectedDate}
+                           onChange={(date) =>
+                             updateQuestion(q.id, "selectedDate", date)
+                           }
+                           placeholderText="Select a date"
+                           dateFormat="dd/MM/yyyy"
+                           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 
+                           block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
+                           dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                         />
+                       </div>
+                     )}
+                     <div className="flex items-center space-x-3">
+                       <input
+                         type="checkbox"
+                         checked={q.required}
+                         onChange={(e) =>
+                           updateQuestion(q.id, "required", e.target.checked)
+                         }
+                       />
+                       <label className="text-sm text-gray-700">Required</label>
+                     </div>
+                   </div>
+                 ))}
+                 <div className="flex justify-between mt-4">
+                   <button
+                     type="button"
+                     onClick={prevStep}
+                     className="px-4 py-2 bg-gray-300 text-black rounded-lg"
+                   >
+                     ย้อนกลับ
+                   </button>
+                   <button
+                     type="button"
+                     onClick={addQuestion}
+                     className="px-4 py-2 bg-green-500 text-white rounded-lg"
+                   >
+                     Add Question
+                   </button>
+                   <button
+                     type="submit"
+                     className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+                   >
+                     Submit Form
+                   </button>
+                 </div>
+               </form>
+             </div>
+           </div>
+          )}
         </div>
       </main>
 

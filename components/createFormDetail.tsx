@@ -3,75 +3,110 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 interface FormSectionProps {
-    projectData: any;
-    handleProjectChange: (field: string, value: any) => void;
-    handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    nextStep: () => void;
-  }
-  
-  const InputField: React.FC<{
-    label: string;
-    type: string;
-    value: any;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    placeholder?: string;
-    required?: boolean;
-  }> = ({ label, type, value, onChange, placeholder, required }) => (
-    <div className="sm:col-span-2">
-      <label className="block mb-2 text-sm font-medium text-gray-900">{label}</label>
-      <input
-        type={type}
-        value={value}
-        onChange={onChange}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
-        placeholder={placeholder}
-        required={required}
-      />
-    </div>
-  );
-  
-  const SelectField: React.FC<{
-    label: string;
-    value: any;
-    onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-    options: { value: string; label: string }[];
-    required?: boolean;
-  }> = ({ label, value, onChange, options, required }) => (
-    <div className="w-1/2">
-      <label className="block mb-2 text-sm font-medium text-gray-900">{label}</label>
-      <select
-        value={value}
-        onChange={onChange}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
-        required={required}
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-  
-  const FormSection: React.FC<FormSectionProps> = ({
-    projectData,
-    handleProjectChange,
-    handleFileChange,
-    nextStep,
-  }) => {
-    const handleRewardChange = (reward: string) => {
-      const newRewards = projectData.rewards.includes(reward)
-        ? projectData.rewards.filter((r: string) => r !== reward)
-        : [...projectData.rewards, reward];
-      handleProjectChange("rewards", newRewards);
-    };
-  
-    return (
-  <>
-    <h2 className="mb-4 text-xl font-bold text-gray-900 text-center">สร้างโครงการประพฤติดี</h2>
-    <h1 className="mb-4 font-bold text-gray-900 text-center">กรอกข้อมูลของโครงการ</h1>
-    <form>
+  projectData: any;
+  handleProjectChange: (field: string, value: any) => void;
+  handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  nextStep: () => void;
+}
+
+const InputField: React.FC<{
+  label: string;
+  type: string;
+  value: any;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  required?: boolean;
+}> = ({ label, type, value, onChange, placeholder, required }) => (
+  <div className="sm:col-span-2">
+    <label className="block mb-2 text-sm font-medium text-gray-900">{label}</label>
+    <input
+      type={type}
+      value={value}
+      onChange={onChange}
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
+      placeholder={placeholder}
+      required={required}
+    />
+  </div>
+);
+
+const SelectField: React.FC<{
+  label: string;
+  value: any;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  options: { value: string; label: string }[];
+  required?: boolean;
+}> = ({ label, value, onChange, options, required }) => (
+  <div className="w-1/2">
+    <label className="block mb-2 text-sm font-medium text-gray-900">{label}</label>
+    <select
+      value={value}
+      onChange={onChange}
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
+      required={required}
+    >
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  </div>
+);
+
+
+
+const FormSection: React.FC<FormSectionProps> = ({
+  projectData,
+  handleProjectChange,
+  handleFileChange,
+  nextStep,
+}) => {
+  const handleRewardChange = (reward: string) => {
+    const newRewards = projectData.rewards.includes(reward)
+      ? projectData.rewards.filter((r: string) => r !== reward)
+      : [...projectData.rewards, reward];
+    handleProjectChange("rewards", newRewards);
+  };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("name", projectData.name);
+    formData.append("startDate", projectData.startDate);
+    formData.append("endDate", projectData.endDate);
+    formData.append("academicYear", projectData.academicYear);
+    formData.append("semester", projectData.semester);
+    formData.append("program", projectData.program);
+    formData.append("description", projectData.description);
+    formData.append("announcementFile", projectData.announcementFile);
+    formData.append("rewards", JSON.stringify(projectData.rewards));
+    formData.append("otherReward", projectData.otherReward);
+
+    try {
+      const response = await fetch("/api/scholarship/route", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        alert("Form submitted successfully!");
+        nextStep();
+      } else {
+        alert("Failed to submit the form.");
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert("An error occurred while submitting the form.");
+    }
+  };
+
+  return (
+    <>
+      <h2 className="mb-4 text-xl font-bold text-gray-900 text-center">สร้างโครงการประพฤติดี</h2>
+      <h1 className="mb-4 font-bold text-gray-900 text-center">กรอกข้อมูลของโครงการ</h1>
+      <form>
       <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
         <InputField
           label="ชื่อโครงการ"
@@ -196,7 +231,7 @@ interface FormSectionProps {
         ไปหน้าถัดไป
       </button>
     </form>
-  </>
+    </>
   );
 };
 

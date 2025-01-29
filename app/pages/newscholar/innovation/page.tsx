@@ -1,247 +1,186 @@
 "use client";
-
-import React, { useState } from "react";
-import Sidebar from "@/components/sidebar";
+import axios from "axios";
 import DatePicker from "react-datepicker";
+import React, {ChangeEvent, useEffect,useState} from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import { useRouter } from "next/router";
 
-type Question = {
-    id: number;
-    question: string;
-    type: string; // "text" | "radio" | "checkbox" | "date"
-    options: string[];
-    required: boolean; // กำหนดว่าคำถามต้องตอบหรือไม่
-    selectedDate?: Date; // สำหรับ Date Picker
+
+const Create = () => {
+    const [schName, setschName] = useState("")
+    const [description, setdescription] = useState<string>("")
+    const [academiYear, setacademicYear] = useState<number | string>("")
+    const [term, setterm] = useState<string>("")
+    const [startDate, setstartDate] = useState<Date | null>(null)
+    const [endDate, setendDate] = useState<Date | null>(null)
+    const [schType, setschType] = useState([""])
+    const [attachment, setattachment] = useState<string>("")
+    const [programType, setprogramType] = useState([""])
+    const study = 'ปกติ'
+    const price1 = 1500
+    const price2 = 500
+    const price3 = 16000
+    const sumPrice = 18000
+    // const router = useRouter()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    try {
+      // ทำการส่ง category
+      await axios.post('/api/scholarship', { schName, description, academiYear, term, startDate, endDate, schType, attachment,programType,study,price1,price2,price3,sumPrice })
+    //   router.push('/')
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+
+
+    function handleFileChange(event: ChangeEvent<HTMLInputElement>): void {
+        throw new Error("Function not implemented.");
+    }
+
+  return (
+    <>
+      <h2 className="mb-4 text-xl font-bold text-gray-900 text-center">สร้างโครงการประพฤติดี</h2>
+      <h1 className="mb-4 font-bold text-gray-900 text-center">กรอกข้อมูลของโครงการ</h1>
+      <form>
+      <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
+      <div>
+            <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อโครงการ</label>
+            <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
+            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
+            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่อโครงการ" 
+            value={schName} onChange={(e) => setschName(e.target.value)} required />
+          
+        </div>
+        <div className="sm:col-span-2">
+          <label className="block mb-2 text-sm font-medium text-gray-900">ประกาศโครงการ (PDF)</label>
+          <input
+            type="text"
+            // accept="application/pdf"
+            value={attachment}
+            onChange={(e) => setattachment(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
+            required
+          />
+          
+        </div>
+        {/* <div className="sm:col-span-2">
+            <label className="block mb-2 text-sm font-medium text-gray-900">รางวัลในแต่ละโครงการ</label>
+            <div className="flex flex-col space-y-2">
+              {["ลดค่าบำรุงมหาวิทยาลัย", "ลดค่าหน่วยกิต", "ลดค่าธรรมเนียมพิเศษคณะ", "อื่นๆ"].map((reward) => (
+                <label key={reward} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="reward"
+                    value={reward}
+                    checked={projectData.rewards.includes(reward)}
+                    onChange={() => handleRewardChange(reward)}
+                    className="mr-2"
+                  />
+                  {reward}
+                </label>
+              ))}
+              {projectData.rewards.includes("อื่นๆ") && (
+                <InputField
+                  label=""
+                  type="text"
+                  value={projectData.otherReward}
+                  onChange={(e) => handleProjectChange("otherReward", e.target.value)}
+                  placeholder="กรอกรางวัลอื่นๆ"
+                />
+              )}
+            </div>
+          </div> */}
+        <div className="flex space-x-5">
+          <div className="relative max-w-sm">
+            <label className="block mb-2 text-sm font-medium text-gray-900">วันที่เริ่มโครงการ</label>
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setstartDate(date)}
+              placeholderText="Start date"
+              dateFormat="dd/MM/yyyy"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
+            />
+          </div>
+          <div className="relative max-w-sm">
+            <label className="block mb-2 text-sm font-medium text-gray-900">วันที่จบโครงการ</label>
+            <DatePicker
+              selected={endDate}
+              onChange={(date) => setendDate(date)}
+              placeholderText="End date"
+              dateFormat="dd/MM/yyyy"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
+            />
+          </div>
+        </div>
+        <div className="flex w-full px-3 py-0 space-x-3">
+        
+          <label className="block mb-2 text-sm font-medium text-gray-900">ปีการศึกษา</label>
+          <input
+            type="number"
+            value={academiYear}
+            onChange={(e) => setacademicYear(Number(e.target.value))}
+            placeholder="2568"
+            required
+          />
+          <label htmlFor="term" className="block mb-2 text-sm font-medium text-gray-900">ภาคการศึกษา</label>
+          <select
+            id="term"
+            value={term}
+            onChange={(e) => setterm(e.target.value)}
+            required
+          >
+            <option value="เทอมต้น">เทอมต้น</option>
+            <option value="เทอมปลาย">เทอมปลาย</option>
+          </select>
+          <label htmlFor="programType" className="block mb-2 text-sm font-medium text-gray-900">สำหรับหลักสูตร</label>
+          <select
+            id="programType"
+            value={programType[0]}
+            onChange={(e) => setprogramType([e.target.value])}
+            required
+          >
+            <option value="ภาคไทย">ภาคไทย</option>
+            <option value="ภาคนานาชาติ">ภาคนานาชาติ</option>
+            <option value="ทั้งภาคไทยและนานาชาติ">ทั้งภาคไทยและนานาชาติ</option>
+          </select>
+          <label htmlFor="schType" className="block mb-2 text-sm font-medium text-gray-900">ประเภททุน</label>
+          <select
+            id="schType"
+            value={schType[0]}
+            onChange={(e) => setschType([e.target.value])}
+            required
+          >
+            <option value="inno1">inno1</option>
+            <option value="inno2">inno2</option>
+          </select>
+        </div>
+        <div className="sm:col-span-2">
+          <label className="block mb-2 text-sm font-medium text-gray-900">รายละเอียดโครงการ</label>
+          <textarea
+            value={description}
+            onChange={(e) => setdescription(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
+            placeholder="รายละเอียดโครงการ"
+            rows={6}
+            required
+          />
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={handleSubmit}
+        className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-lg"
+      >
+        ไปหน้าถัดไป
+      </button>
+    </form>
+    </>
+  );
 };
 
-export default function DynamicForm() {
-
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-    };
-
-    const [questions, setQuestions] = useState<Question[]>([
-        { id: 1, question: "Your name?", type: "text", options: [], required: true },
-    ]);
-
-    // เพิ่มคำถามใหม่
-    const addQuestion = () => {
-        setQuestions([
-            ...questions,
-            {
-                id: questions.length + 1,
-                question: "",
-                type: "text",
-                options: [],
-                required: false,
-            },
-        ]);
-    };
-
-    // ลบคำถาม
-    const deleteQuestion = (id: number) => {
-        setQuestions(questions.filter((q) => q.id !== id));
-    };
-
-    // อัปเดตคำถาม
-    const updateQuestion = (id: number, field: string, value: any) => {
-        setQuestions(
-            questions.map((q) =>
-                q.id === id ? { ...q, [field]: value } : q
-            )
-        );
-    };
-
-    // ฟังก์ชันตรวจสอบ validation
-    const validateForm = () => {
-        for (let q of questions) {
-            if (q.required && (!q.options.length || !q.question.trim())) {
-                alert(`Question "${q.question || 'Untitled'}" is required!`);
-                return false;
-            }
-        }
-        return true;
-    };
-
-    // ส่งข้อมูลฟอร์ม
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (validateForm()) {
-            console.log("Form Data:", questions);
-            alert("Form Submitted!");
-        }
-    };
-
-    return (
-        <div className="min-h-screen flex flex-col">
-            {/* Sidebar */}
-            <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-
-            {/* Header Section */}
-            <header
-                className="shadow-md flex items-center justify-between"
-                style={{ backgroundColor: "rgb(0, 104, 95)" }}
-            >
-                <div className="px-4 py-4">
-                    {/* Sidebar Toggle Button */}
-                    <button
-                        onClick={toggleSidebar}
-                        className="text-white focus:outline-none"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-6 w-6"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M4 6h16M4 12h16m-7 6h7"
-                            />
-                        </svg>
-                    </button>
-                </div>
-                <h1 className="text-3xl font-bold text-white text-center flex-1">
-                    Dek-D KU
-                </h1>
-                <div className="w-10"></div> {/* ใช้เพื่อเว้นช่องให้ Header ตรงกลาง */}
-            </header>
-
-            {/* Main Section */}
-            <main className="flex-1 flex items-center justify-center bg-gray-100">
-                {/* Form Section */}
-                <form onSubmit={handleSubmit} className="w-full max-w-3xl bg-white p-6 rounded-lg shadow-lg space-y-4">
-                    {questions.map((q, index) => (
-                        <div key={q.id} className="space-y-2 border-b pb-4">
-                            <div className="flex justify-between items-center">
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Question {index + 1}
-                                </label>
-                                <button
-                                    type="button"
-                                    onClick={() => deleteQuestion(q.id)}
-                                    className="text-red-500 text-sm"
-                                >
-                                    Delete
-                                </button>
-                            </div>
-                            <input
-                                type="text"
-                                placeholder="Enter your question"
-                                value={q.question}
-                                onChange={(e) =>
-                                    updateQuestion(q.id, "question", e.target.value)
-                                }
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <select
-                                value={q.type}
-                                onChange={(e) => updateQuestion(q.id, "type", e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            >
-                                <option value="text">Text</option>
-                                <option value="radio">Multiple Choice</option>
-                                <option value="checkbox">Checkbox</option>
-                                <option value="date">Date Picker</option>
-                            </select>
-                            {q.type === "radio" || q.type === "checkbox" ? (
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        Options
-                                    </label>
-                                    {q.options.map((option, idx) => (
-                                        <div key={idx} className="flex items-center space-x-2">
-                                            <input
-                                                type="text"
-                                                placeholder={`Option ${idx + 1}`}
-                                                value={option}
-                                                onChange={(e) => {
-                                                    const newOptions = [...q.options];
-                                                    newOptions[idx] = e.target.value;
-                                                    updateQuestion(q.id, "options", newOptions);
-                                                }}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    const newOptions = q.options.filter(
-                                                        (_, i) => i !== idx
-                                                    );
-                                                    updateQuestion(q.id, "options", newOptions);
-                                                }}
-                                                className="text-red-500 text-sm"
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
-                                    ))}
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            updateQuestion(q.id, "options", [...q.options, ""])
-                                        }
-                                        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg"
-                                    >
-                                        Add Option
-                                    </button>
-                                </div>
-                            ) : null}
-                            {q.type === "date" && (
-                                <div className="relative max-w-sm">
-                                    <DatePicker
-                                        selected={q.selectedDate}
-                                        onChange={(date) =>
-                                            updateQuestion(q.id, "selectedDate", date)
-                                        }
-                                        placeholderText="Select a date"
-                                        dateFormat="dd/MM/yyyy"
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 
-                    block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-                    dark:focus:ring-blue-500 dark:focus:border-blue-500 "
-                                    />
-                                </div>
-                            )}
-                            <div className="flex items-center space-x-3">
-                                <input
-                                    type="checkbox"
-                                    checked={q.required}
-                                    onChange={(e) =>
-                                        updateQuestion(q.id, "required", e.target.checked)
-                                    }
-                                />
-                                <label className="text-sm text-gray-700">Required</label>
-                            </div>
-                        </div>
-                    ))}
-                    <button
-                        type="button"
-                        onClick={addQuestion}
-                        className="w-full px-4 py-2 bg-green-500 text-white rounded-lg"
-                    >
-                        Add Question
-                    </button>
-                    <button
-                        type="submit"
-                        className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg"
-                    >
-                        Submit Form
-                    </button>
-                </form>
-            </main>
-
-            {/* Footer Section */}
-            <footer className="bg-gray-800 text-white py-6">
-                <div className="container mx-auto text-center">
-                    <p>&copy; นายกุลชัย</p>
-                </div>
-            </footer>
-        </div>
-    )
-}
+export default Create;

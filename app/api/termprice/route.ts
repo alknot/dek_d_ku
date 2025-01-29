@@ -61,10 +61,6 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
 
-
-    const acceptableCSVFileTypes =
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .csv";
-
     const termPriceData: Termprice = {
       id: generateCuid(),
       academicYear: body.academicYear,
@@ -77,7 +73,7 @@ export async function POST(req: NextRequest) {
       programType: body.programType,
       study: body.study,
       sumPrice: body.sumPrice,
-      
+
     };
 
     const newTermPrice = await db.termprice.create({

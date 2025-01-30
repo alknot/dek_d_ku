@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
           data: {
             id: generateCuid(),
             faculty: price.faculty,
-            department: price.department,
+            // department: price.department,
             academicYear: price.academicYear,
             term: price.term,
             programType: price.programType,

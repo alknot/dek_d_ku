@@ -3,7 +3,11 @@ import axios from "axios";
 import DatePicker from "react-datepicker";
 import React, {ChangeEvent, useEffect,useState} from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
 import { useRouter } from "next/router";
+
+import Sidebar from "@/components/sidebar";
 
 
 const Create = () => {
@@ -14,14 +18,30 @@ const Create = () => {
     const [startDate, setstartDate] = useState<Date | null>(null)
     const [endDate, setendDate] = useState<Date | null>(null)
     const [schType, setschType] = useState([""])
-    const [attachment, setattachment] = useState<string>("")
+    const [attachment, setattachment] = useState<File>()
     const [programType, setprogramType] = useState([""])
+    const [rewards, setrewards] = useState<string[]>(['อื่นๆ', 'ลดค่าบำรุงมหาวิทยาลัย', 'ลดค่าหน่วยกิต', 'ลดค่าธรรมเนียมพิเศษคณะ'])
+    const [otherReward, setotherReward] = useState<string>("")
     const study = 'ปกติ'
     const price1 = 1500
     const price2 = 500
     const price3 = 16000
     const sumPrice = 18000
     // const router = useRouter()
+    const accept = ".csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, .pdf";
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const toggleSidebar = () => {
+      setIsSidebarOpen(!isSidebarOpen);
+    };
+
+    const handleRewardChange = (reward: string) => {
+        setrewards(prevRewards => 
+            prevRewards.includes(reward) 
+            ? prevRewards.filter(r => r !== reward) 
+            : [...prevRewards, reward]
+        );
+    };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,18 +52,22 @@ const Create = () => {
     //   router.push('/')
     } catch (error) {
       console.error(error)
+      
     }
   }
 
-
-
-    function handleFileChange(event: ChangeEvent<HTMLInputElement>): void {
-        throw new Error("Function not implemented.");
-    }
-
   return (
-    <>
-      <h2 className="mb-4 text-xl font-bold text-gray-900 text-center">สร้างโครงการประพฤติดี</h2>
+    <div className="min-h-screen flex flex-col">
+      {/* Sidebar */}
+      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+
+      {/* Header Section */}
+      <Header toggleSidebar={toggleSidebar} />
+
+      {/* Main Section (Full Screen) */}
+      <main className="flex-1 flex justify-center bg-gray-100 w-full mx-auto">
+        <div className="w-full max-w-5xl bg-white p-6 rounded-lg shadow-lg">
+        <h2 className="mb-4 text-xl font-bold text-gray-900 text-center">สร้างโครงการความคืดสร้างสรรค์และนวัตกรรม</h2>
       <h1 className="mb-4 font-bold text-gray-900 text-center">กรอกข้อมูลของโครงการ</h1>
       <form>
       <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
@@ -59,16 +83,15 @@ const Create = () => {
         <div className="sm:col-span-2">
           <label className="block mb-2 text-sm font-medium text-gray-900">ประกาศโครงการ (PDF)</label>
           <input
-            type="text"
-            // accept="application/pdf"
-            value={attachment}
-            onChange={(e) => setattachment(e.target.value)}
+            type="file"
+            accept={accept}
+            onChange={(e) => setattachment(e.target.files?.[0])}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
             required
           />
           
         </div>
-        {/* <div className="sm:col-span-2">
+        <div className="sm:col-span-2">
             <label className="block mb-2 text-sm font-medium text-gray-900">รางวัลในแต่ละโครงการ</label>
             <div className="flex flex-col space-y-2">
               {["ลดค่าบำรุงมหาวิทยาลัย", "ลดค่าหน่วยกิต", "ลดค่าธรรมเนียมพิเศษคณะ", "อื่นๆ"].map((reward) => (
@@ -77,25 +100,25 @@ const Create = () => {
                     type="checkbox"
                     name="reward"
                     value={reward}
-                    checked={projectData.rewards.includes(reward)}
+                    checked={rewards.includes(reward)}
                     onChange={() => handleRewardChange(reward)}
                     className="mr-2"
                   />
                   {reward}
                 </label>
               ))}
-              {projectData.rewards.includes("อื่นๆ") && (
-                <InputField
-                  label=""
+              {rewards.includes("อื่นๆ") && (
+                <input
+                  
                   type="text"
-                  value={projectData.otherReward}
-                  onChange={(e) => handleProjectChange("otherReward", e.target.value)}
+                  value={otherReward}
+                  onChange={(e) => setotherReward(e.target.value)}
                   placeholder="กรอกรางวัลอื่นๆ"
                 />
               )}
             </div>
-          </div> */}
-        <div className="flex space-x-5">
+          </div>
+        <div className="flex space-x-10 sm:col-span-2">
           <div className="relative max-w-sm">
             <label className="block mb-2 text-sm font-medium text-gray-900">วันที่เริ่มโครงการ</label>
             <DatePicker
@@ -117,18 +140,27 @@ const Create = () => {
             />
           </div>
         </div>
-        <div className="flex w-full px-3 py-0 space-x-3">
         
+        <div className="flex space-x-10 sm:col-span-2">
+           <div className="relative max-w-sm">
           <label className="block mb-2 text-sm font-medium text-gray-900">ปีการศึกษา</label>
-          <input
+          <input className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
+            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
+            dark:focus:ring-blue-500 dark:focus:border-blue-500"
             type="number"
             value={academiYear}
             onChange={(e) => setacademicYear(Number(e.target.value))}
             placeholder="2568"
             required
           />
+          </div>
+          <div className="relative max-w-sm">
           <label htmlFor="term" className="block mb-2 text-sm font-medium text-gray-900">ภาคการศึกษา</label>
-          <select
+          <select className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
+            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
+            dark:focus:ring-blue-500 dark:focus:border-blue-500"
             id="term"
             value={term}
             onChange={(e) => setterm(e.target.value)}
@@ -137,8 +169,13 @@ const Create = () => {
             <option value="เทอมต้น">เทอมต้น</option>
             <option value="เทอมปลาย">เทอมปลาย</option>
           </select>
+          </div>
+          <div >
           <label htmlFor="programType" className="block mb-2 text-sm font-medium text-gray-900">สำหรับหลักสูตร</label>
-          <select
+          <select className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
+            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
+            dark:focus:ring-blue-500 dark:focus:border-blue-500"
             id="programType"
             value={programType[0]}
             onChange={(e) => setprogramType([e.target.value])}
@@ -148,17 +185,13 @@ const Create = () => {
             <option value="ภาคนานาชาติ">ภาคนานาชาติ</option>
             <option value="ทั้งภาคไทยและนานาชาติ">ทั้งภาคไทยและนานาชาติ</option>
           </select>
-          <label htmlFor="schType" className="block mb-2 text-sm font-medium text-gray-900">ประเภททุน</label>
-          <select
-            id="schType"
-            value={schType[0]}
-            onChange={(e) => setschType([e.target.value])}
-            required
-          >
-            <option value="inno1">inno1</option>
-            <option value="inno2">inno2</option>
-          </select>
-        </div>
+          </div>
+          
+          </div>
+          
+            
+          
+        
         <div className="sm:col-span-2">
           <label className="block mb-2 text-sm font-medium text-gray-900">รายละเอียดโครงการ</label>
           <textarea
@@ -179,8 +212,16 @@ const Create = () => {
         ไปหน้าถัดไป
       </button>
     </form>
-    </>
+
+        </div>
+      </main>
+
+      {/* Footer Section */}
+      <Footer />
+    </div>
   );
-};
+}
 
 export default Create;
+
+

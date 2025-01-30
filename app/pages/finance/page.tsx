@@ -1,15 +1,28 @@
-
 "use client";
 
 import { useState } from "react";
 import Sidebar from "@/components/sidebar";
-import Termpricetable from "@/components/termpricetable";
+import Footer from "@/components/footer";
+import Header from "@/components/header";
+import CsvUploader from "@/components/uploadCSV";
+import SearchFinancePage from "@/components/searchCSV";
 
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState("searchfinance");
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case "uploadfile":
+        return <CsvUploader />;
+      case "searchfinance":
+      default:
+        return <SearchFinancePage />;
+    }
   };
 
   return (
@@ -18,53 +31,39 @@ export default function Home() {
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Header Section */}
-      <header
-        className="shadow-md flex items-center justify-between"
-        style={{ backgroundColor: "rgb(0, 104, 95)" }}
-      >
-        <meta httpEquiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *"></meta>
-        <div className="px-4 py-4">
-          {/* Sidebar Toggle Button */}
-          <button
-            onClick={toggleSidebar}
-            className="text-white focus:outline-none"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16m-7 6h7"
-              />
-            </svg>
-          </button>
-        </div>
-        <h1 className="text-3xl font-bold text-white text-center flex-1">
-          Dek-D KU
-        </h1>
-        <div className="w-1"></div> {/* ใช้เพื่อเว้นช่องให้ Header ตรงกลาง */}
-        
-      </header>
+      <Header toggleSidebar={toggleSidebar} />
 
-      {/* Main Section (Full Screen) */}
-      <main className="flex-1 flex  justify-center bg-gray-100">
-        <Termpricetable/>
+      {/* Main Section */}
+      <main className="flex-1 flex flex-col items-center justify-center bg-gray-100">
+        <div className="w-full max-w-5xl bg-white p-6 rounded-lg shadow-lg mb-4">
+          <div className="flex justify-center space-x-4 mb-4">
+            <button
+              onClick={() => setCurrentPage("searchfinance")}
+              className={`px-4 py-2 rounded ${
+                currentPage === "searchfinance"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-800"
+              }`}
+            >
+              Search Finance
+            </button>
+            <button
+              onClick={() => setCurrentPage("uploadfile")}
+              className={`px-4 py-2 rounded ${
+                currentPage === "uploadfile"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-800"
+              }`}
+            >
+              Upload File
+            </button>
+          </div>
+          {renderPage()}
+        </div>
       </main>
 
       {/* Footer Section */}
-      <footer className="bg-gray-800 text-white py-6">
-        <div className="container mx-auto text-center">
-          <p>&copy; นายกุลชัย </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
-
-

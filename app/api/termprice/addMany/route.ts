@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       'academicYear',
       'term',
       'department',
-      'faculty',
+      // 'faculty',
       'price1',
       'price2',
       'price3',
@@ -63,6 +63,8 @@ export async function POST(req: NextRequest) {
       programType: b.programType,
       study: b.study,
       sumPrice: b.sumPrice,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }));
 
     const newTermPrices = await db.termprice.createMany({

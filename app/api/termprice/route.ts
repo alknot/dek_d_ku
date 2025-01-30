@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     const requiredFields = [
       'academicYear',
       'term',
-      'department',
+      // 'department',
       'faculty',
       'price1',
       'price2',
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
       id: generateCuid(),
       academicYear: body.academicYear,
       term: body.term,
-      department: body.department,
+      // department: body.department,
       faculty: body.faculty,
       price1: body.price1,
       price2: body.price2,
@@ -73,7 +73,8 @@ export async function POST(req: NextRequest) {
       programType: body.programType,
       study: body.study,
       sumPrice: body.sumPrice,
-
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
     const newTermPrice = await db.termprice.create({

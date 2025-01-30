@@ -177,7 +177,7 @@ model File {
 model Termprice {
   id           String @id @default(cuid()) @map("_id")
   faculty      String
-  department   String
+  // department   String
   academicYear String
   term         String
   programType  String // ไทย,นานาชาติ

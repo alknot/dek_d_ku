@@ -15,10 +15,14 @@ datasource db {
 
 enum Role {
   STUDENT // นิสิต
+  DEPARTMENT_HEAD // หัวหน้าภาควิชา
   FACULTY_STAFF // เจ้าหน้าที่คณะ
+  DEPUTY_DEAN // รองคณบดี
   DEAN // คณบดี
   SA_STAFF // เจ้าหน้าที่กองกิจการนิสิต
-  DEPARTMENT_HEAD // หัวหน้าภาค
+  COMMITTEE // คณะกรรมการ
+  CHAIRMAN // ประธาน
+  FINANCIAL // เจ้าหน้าที่การเงิน
   NOT_ASSIGNED // ไม่ได้กำหนดสิทธิ์
 }
 

@@ -16,8 +16,8 @@ const SearchFinancePage = () => {
   const [term, setTerm] = useState<string>("");
 
   useEffect(() => {
-    // Fetch and parse the CSV file
-    fetch("/path/to/termprice.csv")
+
+    fetch("/api/termprice")
       .then((response) => response.text())
       .then((csvText) => {
         Papa.parse<TermPrice>(csvText, {

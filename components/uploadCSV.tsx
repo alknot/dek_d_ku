@@ -22,7 +22,6 @@ const CsvUploader = () => {
       return;
     }
 
-    // อ่านและ parse ไฟล์ CSV
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
@@ -35,7 +34,7 @@ const CsvUploader = () => {
 
         const parsedData = result.data as Record<string, string>[];
         console.log("Parsed data:", parsedData);
-        // เพิ่ม academicYear และ term ให้กับทุกแถวของข้อมูล
+  
         const dataWithMetadata = parsedData.map((row) => ({
           ...row,
           academicYear,
@@ -61,7 +60,7 @@ const CsvUploader = () => {
           console.log("mappedData:", mappedData);
 
         try {
-          // ส่งข้อมูลไปยัง API
+
           await axios.post("/api/termprice", { data: mappedData });
           alert("อัปโหลดข้อมูลสำเร็จ");
         } catch (error) {

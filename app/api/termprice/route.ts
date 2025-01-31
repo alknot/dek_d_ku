@@ -19,17 +19,17 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const token = req.headers.get('Authorization');
+    // const token = req.headers.get('Authorization');
 
-    const userId = '';
+    // const userId = '';
 
-    const user = await db.user.findUnique({ where: { id: userId } });
-    if (!user) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
-    if (user.role !== Role.SA_STAFF) {
-      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
-    }
+    // const user = await db.user.findUnique({ where: { id: userId } });
+    // if (!user) {
+    //   return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    // }
+    // if (user.role !== Role.SA_STAFF) {
+    //   return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    // }
 
     // Validate the request body
     if (!body || typeof body !== 'object') {

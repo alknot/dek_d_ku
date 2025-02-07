@@ -69,38 +69,45 @@ const FormSection: React.FC<FormSectionProps> = ({
     handleProjectChange("rewards", newRewards);
   };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append("name", projectData.name);
-    formData.append("startDate", projectData.startDate);
-    formData.append("endDate", projectData.endDate);
-    formData.append("academicYear", projectData.academicYear);
-    formData.append("semester", projectData.semester);
-    formData.append("program", projectData.program);
-    formData.append("description", projectData.description);
-    formData.append("announcementFile", projectData.announcementFile);
-    formData.append("rewards", JSON.stringify(projectData.rewards));
-    formData.append("otherReward", projectData.otherReward);
+    formData.append('schName', projectData.name);
+    formData.append('description', projectData.description);
+    formData.append('academicYear', projectData.academicYear);
+    formData.append('term', projectData.semester);
+    formData.append('startDate', projectData.startDate.toISOString());
+    formData.append('endDate', projectData.endDate.toISOString());
+    formData.append('program', projectData.program);
+    formData.append('announcementFile', projectData.announcementFile);
+    formData.append('rewards', JSON.stringify(projectData.rewards));
+    formData.append('otherReward', projectData.otherReward);
 
     try {
-      const response = await fetch("/api/scholarship/route", {
-        method: "POST",
+      const response = await fetch('/api/scholarship', {
+        method: 'POST',
         body: formData,
+        headers: {
+          // Assuming you handle authentication outside of this component
+          'Authorization': 'Bearer your-token-here'
+        },
       });
 
+      const result = await response.json();
       if (response.ok) {
-        alert("Form submitted successfully!");
-        nextStep();
+        alert('Form submitted successfully!');
+        nextStep(); // Proceed to the next step if necessary
       } else {
-        alert("Failed to submit the form.");
+        console.error('Failed to submit form:', result);
+        alert('Failed to submit the form: ' + result.message);
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
-      alert("An error occurred while submitting the form.");
+      console.error('Error submitting form:', error);
+      alert('An error occurred while submitting the form.');
     }
   };
+
 
   return (
     <>
@@ -203,9 +210,9 @@ const FormSection: React.FC<FormSectionProps> = ({
             value={projectData.program}
             onChange={(e) => handleProjectChange("program", e.target.value)}
             options={[
-              { value: "ภาคไทย", label: "ภาคไทย" },
-              { value: "ภาคนานาชาติ", label: "ภาคนานาชาติ" },
-              { value: "ทั้งภาคไทยและนานาชาติ", label: "ทั้งภาคไทยและนานาชาติ" },
+              { value: "ไทย", label: "ภาคไทย" },
+              { value: "นานาชาติ", label: "ภาคนานาชาติ" },
+              { value: "ไทย,นานาชาติ", label: "ทั้งภาคไทยและนานาชาติ" },
             ]}
             required
           />
@@ -225,7 +232,7 @@ const FormSection: React.FC<FormSectionProps> = ({
       </div>
       <button
         type="button"
-        onClick={nextStep}
+        onClick={handleSubmit}
         className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-lg"
       >
         ไปหน้าถัดไป

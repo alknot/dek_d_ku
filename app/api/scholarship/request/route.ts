@@ -99,12 +99,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate required fields
-    const missingField = requiredFields
-      .concat(dynamicQusetionField)
-      .find((field) => !getFieldValue(body, field));
-    if (missingField) {
-      return NextResponse.json({ message: `${missingField} is missing` }, { status: 400 });
-    }
+    // const missingField = requiredFields
+    //   .concat(dynamicQusetionField)
+    //   .find((field) => !getFieldValue(body, field));
+    // if (missingField) {
+    //   return NextResponse.json({ message: `${missingField} is missing` }, { status: 400 });
+    // }
 
     const newFormData: Form = {
       id: generateCuid(),

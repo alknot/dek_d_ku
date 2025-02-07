@@ -5,54 +5,67 @@ import React, {ChangeEvent, useEffect,useState} from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 
 import Sidebar from "@/components/sidebar";
+import { SchType } from "@prisma/client";
+import { programType } from "@prisma/client";
+// import router from "next/dist/shared/lib/router/router";
 
 
 const Create = () => {
     const [schName, setschName] = useState("")
     const [description, setdescription] = useState<string>("")
-    const [academiYear, setacademicYear] = useState<number | string>("")
+    const [academiYear, setacademicYear] = useState<string>("")
     const [term, setterm] = useState<string>("")
     const [startDate, setstartDate] = useState<Date | null>(null)
     const [endDate, setendDate] = useState<Date | null>(null)
-    const [schType, setschType] = useState([""])
+    const [schType, setSchType] = useState<SchType>(SchType.INNOVATION);
     const [attachment, setattachment] = useState<File>()
-    const [programType, setprogramType] = useState([""])
-    const [rewards, setrewards] = useState<string[]>(['อื่นๆ', 'ลดค่าบำรุงมหาวิทยาลัย', 'ลดค่าหน่วยกิต', 'ลดค่าธรรมเนียมพิเศษคณะ'])
-    const [otherReward, setotherReward] = useState<string>("")
-    const study = 'ปกติ'
-    const price1 = 1500
-    const price2 = 500
-    const price3 = 16000
-    const sumPrice = 18000
-    // const router = useRouter()
+    
+    const [programType, setprogramType] = useState<string>("")
+    const [amount, setAmount] = useState<string>("")
+    // const [rewards, setrewards] = useState<string[]>(['อื่นๆ', 'ลดค่าบำรุงมหาวิทยาลัย', 'ลดค่าหน่วยกิต', 'ลดค่าธรรมเนียมพิเศษคณะ'])
+    // const [otherReward, setotherReward] = useState<string>("")
+    const router = useRouter();
     const accept = ".csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, .pdf";
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const toggleSidebar = () => {
       setIsSidebarOpen(!isSidebarOpen);
     };
 
-    const handleRewardChange = (reward: string) => {
-        setrewards(prevRewards => 
-            prevRewards.includes(reward) 
-            ? prevRewards.filter(r => r !== reward) 
-            : [...prevRewards, reward]
-        );
-    };
+    // const handleRewardChange = (reward: string) => {
+    //     setrewards(prevRewards => 
+    //         prevRewards.includes(reward) 
+    //         ? prevRewards.filter(r => r !== reward) 
+    //         : [...prevRewards, reward]
+    //     );
+    // };
 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     try {
-      // ทำการส่ง category
-      await axios.post('/api/scholarship', { schName, description, academiYear, term, startDate, endDate, schType, attachment,programType,study,price1,price2,price3,sumPrice })
-    //   router.push('/')
+      const data = {
+        schName,
+        description,
+        academiYear,
+        term,
+        startDate,
+        endDate,
+        schType,
+        attachment,
+        programType
+      };
+    
+      console.log(data); // ตรวจสอบข้อมูลก่อนส่ง
+    
+      // ส่งข้อมูลไปยัง API
+      await axios.post('/api/scholarship', data);
+    
     } catch (error) {
-      console.error(error)
-      
+      console.error(error);
     }
   }
 
@@ -91,7 +104,7 @@ const Create = () => {
           />
           
         </div>
-        <div className="sm:col-span-2">
+        {/* <div className="sm:col-span-2">
             <label className="block mb-2 text-sm font-medium text-gray-900">รางวัลในแต่ละโครงการ</label>
             <div className="flex flex-col space-y-2">
               {["ลดค่าบำรุงมหาวิทยาลัย", "ลดค่าหน่วยกิต", "ลดค่าธรรมเนียมพิเศษคณะ", "อื่นๆ"].map((reward) => (
@@ -117,7 +130,8 @@ const Create = () => {
                 />
               )}
             </div>
-          </div>
+          </div> */}
+          
         <div className="flex space-x-10 sm:col-span-2">
           <div className="relative max-w-sm">
             <label className="block mb-2 text-sm font-medium text-gray-900">วันที่เริ่มโครงการ</label>
@@ -150,7 +164,7 @@ const Create = () => {
             dark:focus:ring-blue-500 dark:focus:border-blue-500"
             type="number"
             value={academiYear}
-            onChange={(e) => setacademicYear(Number(e.target.value))}
+            onChange={(e) => setacademicYear((e.target.value))}
             placeholder="2568"
             required
           />
@@ -166,6 +180,7 @@ const Create = () => {
             onChange={(e) => setterm(e.target.value)}
             required
           >
+            <option value="">กรุณาเลือก</option>
             <option value="เทอมต้น">เทอมต้น</option>
             <option value="เทอมปลาย">เทอมปลาย</option>
           </select>
@@ -177,13 +192,14 @@ const Create = () => {
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
             dark:focus:ring-blue-500 dark:focus:border-blue-500"
             id="programType"
-            value={programType[0]}
-            onChange={(e) => setprogramType([e.target.value])}
+            value={programType}
+            onChange={(e) => setprogramType(e.target.value)}
             required
           >
-            <option value="ภาคไทย">ภาคไทย</option>
-            <option value="ภาคนานาชาติ">ภาคนานาชาติ</option>
-            <option value="ทั้งภาคไทยและนานาชาติ">ทั้งภาคไทยและนานาชาติ</option>
+            <option value="">กรุณาเลือก</option>
+            <option value="THAI">ภาคไทย</option>
+            <option value="INTERNATIONAL">ภาคนานาชาติ</option>
+            <option value="BOTHTHAIANDINTERNATIONAL">ทั้งภาคไทยและนานาชาติ</option>
           </select>
           </div>
           

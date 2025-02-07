@@ -1,10 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import Papa from "papaparse";
-import axios from "axios";
+import { apiService } from "@/common/apiService";
 
 const CsvUploader = () => {
-  const [academicYear, setAcademicYear] = useState("");
+  const [academicYear, setAcademicYear] = useState<string>(""); 
   const [term, setTerm] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
@@ -35,38 +35,8 @@ const CsvUploader = () => {
         const parsedData = result.data as Record<string, string>[];
         console.log("Parsed data:", parsedData);
   
-        const dataWithMetadata = parsedData.map((row) => ({
-          ...row,
-          academicYear,
-          term,
-        }));
 
-        const mappedData = dataWithMetadata.map((row: any) => ({
-            
-            academicYear: academicYear,
-            term: term,
-            department: row["คณะ"],
-            // faculty: row["คณะ"],
-            price1: parseFloat(row["ค่าธรรมเนียมคณะ"]),
-            price2: parseFloat(row["ค่าบำรุงมหาวิทยาลัย"]),
-            price3: parseFloat(row["ค่าหน่วยกิต"]),
-            programType: row["โปรแกรมการเรียน"],
-            study: row["รูปแบบภาคการเรียน"],
-            sumPrice: parseFloat(row["รวม"]),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          }));
-
-          console.log("mappedData:", mappedData);
-
-        try {
-
-          await axios.post("/api/termprice", { data: mappedData });
-          alert("อัปโหลดข้อมูลสำเร็จ");
-        } catch (error) {
-          console.error("Error uploading data:", error);
-          alert("เกิดข้อผิดพลาดในการอัปโหลดข้อมูล");
-        }
+        await apiService.uploadTermPrice(parsedData, academicYear, term);
       },
     });
   };
@@ -95,8 +65,8 @@ const CsvUploader = () => {
             required
           >
             <option value="">เลือกภาคการศึกษา</option>
-            <option value="ต้น">ต้น</option>
-            <option value="ปลาย">ปลาย</option>
+            <option value="เทอมต้น">เทอมต้น</option>
+            <option value="เทอมปลาย">เทอมปลาย</option>
           </select>
         </div>
         <div>

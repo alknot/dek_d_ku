@@ -6,9 +6,31 @@ import Papa from "papaparse";
 
 const db = new PrismaClient();
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const termPrices = await db.termprice.findMany();
+    // อ่าน query parameters จาก URL
+    const { searchParams } = new URL(request.url);
+    const academicYearParam = searchParams.get("academicYear");
+    const termParam = searchParams.get("term");
+
+    // สร้าง object สำหรับเงื่อนไข filter
+    const filter: { academicYear?: string; term?: string } = {};
+
+    if (academicYearParam) {
+      const academicYear = Number(academicYearParam);
+      if (!isNaN(academicYear)) {
+        filter.academicYear = academicYear.toString();
+      }
+    }
+    if (termParam) {
+      filter.term = termParam;
+    }
+
+    // ดึงข้อมูลโดย filter ตาม academicYear และ term (ถ้ามี)
+    const termPrices = await db.termprice.findMany({
+      where: filter,
+    });
+
     return NextResponse.json(termPrices, { status: 200 });
   } catch (e) {
     return handleError(e);
@@ -39,7 +61,7 @@ export async function POST(req: NextRequest) {
     const requiredFields = [
       'academicYear',
       'term',
-      // 'department',
+      'department',
       'faculty',
       'price1',
       'price2',
@@ -65,7 +87,7 @@ export async function POST(req: NextRequest) {
       id: generateCuid(),
       academicYear: body.academicYear,
       term: body.term,
-      // department: body.department,
+      department: body.department,
       faculty: body.faculty,
       price1: body.price1,
       price2: body.price2,
@@ -82,6 +104,42 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(newTermPrice, { status: 201 });
+  } catch (e: any) {
+    return handleError(e);
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    // อ่าน query parameters จาก URL
+    const { searchParams } = new URL(request.url);
+    const academicYearParam = searchParams.get("academicYear");
+    const termParam = searchParams.get("term");
+
+    // สร้าง object สำหรับเงื่อนไข filter
+    const filter: { academicYear?: string; term?: string } = {};
+
+    if (academicYearParam) {
+      const academicYear = Number(academicYearParam);
+      if (!isNaN(academicYear)) {
+        filter.academicYear = academicYear.toString();
+      }
+    }
+    if (termParam) {
+      filter.term = termParam;
+    }
+
+    // ตรวจสอบว่ามีการส่งค่ามาอย่างน้อย academicYear และ term
+    if (!filter.academicYear || !filter.term) {
+      return NextResponse.json({ message: 'Missing filter parameters' }, { status: 400 });
+    }
+
+    // ลบข้อมูลที่ตรงกับเงื่อนไขที่ระบุ
+    const deleteResult = await db.termprice.deleteMany({
+      where: filter,
+    });
+
+    return NextResponse.json(deleteResult, { status: 200 });
   } catch (e: any) {
     return handleError(e);
   }

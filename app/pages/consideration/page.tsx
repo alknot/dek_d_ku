@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { apiService } from "@/common/apiService";
 
 interface Application {
   id: string;
@@ -28,16 +29,26 @@ const ReviewApplications = () => {
       });
   }, []);
 
-  const handleApprove = (id: string) => {
-    axios.post(`/api/request/approve/${id}`, { isApproved: true })
-      .then(() => {
-        setApplications(applications.map(app => 
-          app.id === id ? { ...app, status: 'APPROVED' } : app
-        ));
-      })
-      .catch(() => {
-        setError("Failed to approve the application. Please try again.");
-      });
+  const handleApprove = async (id: string) => {
+    try{
+    await apiService.requestApprove(id, true)
+    setApplications(applications.map(app => 
+      app.id === id ? { ...app, status: 'APPROVED' } : app
+    ));
+  }catch (e){
+    setError("Failed to approve the application. Please try again.");
+  }
+
+    
+    // axios.post(`/api/request/approve/${id}`, { isApproved: true })
+    //   .then(() => {
+    //     setApplications(applications.map(app => 
+    //       app.id === id ? { ...app, status: 'APPROVED' } : app
+    //     ));
+    //   })
+    //   .catch(() => {
+    //     setError("Failed to approve the application. Please try again.");
+    //   });
   };
 
   const handleReject = (id: string) => {

@@ -73,7 +73,19 @@ enum CompetitiveLevel {
   INTERNATIONAL
 }
 
-model User {
+enum programType {
+  THAI
+  INTERNATIONAL
+  BOTHTHAIANDINTERNATIONAL
+}
+
+enum reward {
+  UNIVERSITYPRICE
+  FACULTYPRICE
+  CREDITPRICE
+}
+
+model User { //ku all login user name ลด faculty+department
   id                String  @id @default(cuid()) @map("_id") // รหัสนิสิต หรือ รหัสเจ้าหน้าที่
   userprincipalname String  @unique
   prenameTh         String // คำนำหน้าชื่อ
@@ -155,20 +167,27 @@ model Scholarship {
   description String
   academiYear String
   term        String
-  amount      Float
+  // amount      Float
   startDate   DateTime
   endDate     DateTime
   schType     SchType
-  attachment  String
-  price       String
-
+  attachment  String?
+  // price       String
+  // reward      reward
+  // otherReward String?
+  programType programType
   form      Form[]    @relation("ScholarshipForm")
-  file      File      @relation("ScholarshipFile", fields: [attachment], references: [id])
-  termprice Termprice @relation("TermpriceScholarship", fields: [price], references: [id])
+  file      File?      @relation("ScholarshipFile", fields: [attachment], references: [id])
+  // termprice Termprice @relation("TermpriceScholarship", fields: [price], references: [id])
 }
+
+
+
+
 
 model File {
   id       String @id @default(cuid()) @map("_id")
+  fileId   String // เก็บ GridFS ID ของไฟล์
   filename String
   mimetype String
   data     String
@@ -181,7 +200,7 @@ model File {
 model Termprice {
   id           String @id @default(cuid()) @map("_id")
   faculty      String
-  // department   String
+  department   String
   academicYear String
   term         String
   programType  String // ไทย,นานาชาติ
@@ -192,7 +211,7 @@ model Termprice {
   sumPrice     Float // ค่าเทอมแบ่งเป็นส่วนย่อย 3 ส่วน
 
   // Relationships
-  scholarship Scholarship[] @relation("TermpriceScholarship")
+  // scholarship Scholarship[] @relation("TermpriceScholarship")
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

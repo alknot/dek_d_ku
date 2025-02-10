@@ -1,14 +1,54 @@
-
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import Sidebar from "@/components/sidebar";
 
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  interface Scholarship {
+    id: number;
+    academiYear: string;
+    term: string;
+    programType: string;
+    schName: string;
+    description: string;
+    startDate: string;
+    endDate: string;
+  }
+
+  const [scholarships, setScholarships] = useState<Scholarship[]>([]);
+  const [academiYear, setAcademicYear] = useState("");
+  const [term, setTerm] = useState("");
+  const [programType, setProgramType] = useState("");
+  const [schType, setSchType] = useState("");
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const fetchScholarships = async () => {
+    try {
+      const response = await axios.get("/api/scholarship", {
+        params: {
+          academiYear: academiYear,
+          term: term,
+          programType: programType,
+          schType: schType,
+        },
+      });
+      setScholarships(response.data.scholarships);
+    } catch (error) {
+      console.error("Failed to fetch scholarships:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchScholarships();
+  }, []);
+
+  const handleSearch = () => {
+    fetchScholarships();
   };
 
   return (
@@ -51,122 +91,105 @@ export default function Home() {
 
       {/* Main Section (Full Screen) */}
       <main className=" flex-1 flex  justify-center bg-gray-100 w-full mx-auto">
-      <div className="p-6 space-y-6 bg-gray-50">
-      {/* หัวข้อ */}
-      <h1 className="text-2xl font-bold text-center text-gray-800">
-        โครงการที่เปิดรับสมัคร
-      </h1>
+        <div className="p-6 space-y-6 bg-gray-50">
+          {/* หัวข้อ */}
+          <h1 className="text-2xl font-bold text-center text-gray-800">
+            โครงการที่เปิดรับสมัคร
+          </h1>
 
-      {/* ช่องค้นหา */}
-      <div className="bg-white shadow rounded-lg p-4 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {/* Dropdown 1 */}
-          <div>
-            <input type="text" id="academicYear" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ปีการศึกษา"  />
+          {/* ช่องค้นหา */}
+          <div className="bg-white shadow rounded-lg p-4 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {/* Dropdown 1 */}
+              <div>
+                <input
+                  type="text"
+                  id="academicYear"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  placeholder="ปีการศึกษา"
+                  value={academiYear}
+                  onChange={(e) => setAcademicYear(e.target.value)}
+                />
+              </div>
+              {/* Dropdown 2 */}
+              <select
+                className="border-gray-300 rounded-lg p-2"
+                value={term}
+                onChange={(e) => setTerm(e.target.value)}
+              >
+                <option value="">เทอม</option>
+                <option value="เทอมต้น">เทอมต้น</option>
+                <option value="เทอมปลาย">เทอมปลาย</option>
+              </select>
+              {/* Dropdown 3 */}
+
+              {/* Dropdown 4 */}
+
+              {/* Dropdown 5 */}
+              <select
+                className="border-gray-300 rounded-lg p-2"
+                value={programType}
+                onChange={(e) => setProgramType(e.target.value)}
+              >
+                <option value="">หลักสูตรที่เปิดรับ</option>
+                <option value="THAI">หลักสูตรนานาชาติ</option>
+                <option value="INTERNATIONAL">หลักสูตรไทย</option>
+              </select>
+              {/* Dropdown 6 */}
+              <select
+                className="border-gray-300 rounded-lg p-2"
+                value={schType}
+                onChange={(e) => setSchType(e.target.value)}
+              >
+                <option value="">ประเภทโครงการ</option>
+                <option value="WELL_BEHAVIOR">ประพฤติดี</option>
+                <option value="EXTRACURRICULAR">กิจกรรมเสริมหลักสูตร</option>
+                <option value="INNOVATION">ความคิดสร้างสรรค์และนวัตกรรม</option>
+              </select>
+            </div>
+            {/* ปุ่มค้นหา */}
+            <div className="text-center">
+              <button
+                onClick={handleSearch}
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-500"
+              >
+                ค้นหา
+              </button>
+            </div>
           </div>
-          {/* Dropdown 2 */}
-          <select className="border-gray-300 rounded-lg p-2">
-            <option>เทอม</option>
-            <option>ต้น</option>
-            <option>ปลาย</option>
-          </select>
-          {/* Dropdown 3 */}
-          
-          {/* Dropdown 4 */}
-          
-          {/* Dropdown 5 */}
-          <select className="border-gray-300 rounded-lg p-2">
-            <option>หลักสูตรที่เปิดรับ</option>
-            <option>หลักสูตรนานาชาติ</option>
-            <option>หลักสูตรไทย</option>
-          </select>
-          {/* Dropdown 6 */}
-          <select className="border-gray-300 rounded-lg p-2">
-            <option>ประเภทโครงการ</option>
-            <option>ประพฤติดี</option>
-            <option>กิจกรรมนอกหลักสูตร</option>
-            <option>ความคิดสร้างสรรค์และนวัตกรรม</option>
-          </select>
-        </div>
-        {/* ปุ่มค้นหา */}
-        <div className="text-center">
-          <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-500">
-            ค้นหา
-          </button>
-        </div>
-      </div>
 
-      {/* ตาราง */}
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-200">
-          <thead className="bg-blue-800 text-white">
-            <tr>
-              <th className="px-4 py-2 text-left">ที่</th>
-              <th className="px-4 py-2 text-left">โครงการ</th>
-              <th className="px-9 py-2 text-left"></th>
-              <th >รับสมัคร</th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* โครงการ 1 */}
-            <tr className="border-b border-gray-200">
-              <td className="px-4 py-2">1</td>
-              <td className="px-4 py-2">
-                <div className="font-bold text-gray-800">
-                  โครงการ 
-                </div>
-                <div className="text-sm text-gray-600">
-                  Description
-                </div>
-                
-              </td>
-              <td></td>
-              <td className="px-4 py-2 text-center">
-                <div>1 Oct 2025 - 4 May 2026</div>
-                <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
-                  เหลือ 177 วัน
-                </span>
-              </td>
-            </tr>
-            {/* โครงการ 2 */}
-            <tr className="border-b border-gray-200">
-              <td className="px-4 py-2">2</td>
-              <td className="px-4 py-2">
-                <div className="font-bold text-gray-800">
-                  โครงการ
-                </div>
-                <div className="text-sm text-gray-600">
-                  description
-                </div>
-                
-              </td>
-              <td></td>
-              <td className="px-4 py-2 text-center">
-                <div>19 Dec 2025 - 28 Feb 2026</div>
-                <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                  เหลือ 71 วัน
-                </span>
-              </td>
-            </tr>
-            {/* โครงการ 3 */}
-            <tr>
-              <td className="px-4 py-2">3</td>
-              <td className="px-4 py-2">
-                <div className="font-bold text-gray-800">
-                  โครงการ
-                </div>
-              </td>
-              <td></td>
-              <td className="px-4 py-2 text-center">
-                <span className="bg-red-100 text-red-800 px-2 py-1 rounded">
-                  หมดเขต
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+          {/* ตาราง */}
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse border border-gray-200">
+              <thead className="bg-blue-800 text-white">
+                <tr>
+                  <th className="px-4 py-2 text-left">ที่</th>
+                  <th className="px-4 py-2 text-left">ปีการศึกษา</th>
+                  <th className="px-4 py-2 text-left">เทอม</th>
+                  <th className="px-4 py-2 text-left">หลักสูตรที่เปิดรับ</th>
+                  <th className="px-4 py-2 text-left">โครงการ</th>
+                  <th className="px-9 py-2 text-left">รายละเอียดโครงการ</th>
+                  <th className="px-9 py-2 text-left">วันที่เริ่มโครงการ</th>
+                  <th className="px-9 py-2 text-left">วันที่จบโครงการ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {scholarships.map((scholarship, index) => (
+                  <tr key={scholarship.id}>
+                    <td className="px-4 py-2 border">{index + 1}</td>
+                    <td className="px-4 py-2 border">{scholarship.academiYear}</td>
+                    <td className="px-4 py-2 border">{scholarship.term}</td>
+                    <td className="px-4 py-2 border">{scholarship.programType}</td>
+                    <td className="px-4 py-2 border">{scholarship.schName}</td>
+                    <td className="px-4 py-2 border">{scholarship.description}</td>
+                    <td className="px-4 py-2 border">{scholarship.startDate}</td>
+                    <td className="px-4 py-2 border">{scholarship.endDate}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </main>
 
       {/* Footer Section */}

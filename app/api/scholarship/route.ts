@@ -1,6 +1,6 @@
 import { getFieldValue } from '@/app/libs/common';
 import { generateCuid, handleError } from '@/app/libs/utils';
-import { PrismaClient, Role } from '@prisma/client';
+import { PrismaClient, programType, Role, SchType } from '@prisma/client';
 import mongoose from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -8,18 +8,30 @@ import { NextRequest, NextResponse } from 'next/server';
 const db = new PrismaClient();
 
 export async function GET(req: NextRequest) {
-  const token = req.headers.get('Authorization');
+  
+  // const token = req.headers.get('Authorization');
 
-  if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  // if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
   // Do something to verify token and get id
   const id = '';
   try {
-    const user = await db.user.findUnique({ where: { id } });
+    // const user = await db.user.findUnique({ where: { id } });
 
-    if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-
-    const scholarships = await db.scholarship.findMany();
+    // if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    const { searchParams } = new URL(req.url);
+    const academiYear = searchParams.get('academiYear');
+    const term = searchParams.get('term');
+    const programType = searchParams.get('programType');
+    const schType = searchParams.get('schType');
+    const scholarships = await db.scholarship.findMany({
+      where: {
+        academiYear: academiYear ? academiYear : undefined,
+        term: term || undefined,
+        programType: programType as programType || undefined,
+        schType: schType as SchType || undefined,
+      },
+    });
 
     return NextResponse.json({ scholarships: scholarships ?? [] }, { status: 200 });
   } catch (e: any) {
@@ -60,7 +72,7 @@ export async function POST(req: NextRequest) {
       'startDate',
       'endDate',
       'schType',
-      'attachment',
+      // 'attachment',
       // 'price',
     ];
 
@@ -142,7 +154,7 @@ export async function POST(req: NextRequest) {
           endDate: new Date(body.endDate),
           schType: body.schType,
           programType: body.programType,
-          attachment: body.attachment,
+          // attachment: body.attachment,
           // attachment: createdAttachment.id,
           // price: createdPrice.id,
         },

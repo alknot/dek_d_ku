@@ -171,13 +171,13 @@ model Scholarship {
   startDate   DateTime
   endDate     DateTime
   schType     SchType
-  attachment  String?
+  // attachment  String?
   // price       String
   // reward      reward
   // otherReward String?
   programType programType
   form      Form[]    @relation("ScholarshipForm")
-  file      File?      @relation("ScholarshipFile", fields: [attachment], references: [id])
+  // file      File?      @relation("ScholarshipFile", fields: [attachment], references: [id])
   // termprice Termprice @relation("TermpriceScholarship", fields: [price], references: [id])
 }
 
@@ -194,7 +194,7 @@ model File {
 
   // Relationships
   form        Form[]        @relation("FileForm")
-  scholarship Scholarship[] @relation("ScholarshipFile")
+  // scholarship Scholarship[] @relation("ScholarshipFile")
 }
 
 model Termprice {

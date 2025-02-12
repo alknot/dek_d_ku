@@ -20,7 +20,7 @@ const ReviewApplications = () => {
   useEffect(() => {
     axios.get("/api/request")  // Adjust the endpoint as needed
       .then(res => {
-        setApplications(res.data);
+        setApplications(res.data as Application[]);
         setLoading(false);
       })
       .catch(err => {

@@ -18,7 +18,7 @@ const TrackApprovalStatus = () => {
   useEffect(() => {
     axios.get("/api/user/applications")  // Adjust this endpoint to match your API structure
       .then(res => {
-        setApplications(res.data);
+        setApplications(res.data as Application[]);
         setLoading(false);
       })
       .catch(err => {

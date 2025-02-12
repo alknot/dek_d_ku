@@ -37,7 +37,8 @@ export default function Home() {
           schType: schType,
         },
       });
-      setScholarships(response.data.scholarships);
+      const data = response.data as { scholarships: Scholarship[] };
+      setScholarships(data.scholarships);
     } catch (error) {
       console.error("Failed to fetch scholarships:", error);
     }

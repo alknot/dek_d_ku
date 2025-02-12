@@ -61,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             </a>
           </li>
           <li>
-            <a href="#" className="block py-2 px-4 hover:bg-gray-700 rounded">
+            <a href="../../pages/test" className="block py-2 px-4 hover:bg-gray-700 rounded">
               ทำเนียบ
             </a>
           </li>

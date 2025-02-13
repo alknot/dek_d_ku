@@ -19,11 +19,13 @@
     "date-fns": "^4.1.0",
     "firebase-admin": "^13.1.0",
     "next": "15.1.3",
+    "next-auth": "https://gitpkg.vercel.app/emthy0/next-auth/packages/next-auth?ku-temp",
     "papaparse": "^5.4.1",
     "prettier-plugin-tailwindcss": "^0.6.9",
     "react": "^19.0.0",
     "react-datepicker": "^7.6.0",
     "react-dom": "^19.0.0",
+    "react-jwt": "^1.2.2",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {

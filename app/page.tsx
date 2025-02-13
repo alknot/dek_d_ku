@@ -1,8 +1,8 @@
-
 "use client";
 
 import { useState } from "react";
 import Sidebar from "@/components/sidebar";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -56,10 +56,17 @@ export default function Home() {
           <p className="mt-4 text-lg text-gray-600">
             This main section is now fully stretched to cover the page.
           </p>
-          <button className="mt-6 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-500 transition">
-            Get Started
-          </button>
+          <button className="button is-primary" onClick={() => signIn("keycloak")}>
+        Log in
+      </button>
         </div>
+
+        <button
+          className="button is-primary"
+          onClick={() => signOut({ callbackUrl: "/api/auth/logout" })}
+        >
+          Log out
+        </button>
       </main>
 
       {/* Footer Section */}

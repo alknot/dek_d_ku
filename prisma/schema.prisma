@@ -187,7 +187,7 @@ model Scholarship {
 
 model File {
   id       String @id @default(cuid()) @map("_id")
-  fileId   String // เก็บ GridFS ID ของไฟล์
+  
   filename String
   mimetype String
   data     String

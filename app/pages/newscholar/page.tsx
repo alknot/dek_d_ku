@@ -64,10 +64,12 @@ export default function Home() {
           <button className = {styles.button} >
              โครงการประพฤติดี
           </button>
-          </Link>
+          </Link >
+          <Link href="../pages/newscholar/extracurricular">
           <button className = {styles.button} >
             โครงการกิจกรรมนอกหลักสูตร
           </button>
+          </Link>
           </div>
 
           <div className="space-y-10 space-x-10 ">

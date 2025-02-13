@@ -1,7 +1,7 @@
 import { getFieldValue } from '@/app/libs/common';
 import { generateCuid, handleError } from '@/app/libs/utils';
 import { PrismaClient, programType, Role, SchType } from '@prisma/client';
-import mongoose from 'mongoose';
+
 import { NextRequest, NextResponse } from 'next/server';
 
 
@@ -91,18 +91,7 @@ export async function POST(req: NextRequest) {
     //     { status: 400 }
     //   );
     // }
-    const mongoURI = process.env.DATABASE_URL;
-    if (!mongoURI) {
-      return NextResponse.json({ message: 'Database URL is not defined' }, { status: 500 });
-    }
-
-    const conn = mongoose.createConnection(mongoURI);
-    const Grid = require("gridfs-stream");
-    let gfs;
-    conn.once("open", () => {
-      gfs = Grid(conn.db, mongoose.mongo);
-      gfs.collection("uploads"); // ตั้งชื่อ collection ที่ใช้เก็บไฟล์
-    });
+    
     // Perform transaction
     const result = await db.$transaction(async (tx) => {
       // Create the related entities first

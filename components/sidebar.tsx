@@ -21,52 +21,52 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         </button>
         <ul className="mt-6 space-y-2">
           <li>
-            <a href="../../" className="block py-2 px-4 hover:bg-gray-700 rounded">
+            <a href="../../../" className="block py-2 px-4 hover:bg-gray-700 rounded">
               วิธีใช้งาน
             </a>
           </li>
           <li>
-            <a href="../../pages/userinfo" className="block py-2 px-4 hover:bg-gray-700 rounded">
+            <a href="../../../pages/userinfo" className="block py-2 px-4 hover:bg-gray-700 rounded">
               User Info
             </a>
           </li>
           <li>
-            <a href="../../pages/recentscholar" className="block py-2 px-4 hover:bg-gray-700 rounded">
+            <a href="../../../pages/recentscholar" className="block py-2 px-4 hover:bg-gray-700 rounded">
               โครงการที่เปิดรับ
             </a>
           </li>
           <li>
-            <a href="../../pages/newscholar" className="block py-2 px-4 hover:bg-gray-700 rounded">
+            <a href="../../../pages/newscholar" className="block py-2 px-4 hover:bg-gray-700 rounded">
               สร้างโครงการ
             </a>
           </li>
           <li>
-            <a href="../../pages/consideration" className="block py-2 px-4 hover:bg-gray-700 rounded">
+            <a href="../../../pages/consideration" className="block py-2 px-4 hover:bg-gray-700 rounded">
               พิจารณาผล
             </a>
           </li>
           <li>
-            <a href="../../pages/showresult" className="block py-2 px-4 hover:bg-gray-700 rounded">
+            <a href="../../../pages/showresult" className="block py-2 px-4 hover:bg-gray-700 rounded">
               ติดตามผลการพิจารณา
             </a>
           </li>
           <li>
-            <a href="../../pages/dashboard" className="block py-2 px-4 hover:bg-gray-700 rounded">
+            <a href="../../../pages/dashboard" className="block py-2 px-4 hover:bg-gray-700 rounded">
               Dashboard
             </a>
           </li>
           <li>
-            <a href="../../pages/finance" className="block py-2 px-4 hover:bg-gray-700 rounded">
+            <a href="../../../pages/finance" className="block py-2 px-4 hover:bg-gray-700 rounded">
               การเงิน
             </a>
           </li>
           <li>
-            <a href="../../pages/giveprivilege" className="block py-2 px-4 hover:bg-gray-700 rounded">
+            <a href="../../../pages/giveprivilege" className="block py-2 px-4 hover:bg-gray-700 rounded">
               การจัดการสิทธิการเข้าถึง
             </a>
           </li>
           <li>
-            <a href="../../pages/hallofflame" className="block py-2 px-4 hover:bg-gray-700 rounded">
+            <a href="../../../pages/hallofflame" className="block py-2 px-4 hover:bg-gray-700 rounded">
               ทำเนียบ
             </a>
           </li>

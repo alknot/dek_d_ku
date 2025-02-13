@@ -1,307 +1,122 @@
 "use client";
-
-import { useState } from "react";
-import Sidebar from "@/components/sidebar";
+import axios from "axios";
 import DatePicker from "react-datepicker";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import FormSection from "@/components/createFormDetail";
-import Footer from "@/components/footer";
 import Header from "@/components/header";
+import Footer from "@/components/footer";
+import { useRouter } from 'next/navigation'
 
-type Question = {
-  id: number;
-  question: string;
-  type: string; // "text" | "choice" | "checkbox" | "date"
-  options: string[];
-  required: string; // Change to string type
-  selectedDate?: Date; // สำหรับ Date Picker
-};
+import Sidebar from "@/components/sidebar";
+import { SchType } from "@prisma/client";
+import { programType } from "@prisma/client";
+// import router from "next/dist/shared/lib/router/router";
 
-const DynamicForm: React.FC<{
-  questions: Question[];
-  addQuestion: () => void;
-  deleteQuestion: (id: number) => void;
-  updateQuestion: (id: number, field: string, value: any) => void;
-  handleSubmit: (e: React.FormEvent) => void;
-  prevStep: () => void;
-}> = ({
-  questions,
-  addQuestion,
-  deleteQuestion,
-  updateQuestion,
-  handleSubmit,
-  prevStep,
-}) => {
-  const handleFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
 
-    try {
-      const response = await fetch("/api/request/route", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ questions }),
-      });
+const Create = () => {
+  const [schName, setschName] = useState("")
+  const [description, setdescription] = useState<string>("")
+  const [academiYear, setacademicYear] = useState<string>("")
+  const [term, setterm] = useState<string>("")
+  const [startDate, setstartDate] = useState<Date | null>(null)
+  const [endDate, setendDate] = useState<Date | null>(null)
+  const [schType, setSchType] = useState<SchType>(SchType.WELL_BEHAVIOR);
+  const [attachment, setattachment] = useState<File>()
 
-      if (response.ok) {
-        alert("Form submitted successfully!");
-      } else {
-        alert("Failed to submit the form.");
-      }
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      alert("An error occurred while submitting the form.");
-    }
-  };
+  const [pdf, setPdf] = useState<File | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [pdfMimeType, setPdfMimeType] = useState<string | null>(null);
 
-  return (
-    <div className="flex justify-center items-top min-h-screen bg-white ">
-      <div className="w-full max-w-3xl bg-white p-6 rounded-lg shadow-lg space-y-4">
-        <h2 className="mb-4 text-xl font-bold text-gray-900 text-center">
-          ตัวอย่างคำถามเพื่อสมัครเข้าโครงการ
-        </h2>
-        <form onSubmit={handleFormSubmit}>
-          {questions.map((q, index) => (
-            <div key={q.id} className="space-y-2 border-b pb-4">
-              <div className="flex justify-between items-center">
-                <label className="block text-sm font-medium text-gray-700">
-                  Question {index + 1}
-                </label>
-                <button
-                  type="button"
-                  onClick={() => deleteQuestion(q.id)}
-                  className="text-red-500 text-sm"
-                >
-                  Delete
-                </button>
-              </div>
-              <input
-                type="text"
-                placeholder="Enter your question"
-                value={q.question}
-                onChange={(e) =>
-                  updateQuestion(q.id, "question", e.target.value)
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <select
-                value={q.type}
-                onChange={(e) => updateQuestion(q.id, "type", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="text">Text</option>
-                <option value="choice">Multiple Choice</option>
-                <option value="checkbox">Checkbox</option>
-                <option value="date">Date Picker</option>
-              </select>
-              {q.type === "choice" || q.type === "checkbox" ? (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Options
-                  </label>
-                  {q.options.map((option, idx) => (
-                    <div key={idx} className="flex items-center space-x-2">
-                      <input
-                        type="text"
-                        placeholder={`Option ${idx + 1}`}
-                        value={option}
-                        onChange={(e) => {
-                          const newOptions = [...q.options];
-                          newOptions[idx] = e.target.value;
-                          updateQuestion(q.id, "options", newOptions);
-                        }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newOptions = q.options.filter((_, i) => i !== idx);
-                          updateQuestion(q.id, "options", newOptions);
-                        }}
-                        className="text-red-500 text-sm"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() =>
-                      updateQuestion(q.id, "options", [...q.options, ""])
-                    }
-                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg"
-                  >
-                    Add Option
-                  </button>
-                </div>
-              ) : null}
-              {q.type === "date" && (
-                <div className="relative max-w-sm">
-                  <DatePicker
-                    selected={q.selectedDate}
-                    onChange={(date) =>
-                      updateQuestion(q.id, "selectedDate", date)
-                    }
-                    placeholderText="Select a date"
-                    dateFormat="dd/MM/yyyy"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 
-                           block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-                           dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  />
-                </div>
-              )}
-              <div className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  checked={q.required === 'true'}
-                  onChange={(e) =>
-                    updateQuestion(q.id, "required", e.target.checked ? 'true' : 'false')
-                  }
-                />
-                <label className="text-sm text-gray-700">Required</label>
-              </div>
-            </div>
-          ))}
-          <div className="flex justify-between mt-4">
-            <button
-              type="button"
-              onClick={prevStep}
-              className="px-4 py-2 bg-gray-300 text-black rounded-lg"
-            >
-              ย้อนกลับ
-            </button>
-            <button
-              type="button"
-              onClick={addQuestion}
-              className="px-4 py-2 bg-green-500 text-white rounded-lg"
-            >
-              Add Question
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg"
-            >
-              Submit Form
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
-
-export default function Home() {
+  const [programType, setprogramType] = useState<string>("")
+  const [amount, setAmount] = useState<string>("")
+  // const [rewards, setrewards] = useState<string[]>(['อื่นๆ', 'ลดค่าบำรุงมหาวิทยาลัย', 'ลดค่าหน่วยกิต', 'ลดค่าธรรมเนียมพิเศษคณะ'])
+  // const [otherReward, setotherReward] = useState<string>("")
+  const router = useRouter();
+  const accept = ".pdf";
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1); // ควบคุมขั้นตอนของฟอร์ม
-
-  const [projectData, setProjectData] = useState({
-    name: "",
-    startDate: null,
-    endDate: null,
-    academicYear: "",
-    semester: "",
-    program: "",
-    description: "",
-    announcementFile: null,
-    announcementFileName: "",
-    announcementFileContent: "",
-    rewards: [] as ("ลดค่าบำรุงมหาวิทยาลัย" | "ลดค่าหน่วยกิต" | "ลดค่าธรรมเนียมพิเศษคณะ" | "อื่นๆ")[],
-    otherReward: "",
-  });
-
-  // ฟังก์ชันเปิด/ปิด Sidebar
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  // ฟังก์ชันเปลี่ยนขั้นตอน
-  const nextStep = () => setCurrentStep((prev) => prev + 1);
-  const prevStep = () => setCurrentStep((prev) => prev - 1);
+  // const handleRewardChange = (reward: string) => {
+  //     setrewards(prevRewards => 
+  //         prevRewards.includes(reward) 
+  //         ? prevRewards.filter(r => r !== reward) 
+  //         : [...prevRewards, reward]
+  //     );
+  // };
 
-  const [questions, setQuestions] = useState<Question[]>([
-    // { id: 1, question: "ชื่อ-นามสกุล (นาย/นางสาว)", type: "text", options: [], required: 'true' },
-    // { id: 2, question: "NAME-SURNAME (Miss/Mr)", type: "text", options: [], required: 'true' },
-    // { id: 3, question: "นิสิตชั้นปีที่", type: "text", options: [], required: 'true' },
-    // { id: 4, question: "รหัสนิสิต", type: "text", options: [], required: 'true' },
-    // { id: 5, question: "ภาควิชา/สาขาวิชา", type: "text", options: [], required: 'true' },
-    // { id: 6, question: "คณะ", type: "text", options: [], required: 'true' },
-    // { id: 7, question: "อาจารย์ที่ปรึกษา", type: "text", options: [], required: 'true' },
-    // { id: 8, question: "คะแนนเฉลี่ยสะสม", type: "text", options: [], required: 'true' },
-    // { id: 9, question: "เกิดวันที่", type: "date", options: [], required: 'true' },
-    // { id: 10, question: "อายุ(ปี)", type: "text", options: [], required: 'true' },
-    // { id: 11, question: "โทรศัพท์", type: "text", options: [], required: 'true' },
-    // { id: 12, question: "E-mail", type: "text", options: [], required: 'true' },
-    // { id: 13, question: "ที่อยู่ปัจจุบัน", type: "text", options: [], required: 'true' },
-    // { id: 14, question: "ท่านเรียนภาคการศึกษานี้เป็นภาคสุดท้ายใช่หรือไม่", type: "choice", options: ['ใช่','ไม่ใช่'], required: 'true' },
-  ]);
-
-  // เพิ่มคำถามใหม่
-  const addQuestion = () => {
-    setQuestions([
-      ...questions,
-      {
-        id: questions.length + 1,
-        question: "",
-        type: "text",
-        options: [],
-        required: 'false',
-      },
-    ]);
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setPdf(event.target.files[0]);
+      setPdfMimeType(event.target.files[0].type);
+      console.log(event.target.files[0].type);
+    }
   };
 
-  // ลบคำถาม
-  const deleteQuestion = (id: number) => {
-    setQuestions(questions.filter((q) => q.id !== id));
-  };
+  const handleUploadPdf = async () => {
+    if (!pdf) return;
 
-  // อัปเดตคำถาม
-  const updateQuestion = (id: number, field: string, value: any) => {
-    setQuestions(
-      questions.map((q) =>
-        q.id === id ? { ...q, [field]: value } : q
-      )
-    );
-  };
+    const toBase64 = (file: File): Promise<string> =>
+      new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = (error) => reject(error);
+      });
 
-  // ฟังก์ชันตรวจสอบ validation
-  const validateForm = () => {
-    for (const q of questions) {
-      if (q.required === 'true' && (!q.options.length || !q.question.trim())) {
-        alert(`Question "${q.question || 'Untitled'}" is required!`);
-        return false;
+    const base64File = await toBase64(pdf);
+
+    const formData = new FormData();
+    formData.append('pdf', base64File);
+    formData.append('mimeType', pdfMimeType || '');
+    formData.forEach((value, key) => {
+      console.log(`${key}:`, value);
+    });
+
+    try {
+      const response = await fetch('/api/upload/pdf', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        setPdfUrl((await response.json()).url);
+      } else {
+        setPdfUrl(null);
       }
-    }
-    return true;
-  };
-
-  // ส่งข้อมูลฟอร์ม
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (validateForm()) {
-      console.log("Form Data:", questions);
-      alert("Form Submitted!");
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      setPdfUrl(null);
     }
   };
 
-  const handleProjectChange = (field: string, value: any) => {
-    setProjectData({ ...projectData, [field]: value });
-  };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      handleProjectChange("announcementFile", e.target.files[0]);
-      handleProjectChange("announcementFileName", e.target.files[0].name);
+    try {
+      const data = {
+        schName,
+        description,
+        academiYear,
+        term,
+        startDate,
+        endDate,
+        schType,
+        programType
+      };
+
+      console.log(data); // ตรวจสอบข้อมูลก่อนส่ง
+
+      // ส่งข้อมูลไปยัง API
+      handleUploadPdf();
+      await axios.post('/api/scholarship', data);
+      router.push('pages/newscholar/innovation/example');
+
+    } catch (error) {
+      console.error(error);
     }
-  };
-
-  const handleRewardChange = (reward: string) => {
-    const newRewards = projectData.rewards.includes(reward as "ลดค่าบำรุงมหาวิทยาลัย" | "ลดค่าหน่วยกิต" | "ลดค่าธรรมเนียมพิเศษคณะ" | "อื่นๆ")
-      ? projectData.rewards.filter((r) => r !== reward)
-      : [...projectData.rewards, reward];
-    handleProjectChange("rewards", newRewards);
-  };
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -312,29 +127,165 @@ export default function Home() {
       <Header toggleSidebar={toggleSidebar} />
 
       {/* Main Section (Full Screen) */}
-
-      {/* Main Section */}
       <main className="flex-1 flex justify-center bg-gray-100 w-full mx-auto">
         <div className="w-full max-w-5xl bg-white p-6 rounded-lg shadow-lg">
-          {currentStep === 1 && (
-            <FormSection
-              projectData={projectData}
-              handleProjectChange={handleProjectChange}
-              handleFileChange={handleFileChange}
-              nextStep={nextStep}
-            />
-          )}
+          <h2 className="mb-4 text-xl font-bold text-gray-900 text-center">สร้างโครงการความคืดสร้างสรรค์และนวัตกรรม</h2>
+          <h1 className="mb-4 font-bold text-gray-900 text-center">กรอกข้อมูลของโครงการ</h1>
+          <form>
+            <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
+              <div>
+                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อโครงการ</label>
+                <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
+            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
+            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่อโครงการ"
+                  value={schName} onChange={(e) => setschName(e.target.value)} required />
 
-          {currentStep === 2 && (
-            <DynamicForm
-              questions={questions}
-              addQuestion={addQuestion}
-              deleteQuestion={deleteQuestion}
-              updateQuestion={updateQuestion}
-              handleSubmit={handleSubmit}
-              prevStep={prevStep}
-            />
-          )}
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block mb-2 text-sm font-medium text-gray-900">ประกาศโครงการ (PDF)</label>
+                <input
+                  type="file"
+                  accept={accept}
+                  onChange={handleFileChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
+                  required
+                />
+                {pdfUrl && (
+                  <a
+                    href={pdfUrl}
+                    className="mt-4 text-green-500"
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    {pdfUrl}
+                  </a>
+                )}
+              </div>
+              {/* <div className="sm:col-span-2">
+            <label className="block mb-2 text-sm font-medium text-gray-900">รางวัลในแต่ละโครงการ</label>
+            <div className="flex flex-col space-y-2">
+              {["ลดค่าบำรุงมหาวิทยาลัย", "ลดค่าหน่วยกิต", "ลดค่าธรรมเนียมพิเศษคณะ", "อื่นๆ"].map((reward) => (
+                <label key={reward} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="reward"
+                    value={reward}
+                    checked={rewards.includes(reward)}
+                    onChange={() => handleRewardChange(reward)}
+                    className="mr-2"
+                  />
+                  {reward}
+                </label>
+              ))}
+              {rewards.includes("อื่นๆ") && (
+                <input
+                  
+                  type="text"
+                  value={otherReward}
+                  onChange={(e) => setotherReward(e.target.value)}
+                  placeholder="กรอกรางวัลอื่นๆ"
+                />
+              )}
+            </div>
+          </div> */}
+
+              <div className="flex space-x-10 sm:col-span-2">
+                <div className="relative max-w-sm">
+                  <label className="block mb-2 text-sm font-medium text-gray-900">วันที่เริ่มโครงการ</label>
+                  <DatePicker
+                    selected={startDate}
+                    onChange={(date) => setstartDate(date)}
+                    placeholderText="Start date"
+                    dateFormat="dd/MM/yyyy"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
+                  />
+                </div>
+                <div className="relative max-w-sm">
+                  <label className="block mb-2 text-sm font-medium text-gray-900">วันที่จบโครงการ</label>
+                  <DatePicker
+                    selected={endDate}
+                    onChange={(date) => setendDate(date)}
+                    placeholderText="End date"
+                    dateFormat="dd/MM/yyyy"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
+                  />
+                </div>
+              </div>
+
+              <div className="flex space-x-10 sm:col-span-2">
+                <div className="relative max-w-sm">
+                  <label className="block mb-2 text-sm font-medium text-gray-900">ปีการศึกษา</label>
+                  <input className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
+            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
+            dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    type="number"
+                    value={academiYear}
+                    onChange={(e) => setacademicYear((e.target.value))}
+                    placeholder="2568"
+                    required
+                  />
+                </div>
+                <div className="relative max-w-sm">
+                  <label htmlFor="term" className="block mb-2 text-sm font-medium text-gray-900">ภาคการศึกษา</label>
+                  <select className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
+            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
+            dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    id="term"
+                    value={term}
+                    onChange={(e) => setterm(e.target.value)}
+                    required
+                  >
+                    <option value="">กรุณาเลือก</option>
+                    <option value="เทอมต้น">เทอมต้น</option>
+                    <option value="เทอมปลาย">เทอมปลาย</option>
+                  </select>
+                </div>
+                <div >
+                  <label htmlFor="programType" className="block mb-2 text-sm font-medium text-gray-900">สำหรับหลักสูตร</label>
+                  <select className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
+            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
+            dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    id="programType"
+                    value={programType}
+                    onChange={(e) => setprogramType(e.target.value)}
+                    required
+                  >
+                    <option value="">กรุณาเลือก</option>
+                    <option value="THAI">ภาคไทย</option>
+                    <option value="INTERNATIONAL">ภาคนานาชาติ</option>
+                    <option value="BOTHTHAIANDINTERNATIONAL">ทั้งภาคไทยและนานาชาติ</option>
+                  </select>
+                </div>
+
+              </div>
+
+
+
+
+              <div className="sm:col-span-2">
+                <label className="block mb-2 text-sm font-medium text-gray-900">รายละเอียดโครงการ</label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setdescription(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
+                  placeholder="รายละเอียดโครงการ"
+                  rows={6}
+                  required
+                />
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-lg"
+            >
+              ยืนยันและไปหน้าถัดไป
+            </button>
+          </form>
+
         </div>
       </main>
 
@@ -343,3 +294,7 @@ export default function Home() {
     </div>
   );
 }
+
+export default Create;
+
+

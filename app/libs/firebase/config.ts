@@ -1,7 +1,9 @@
 import admin, { cert, getApps, initializeApp } from 'firebase-admin/app';
 import { getStorage } from 'firebase-admin/storage';
 
-import serviceAccount from './dek-d-ku-2737b-firebase-adminsdk-fbsvc-990c74472a.json';
+const serviceAccountBase64 = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64 || '';
+const serviceAccountJson = Buffer.from(serviceAccountBase64, 'base64').toString('utf-8');
+const serviceAccount = JSON.parse(serviceAccountJson);
 
 if (!getApps().length) {
   console.log('Initializing Firebase app');

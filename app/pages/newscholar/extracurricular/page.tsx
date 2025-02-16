@@ -111,7 +111,7 @@ const Create = () => {
       // ส่งข้อมูลไปยัง API
       handleUploadPdf();
       await axios.post('/api/scholarship', data);
-      router.push('pages/newscholar/extracurricular/example');
+      router.push('../../../../pages/newscholar/extracurricular/example');
 
     } catch (error) {
       console.error(error);

@@ -3,9 +3,18 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Sidebar from "@/components/sidebar";
+import Modal from "@/components/Modal";
+import { format, differenceInDays } from "date-fns";
+import { th } from "date-fns/locale";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedScholarship, setSelectedScholarship] = useState<Scholarship | null>(null);
+
   interface Scholarship {
     id: number;
     academiYear: string;
@@ -15,6 +24,7 @@ export default function Home() {
     description: string;
     startDate: string;
     endDate: string;
+    pdf: string;
   }
 
   const [scholarships, setScholarships] = useState<Scholarship[]>([]);
@@ -22,7 +32,20 @@ export default function Home() {
   const [term, setTerm] = useState("");
   const [programType, setProgramType] = useState("");
   const [schType, setSchType] = useState("");
+  const router = useRouter();
 
+
+  const navigateToForm = (scholarship: Scholarship) => {
+    // Here you can either set state or use routing to navigate
+    // For example, using React Router:
+    
+    router.push(`../../../pages/recentscholar/applyform/${selectedScholarship?.id}`);
+    setIsModalOpen(false); // Close the modal first
+    // Alternatively, set some state to conditionally render the form in the current component
+    setSelectedScholarship(scholarship); // assuming this triggers the form display
+  };
+
+  
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
@@ -35,6 +58,7 @@ export default function Home() {
           term: term,
           programType: programType,
           schType: schType,
+          
         },
       });
       const data = response.data as { scholarships: Scholarship[] };
@@ -52,43 +76,23 @@ export default function Home() {
     fetchScholarships();
   };
 
+  const handleOpenModal = (scholarship: Scholarship) => {
+    setSelectedScholarship(scholarship);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedScholarship(null);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Header Section */}
-      <header
-        className="shadow-md flex items-center justify-between"
-        style={{ backgroundColor: "rgb(0, 104, 95)" }}
-      >
-        <div className="px-4 py-4">
-          {/* Sidebar Toggle Button */}
-          <button
-            onClick={toggleSidebar}
-            className="text-white focus:outline-none"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16m-7 6h7"
-              />
-            </svg>
-          </button>
-        </div>
-        <h1 className="text-3xl font-bold text-white text-center flex-1">
-          Dek-D KU
-        </h1>
-        {/* <div className="w-10"></div> ใช้เพื่อเว้นช่องให้ Header ตรงกลาง */}
-      </header>
+      <Header toggleSidebar={toggleSidebar} />
 
       {/* Main Section (Full Screen) */}
       <main className=" flex-1 flex  justify-center bg-gray-100 w-full mx-auto">
@@ -133,8 +137,8 @@ export default function Home() {
                 onChange={(e) => setProgramType(e.target.value)}
               >
                 <option value="">หลักสูตรที่เปิดรับ</option>
-                <option value="THAI">หลักสูตรนานาชาติ</option>
-                <option value="INTERNATIONAL">หลักสูตรไทย</option>
+                <option value="THAI">หลักสูตรไทย</option>
+                <option value="INTERNATIONAL">หลักสูตรนานาชาติ</option>
               </select>
               {/* Dropdown 6 */}
               <select
@@ -144,7 +148,7 @@ export default function Home() {
               >
                 <option value="">ประเภทโครงการ</option>
                 <option value="WELL_BEHAVIOR">ประพฤติดี</option>
-                <option value="EXTRACURRICULAR">กิจกรรมเสริมหลักสูตร</option>
+                <option value="EXTRACURRICULAR">กิจกรรมนอกหลักสูตร</option>
                 <option value="INNOVATION">ความคิดสร้างสรรค์และนวัตกรรม</option>
               </select>
             </div>
@@ -164,41 +168,82 @@ export default function Home() {
             <table className="w-full border-collapse border border-gray-200">
               <thead className="bg-blue-800 text-white">
                 <tr>
-                  <th className="px-4 py-2 text-left">ที่</th>
-                  <th className="px-4 py-2 text-left">ปีการศึกษา</th>
-                  <th className="px-4 py-2 text-left">เทอม</th>
-                  <th className="px-4 py-2 text-left">หลักสูตรที่เปิดรับ</th>
-                  <th className="px-4 py-2 text-left">โครงการ</th>
-                  <th className="px-9 py-2 text-left">รายละเอียดโครงการ</th>
-                  <th className="px-9 py-2 text-left">วันที่เริ่มโครงการ</th>
-                  <th className="px-9 py-2 text-left">วันที่จบโครงการ</th>
+                  <th className="px-4 py-2 text-left text-center">ที่</th>
+                  <th className="px-2 py-2 w-28 text-left text-center">ปีการศึกษา</th>
+                  <th className="px-4 py-2 text-left text-center">เทอม</th>
+                  <th className="px-4 py-2 text-left text-center">หลักสูตรที่เปิดรับ</th>
+                  <th className="px-4 py-2 text-left text-center">โครงการ</th>
+                  <th className="px-9 py-2 text-left text-center">กำหนดการ</th>
+                  <th className="px-9 py-2 text-left text-center">รายละเอียด</th>
                 </tr>
               </thead>
               <tbody>
-                {scholarships.map((scholarship, index) => (
-                  <tr key={scholarship.id}>
-                    <td className="px-4 py-2 border">{index + 1}</td>
-                    <td className="px-4 py-2 border">{scholarship.academiYear}</td>
-                    <td className="px-4 py-2 border">{scholarship.term}</td>
-                    <td className="px-4 py-2 border">{scholarship.programType}</td>
-                    <td className="px-4 py-2 border">{scholarship.schName}</td>
-                    <td className="px-4 py-2 border">{scholarship.description}</td>
-                    <td className="px-4 py-2 border">{scholarship.startDate}</td>
-                    <td className="px-4 py-2 border">{scholarship.endDate}</td>
-                  </tr>
-                ))}
+                {scholarships.map((scholarship, index) => {
+                  const daysLeft = differenceInDays(new Date(scholarship.endDate), new Date());
+                  let buttonColor = "bg-green-600";
+                  if (daysLeft <= 14 && daysLeft > 7) {
+                    buttonColor = "bg-yellow-600";
+                  } else if (daysLeft <= 7) {
+                    buttonColor = "bg-red-600";
+                  }
+
+                  return (
+                    <tr key={scholarship.id}>
+                      <td className="px-4 py-2 border w-12">{index + 1}</td>
+                      <td className="px-2 py-2 border w-28 text-center">{scholarship.academiYear}</td>
+                      <td className="px-4 py-2 border w-28 text-center">{scholarship.term}</td>
+                      <td className="px-4 py-2 border w-28">{scholarship.programType}</td>
+                      <td className="px-4 py-2 border">{scholarship.schName}</td>
+                      <td className="px-4 py-2 border text-center w-80">
+                        {format(new Date(scholarship.startDate), "dd MMMM yyyy", { locale: th })} -{" "}
+                        {format(new Date(scholarship.endDate), "dd MMMM yyyy", { locale: th })}<br />
+                        {daysLeft > 0 ? (
+                          <button className={`px-2 py-1 rounded-lg ${buttonColor}`}>
+                            คงเหลือ {daysLeft} วัน
+                          </button>
+                        ) : (
+                          <span className="text-red-600">หมดเขต</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-2 border text-center w-40">
+                        <button
+                          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400"
+                          onClick={() => handleOpenModal(scholarship)}
+                        >
+                          รายละเอียด
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         </div>
       </main>
 
+      {/* Modal */}
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+  {selectedScholarship && (
+    <div>
+      <h2 className="text-xl font-bold mb-4">{selectedScholarship.schName}</h2>
+      <p><strong>ปีการศึกษา:</strong> {selectedScholarship.academiYear}</p>
+      <p><strong>เทอม:</strong> {selectedScholarship.term}</p>
+      <p><strong>หลักสูตรที่เปิดรับ:</strong> {selectedScholarship.programType}</p>
+      <p><strong>รายละเอียดโครงการ:</strong> {selectedScholarship.description}</p>
+      <p><strong>กำหนดการ:</strong> {format(new Date(selectedScholarship.startDate), "dd MMMM yyyy", { locale: th })} - {format(new Date(selectedScholarship.endDate), "dd MMMM yyyy", { locale: th })}</p>
+      <button
+        className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-lg"
+        onClick={() => navigateToForm(selectedScholarship)}
+      >
+        สมัครโครงการนี้
+      </button>
+    </div>
+  )}
+</Modal>
+
       {/* Footer Section */}
-      <footer className="bg-gray-800 text-white py-6">
-        <div className="container mx-auto text-center">
-          <p>&copy; นายกุลชัย </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

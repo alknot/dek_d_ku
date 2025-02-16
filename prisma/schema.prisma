@@ -177,6 +177,7 @@ model Scholarship {
   // otherReward String?
   programType programType
   form      Form[]    @relation("ScholarshipForm")
+  // pdfUrl    String
   // file      File?      @relation("ScholarshipFile", fields: [attachment], references: [id])
   // termprice Termprice @relation("TermpriceScholarship", fields: [price], references: [id])
 }

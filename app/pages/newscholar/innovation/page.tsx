@@ -93,7 +93,7 @@ const Create = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
+     handleUploadPdf();
     try {
       const data = {
         schName,
@@ -103,13 +103,14 @@ const Create = () => {
         startDate,
         endDate,
         schType,
-        programType
+        programType,
+        pdfUrl
       };
 
       console.log(data); // ตรวจสอบข้อมูลก่อนส่ง
 
       // ส่งข้อมูลไปยัง API
-      handleUploadPdf();
+      
       await axios.post('/api/scholarship', data);
       router.push('pages/newscholar/innovation/example');
 
@@ -129,7 +130,7 @@ const Create = () => {
       {/* Main Section (Full Screen) */}
       <main className="flex-1 flex justify-center bg-gray-100 w-full mx-auto">
         <div className="w-full max-w-5xl bg-white p-6 rounded-lg shadow-lg">
-          <h2 className="mb-4 text-xl font-bold text-gray-900 text-center">สร้างโครงการความคืดสร้างสรรค์และนวัตกรรม</h2>
+          <h2 className="mb-4 text-xl font-bold text-gray-900 text-center">สร้างโครงการความคิดสร้างสรรค์และนวัตกรรม</h2>
           <h1 className="mb-4 font-bold text-gray-900 text-center">กรอกข้อมูลของโครงการ</h1>
           <form>
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">

@@ -56,7 +56,7 @@ export default function Home() {
           <p className="mt-4 text-lg text-gray-600">
             This main section is now fully stretched to cover the page.
           </p>
-          <button className="button is-primary" onClick={() => signIn("keycloak")}>
+          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400" onClick={() => signIn("keycloak")}>
         Log in
       </button>
         </div>

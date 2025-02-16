@@ -143,6 +143,7 @@ export async function POST(req: NextRequest) {
           endDate: new Date(body.endDate),
           schType: body.schType,
           programType: body.programType,
+          
           // attachment: body.attachment,
           // attachment: createdAttachment.id,
           // price: createdPrice.id,

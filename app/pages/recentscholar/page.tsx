@@ -51,13 +51,24 @@ export default function Home() {
     // Navigate based on the scholarship type
     switch(scholarship.schType) {
       case "WELL_BEHAVIOR":
-        router.push(`../../../pages/recentscholar/applyform/wellbehavior/${scholarship.id}`);
+        // if (scholarship.term === "เทอมต้น") {
+        //   const term=1;
+        //   const url = `../../../../../../../../../../../../pages/recentscholar/applyform/wellbehavior/${scholarship.id}?academiYear=${encodeURIComponent(scholarship.academiYear)}&term=${encodeURIComponent(term)}`;
+        // router.push(url);
+        // }
+        // else if (scholarship.term === "เทอมปลาย") {
+        //   const term=2;
+        //   const url = `../../../../../../../../../../../../pages/recentscholar/applyform/wellbehavior/${scholarship.id}?term=${encodeURIComponent(term)}&academicYear=${encodeURIComponent(scholarship.academiYear)}`;
+        // router.push(url);
+        // }
+        
         break;
       case "EXTRACURRICULAR":
-        router.push(`../../../pages/recentscholar/applyform/wellbehavior/${scholarship.id}`);
+        
+        router.push(`../../../pages/recentscholar/applyform/extracurricular/${scholarship.id}`);
         break;
       case "INNOVATION":
-        router.push(`../../../pages/recentscholar/applyform/wellbehavior/${scholarship.id}`);
+        router.push(`../../../pages/recentscholar/applyform/innovation/${scholarship.id}`);
         break;
       default:
         console.error("Unsupported scholarship type:", scholarship.schType);
@@ -224,14 +235,17 @@ export default function Home() {
                           <span className="text-red-600">หมดเขต</span>
                         )}
                       </td>
-                      <td className="px-4 py-2 border text-center w-40">
-                        <button
-                          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400"
-                          onClick={() => handleOpenModal(scholarship)}
-                        >
-                          รายละเอียด
-                        </button>
-                      </td>
+
+                      {daysLeft > 0 && (
+                        <td className="px-4 py-2 border text-center w-40">
+                          <button
+                            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400"
+                            onClick={() => handleOpenModal(scholarship)}
+                          >
+                            รายละเอียด
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   );
                 })}
@@ -260,6 +274,7 @@ export default function Home() {
       <p><strong>หลักสูตรที่เปิดรับ:</strong> {selectedScholarship.programType}</p>
       <p><strong>รายละเอียดโครงการ:</strong> {selectedScholarship.description}</p>
       <p><strong>กำหนดการ:</strong> {format(new Date(selectedScholarship.startDate), "dd MMMM yyyy", { locale: th })} - {format(new Date(selectedScholarship.endDate), "dd MMMM yyyy", { locale: th })}</p>
+      
       <button
         className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-lg"
         onClick={() => navigateToForm(selectedScholarship)}

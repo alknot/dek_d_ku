@@ -32,12 +32,12 @@ export default function Home() {
           </div>
              <div style={{ height: '40px' }}></div>
           <div className="space-x-10  space-y-20">
-          <Link href="../pages/newscholar/wellbehavior">
+          <Link href="../../../../pages/newscholar/wellbehavior">
           <button className = {styles.button} >
              โครงการประพฤติดี
           </button>
           </Link >
-          <Link href="../pages/newscholar/extracurricular">
+          <Link href="../../../../pages/newscholar/extracurricular">
           <button className = {styles.button} >
             โครงการกิจกรรมนอกหลักสูตร
           </button>
@@ -45,7 +45,7 @@ export default function Home() {
           </div>
 
           <div className="space-y-10 space-x-10 ">
-          <Link href="../pages/newscholar/innovation">
+          <Link href="../../../../pages/newscholar/innovation">
           <button className = {styles.button} >
             โครงการความคิดสร้างสรรค์และนวัตกรรม
           </button> 

@@ -67,7 +67,6 @@ export async function POST(req: NextRequest) {
     const requiredFields = [
       'forScholarship',
       'schType',
-
       'nisitNameTh',
       'nisitNameEn',
       'nisitAcademicyear',

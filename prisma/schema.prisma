@@ -140,7 +140,7 @@ model Form {
   phone             String
   email             String
   address           String
-
+  isLastTerm        Boolean
   // Depend on scholarship type (innovation, extracurricular)
   certificate      String?
   activityImageUrl String?
@@ -181,10 +181,6 @@ model Scholarship {
   // file      File?      @relation("ScholarshipFile", fields: [attachment], references: [id])
   // termprice Termprice @relation("TermpriceScholarship", fields: [price], references: [id])
 }
-
-
-
-
 
 model File {
   id       String @id @default(cuid()) @map("_id")

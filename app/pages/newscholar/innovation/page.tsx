@@ -115,7 +115,7 @@ const Create = () => {
       // ส่งข้อมูลไปยัง API
       
       await axios.post('/api/scholarship', data);
-      router.push('pages/newscholar/innovation/example');
+      router.push('../../../pages/newscholar/innovation/example');
 
     } catch (error) {
       console.error(error);

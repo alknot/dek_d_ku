@@ -81,7 +81,9 @@ const Create = () => {
       });
 
       if (response.ok) {
-        setPdfUrl((await response.json()).url);
+        const URL = (await response.json()).url;
+        setPdfUrl(URL);
+        return URL;
       } else {
         setPdfUrl(null);
       }
@@ -93,7 +95,8 @@ const Create = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
+    const url = await handleUploadPdf();
+    console.log(pdfUrl);
     try {
       const data = {
         schName,
@@ -103,13 +106,13 @@ const Create = () => {
         startDate,
         endDate,
         schType,
-        programType
+        programType,
+        pdfUrl: url,
       };
 
       console.log(data); // ตรวจสอบข้อมูลก่อนส่ง
-
+      
       // ส่งข้อมูลไปยัง API
-      handleUploadPdf();
       await axios.post('/api/scholarship', data);
       router.push('../../../../pages/newscholar/wellbehavior/example');
 

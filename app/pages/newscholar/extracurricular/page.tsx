@@ -74,37 +74,41 @@ const Create = () => {
       console.log(`${key}:`, value);
     });
 
-    try {
-      const response = await fetch('/api/upload/pdf', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        setPdfUrl((await response.json()).url);
-      } else {
-        setPdfUrl(null);
-      }
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      setPdfUrl(null);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    try {
-      const data = {
-        schName,
-        description,
-        academiYear,
-        term,
-        startDate,
-        endDate,
-        schType,
-        programType
-      };
+   try {
+         const response = await fetch('/api/upload/pdf', {
+           method: 'POST',
+           body: formData,
+         });
+   
+         if (response.ok) {
+           const URL = (await response.json()).url;
+           setPdfUrl(URL);
+           return URL;
+         } else {
+           setPdfUrl(null);
+         }
+       } catch (error) {
+         console.error('Error uploading file:', error);
+         setPdfUrl(null);
+       }
+     };
+   
+     const handleSubmit = async (e: React.FormEvent) => {
+       e.preventDefault()
+       const url = await handleUploadPdf();
+       console.log(pdfUrl);
+       try {
+         const data = {
+           schName,
+           description,
+           academiYear,
+           term,
+           startDate,
+           endDate,
+           schType,
+           programType,
+           pdfUrl: url,
+         };
 
       console.log(data); // ตรวจสอบข้อมูลก่อนส่ง
 

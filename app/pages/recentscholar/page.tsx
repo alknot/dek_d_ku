@@ -16,6 +16,8 @@ export default function Home() {
   const [selectedScholarship, setSelectedScholarship] = useState<Scholarship | null>(null);
 
   interface Scholarship {
+    schType: any;
+    
     id: number;
     academiYear: string;
     term: string;
@@ -24,7 +26,7 @@ export default function Home() {
     description: string;
     startDate: string;
     endDate: string;
-    pdf: string;
+    pdfUrl: string;
   }
 
   const [scholarships, setScholarships] = useState<Scholarship[]>([]);
@@ -33,17 +35,34 @@ export default function Home() {
   const [programType, setProgramType] = useState("");
   const [schType, setSchType] = useState("");
   const router = useRouter();
-
+ 
+  
 
   const navigateToForm = (scholarship: Scholarship) => {
     // Here you can either set state or use routing to navigate
     // For example, using React Router:
-    
-    router.push(`../../../pages/recentscholar/applyform/${selectedScholarship?.id}`);
+    if (!scholarship) {
+      console.error("No scholarship selected");
+      return;
+    }
+  
     setIsModalOpen(false); // Close the modal first
-    // Alternatively, set some state to conditionally render the form in the current component
-    setSelectedScholarship(scholarship); // assuming this triggers the form display
-  };
+  
+    // Navigate based on the scholarship type
+    switch(scholarship.schType) {
+      case "WELL_BEHAVIOR":
+        router.push(`../../../pages/recentscholar/applyform/wellbehavior/${scholarship.id}`);
+        break;
+      case "EXTRACURRICULAR":
+        router.push(`../../../pages/recentscholar/applyform/wellbehavior/${scholarship.id}`);
+        break;
+      case "INNOVATION":
+        router.push(`../../../pages/recentscholar/applyform/wellbehavior/${scholarship.id}`);
+        break;
+      default:
+        console.error("Unsupported scholarship type:", scholarship.schType);
+    }
+  }
 
   
   const toggleSidebar = () => {
@@ -227,6 +246,15 @@ export default function Home() {
   {selectedScholarship && (
     <div>
       <h2 className="text-xl font-bold mb-4">{selectedScholarship.schName}</h2>
+      <div className="flex items-center space-x-2">
+              <p><strong>เอกสารประจำโครงการ:</strong></p>
+              <button
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400"
+                onClick={() => window.open(selectedScholarship.pdfUrl, '_blank')}
+              >
+                แสดงเอกสาร
+              </button>
+            </div>
       <p><strong>ปีการศึกษา:</strong> {selectedScholarship.academiYear}</p>
       <p><strong>เทอม:</strong> {selectedScholarship.term}</p>
       <p><strong>หลักสูตรที่เปิดรับ:</strong> {selectedScholarship.programType}</p>

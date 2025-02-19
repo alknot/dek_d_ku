@@ -116,14 +116,14 @@ model User { //ku all login user name ลด faculty+department
   updatedAt   DateTime @updatedAt
 
   // Relationships
-  Form        Form[] @relation("UserForm")
+  // Form        Form[] @relation("UserForm")
   CommentUser Form[] @relation("CommentedUserForm")
 }
 
 model Form {
   id             String        @id @map("_id")
-  createdBy      String
-  forScholarship String
+  // createdBy      String
+  scholarshipID String
   schType        SchType
   approveStatus  RequestStatus
 
@@ -136,7 +136,7 @@ model Form {
   advisor           String
   gpa               Float
   dateofBirth       DateTime
-  age               Int
+  age               String
   phone             String
   email             String
   address           String
@@ -156,8 +156,8 @@ model Form {
 
   // Relationships
   commentedUser   User?       @relation("CommentedUserForm", fields: [commentedBy], references: [id])
-  user            User        @relation("UserForm", fields: [createdBy], references: [id])
-  scholarship     Scholarship @relation("ScholarshipForm", fields: [forScholarship], references: [id])
+  // user            User        @relation("UserForm", fields: [createdBy], references: [id])
+  scholarship     Scholarship @relation("ScholarshipForm", fields: [scholarshipID], references: [id])
   certificateFile File?       @relation("FileForm", fields: [certificate], references: [id])
 }
 
@@ -226,11 +226,12 @@ type InnovationQuestion {
   competitionName  String
   teamName         String
   innovationName   String
-  priceName        String
+  prizeName        String
   organizer        String
   competitiveLevel CompetitiveLevel
   numberOfTeam     Int
   activityHour     ActivityHour
+  attachfile       String
 }
 
 type WellBehaviorQuestion {
@@ -240,13 +241,14 @@ type WellBehaviorQuestion {
 type ExtracurricularQuestion {
   extracurricularType ExtracurricularType
 
-  awardDate        DateTime
-  competitionName  String
-  teamName         String
-  innovationName   String
-  priceName        String
-  organizer        String
-  competitiveLevel CompetitiveLevel
-  numberOfTeam     Int
-  activityHour     ActivityHour
+  awardDate        DateTime?
+  competitionName  String?
+  teamName         String?
+  innovationName   String?
+  priceName        String?
+  organizer        String?
+  competitiveLevel CompetitiveLevel?
+  numberOfTeam     Int?
+  activityHour     ActivityHour?
+  attachfile       String?
 }

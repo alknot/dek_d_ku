@@ -50,20 +50,20 @@ export async function POST(req: NextRequest) {
   try {
     const token = req.headers.get('Authorization');
 
-    if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    // if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
     // Do something to verify token and get id
     const userid = '';
-    const user = await db.user.findUnique({ where: { id: userid } });
-    if (!user) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
+    // const user = await db.user.findUnique({ where: { id: userid } });
+    // if (!user) {
+    //   return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    // }
     const body = await req.json();
 
     // Check if the body is null or not an object
-    if (!body || typeof body !== 'object') {
-      return NextResponse.json({ message: 'Invalid or missing request body' }, { status: 400 });
-    }
+    // if (!body || typeof body !== 'object') {
+    //   return NextResponse.json({ message: 'Invalid or missing request body' }, { status: 400 });
+    // }
 
     const requiredFields = [
       'forScholarship',
@@ -108,8 +108,8 @@ export async function POST(req: NextRequest) {
 
     const newFormData: Form = {
       id: generateCuid(),
-      createdBy: userid,
-      forScholarship: body.forScholarship,
+      // createdBy: userid,
+      scholarshipID: body.forScholarship,
       schType: body.schType,
       approveStatus: RequestStatus.PENDING_DEPARTMENT_HEAD,
 
@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
       phone: body.phone,
       email: body.email,
       address: body.address,
-
+      isLastTerm: body.isLastTerm,
       certificate: body.certificate,
       activityImageUrl: body.activityImageUrl,
 

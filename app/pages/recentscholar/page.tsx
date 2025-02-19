@@ -51,24 +51,45 @@ export default function Home() {
     // Navigate based on the scholarship type
     switch(scholarship.schType) {
       case "WELL_BEHAVIOR":
-        // if (scholarship.term === "เทอมต้น") {
-        //   const term=1;
-        //   const url = `../../../../../../../../../../../../pages/recentscholar/applyform/wellbehavior/${scholarship.id}?academiYear=${encodeURIComponent(scholarship.academiYear)}&term=${encodeURIComponent(term)}`;
-        // router.push(url);
-        // }
-        // else if (scholarship.term === "เทอมปลาย") {
-        //   const term=2;
-        //   const url = `../../../../../../../../../../../../pages/recentscholar/applyform/wellbehavior/${scholarship.id}?term=${encodeURIComponent(term)}&academicYear=${encodeURIComponent(scholarship.academiYear)}`;
-        // router.push(url);
-        // }
+        if (scholarship.term === "เทอมต้น") {
+          const term=1;
+          const url = `../../../../../../../../../../../../pages/recentscholar/applyform/wellbehavior/${scholarship.id}?academiYear=${encodeURIComponent(scholarship.academiYear)}&term=${encodeURIComponent(term)}`;
+        router.push(url);
+        }
+        else if (scholarship.term === "เทอมปลาย") {
+          const term=2;
+          const url = `../../../../../../../../../../../../pages/recentscholar/applyform/wellbehavior/${scholarship.id}?term=${encodeURIComponent(term)}&academicYear=${encodeURIComponent(scholarship.academiYear)}`;
+        router.push(url);
+        }
         
         break;
       case "EXTRACURRICULAR":
         
-        router.push(`../../../pages/recentscholar/applyform/extracurricular/${scholarship.id}`);
+      if (scholarship.term === "เทอมต้น") {
+        const term=1;
+        const url = `../../../../../../../../../../../../pages/recentscholar/applyform/extracurricular/${scholarship.id}?academiYear=${encodeURIComponent(scholarship.academiYear)}&term=${encodeURIComponent(term)}`;
+      router.push(url);
+      }
+      else if (scholarship.term === "เทอมปลาย") {
+        const term=2;
+        const url = `../../../../../../../../../../../../pages/recentscholar/applyform/extracurricular/${scholarship.id}?term=${encodeURIComponent(term)}&academicYear=${encodeURIComponent(scholarship.academiYear)}`;
+      router.push(url);
+      }
+        
         break;
       case "INNOVATION":
-        router.push(`../../../pages/recentscholar/applyform/innovation/${scholarship.id}`);
+
+      if (scholarship.term === "เทอมต้น") {
+        const term=1;
+        const url = `../../../../../../../../../../../../pages/recentscholar/applyform/innovation/${scholarship.id}?academiYear=${encodeURIComponent(scholarship.academiYear)}&term=${encodeURIComponent(term)}`;
+      router.push(url);
+      }
+      else if (scholarship.term === "เทอมปลาย") {
+        const term=2;
+        const url = `../../../../../../../../../../../../pages/recentscholar/applyform/innovation/${scholarship.id}?term=${encodeURIComponent(term)}&academicYear=${encodeURIComponent(scholarship.academiYear)}`;
+      router.push(url);
+      }
+        
         break;
       default:
         console.error("Unsupported scholarship type:", scholarship.schType);

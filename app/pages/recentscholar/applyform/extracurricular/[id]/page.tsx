@@ -8,27 +8,292 @@ import Footer from "@/components/footer";
 import { useRouter } from "next/compat/router";
 
 import Sidebar from "@/components/sidebar";
-import { SchType } from "@prisma/client";
+import { ActivityHour, CompetitiveLevel, ExtracurricularType, SchType } from "@prisma/client";
 import { programType } from "@prisma/client";
 // import router from "next/dist/shared/lib/router/router";
 
 
 const Create = () => {
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setPdf(event.target.files[0]);
+      setPdfMimeType(event.target.files[0].type);
+      console.log(event.target.files[0].type);
+    }
+  };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setImages(event.target.files[0]);
+      setImageMimeType(event.target.files[0].type);
+      console.log(event.target.files[0].type);
+    }
+  };
+
+  const handleUploadPdf = async () => {
+    if (!pdf) return;
+
+    const toBase64 = (file: File): Promise<string> =>
+      new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = (error) => reject(error);
+      });
+
+    const base64File = await toBase64(pdf);
+
+    const formData = new FormData();
+    formData.append('pdf', base64File);
+    formData.append('mimeType', pdfMimeType || '');
+    formData.forEach((value, key) => {
+      console.log(`${key}:`, value);
+    });
+
+    try {
+      const response = await fetch('/api/upload/pdf', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const URL = (await response.json()).url;
+        setPdfUrl(URL);
+        return URL;
+      } else {
+        setPdfUrl(null);
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      setPdfUrl(null);
+    }
+  };
+
+  const handleUploadImage = async () => {
+    if (!image) return;
+
+    const toBase64 = (image: File): Promise<string> =>
+      new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(image);
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = (error) => reject(error);
+      });
+
+    const base64Image = await toBase64(image);
+
+    const formData = new FormData();
+    formData.append('image', base64Image);
+    formData.append('mimeType', imageMimeType || '');
+    formData.forEach((value, key) => {
+      console.log(`${key}:`, value);
+    });
+
+    try {
+      const response = await fetch('/api/upload/image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      console.log(response);
+
+      if (response.ok) {
+        const URL = (await response.json()).url;
+        setImageUrl(URL);
+        return URL;
+      } else {
+        setImageUrl(null);
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      setImageUrl(null);
+    }
+  };
+
+  const [pdf, setPdf] = useState<File | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [pdfMimeType, setPdfMimeType] = useState<string | null>(null);
+  const [image, setImages] = useState<File | null>(null);
+  const [imageMimeType, setImageMimeType] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+
+  const [nisitNameTh, setNisitNameTH] = useState<string>("");
+  const [nisitNameEn, setNisitNameENG] = useState<string>("");
+  const [nisitid, setNisitID] = useState<string>("");
+  const [nisitAcademicyear, setNisitAcademicyear] = useState<string>("");
+  const [age, setAge] = useState<number>();
+  const [dateofBirth, setDateofBirth] = useState<Date | null>(null);
+  const [awardDate, setAwardDate] = useState<Date | null>(null);
+  const [faculty, setFaculty] = useState<string>("");
+  const [department, setDepartment] = useState<string>("");
+  const [advisor, setAdvisor] = useState<string>("");
+  const [gpa, setGPA] = useState<number>();
+  const [phone, setPhone] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [address, setAddress] = useState<string>("");
+  const [isLastTerm, setLastterm] = useState("");
+  const [competitionName, setCompetitionName] = useState<string>("");
+  const [teamName, setTeamName] = useState<string>("");
+  const [innovationName, setInnovationName] = useState<string>("");
+  const [organizer, setOrganizer] = useState<string>("");
+  const [prizeName, setPrizeName] = useState<string>("");
+  const [fileType, setFileType] = useState<string>("");
+  const [numberOfTeam, setNumberOfTeam] = useState<number>();
+  const [ExtracurricularType, setExtracurricularType] = useState<ExtracurricularType>();
+  const [activityHour, setactivityHour] = useState<ActivityHour>();
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState('');
+  const options = [
+    { label: 'กรุณาเลือก', value: '' },
+    { label: 'เข้าร่วมการแข่งขันทางวิชาการหรือศิลปกรรม ระดับอุดมศึกษา และได้รับราลวัลใดรางวัลหนึ่งจากการแข่งขัน', value: "UNIVERSITY_COMPETITION" },
+    { label: 'เข้าร่วมการแข่งขันทางวิชาการหรือศิลปกรรม ระดับชาติ และได้รับราลวัลใดรางวัลหนึ่งจากการแข่งขัน', value: "NATIONAL_COMPETITION" },
+    { label: 'เข้าร่วมการแข่งขันทางวิชาการหรือศิลปกรรม ระดับนานาชาติ และได้รับราลวัลใดรางวัลหนึ่งจากการแข่งขัน', value: "INTERNATIONAL_COMPETITION" },
+    { label: 'ดำรงตำแหน่งนายกองค์การบริหาร องค์การนิสิต ประธานสภาผู้แทนนิสิตหรือนายกสโมสรนิสิต', value: "POSITION" },
+    { label: 'เป็นนิสิตที่ดำเนินกิจกรรมและต้องแสดงให้เห็นว่าเมื่อดำเนินกิจกรรมแล้ว ชาวบ้าน ชุมชนในท้องถิ่นหรือผู้เข้าร่วมกิจกรรมได้รับประโยชน์อย่างไรจากการดำเนินกิจกรรมก่อให้เกิดประโยชน์ต่อส่วนรวมและเป็นการสร้างเกียรติคุณต่อคณะหรือมหาลัยหรือไม่', value: "SOCIAL" },
+  ];
+
   
+
+  
+
+  <option value="SOCIAL">เป็นนิสิตที่ดำเนินกิจกรรมและต้องแสดงให้เห็นว่าเมื่อดำเนินกิจกรรมแล้ว ชาวบ้าน 
+    ชุมชนในท้องถิ่นหรือผู้เข้าร่วมกิจกรรมได้รับประโยชน์อย่างไรจากการดำเนินกิจกรรมก่อให้เกิดประโยชน์ต่อส่วนรวมและเป็นการสร้างเกียรติคุณต่อคณะหรือมหาลัยหรือไม่</option>
+
+
+  const router = useRouter();
+  const { id, academiYear, term } = router?.query || {};
+  console.log("id", id);
+  const accept = ".pdf";
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  // const handleRewardChange = (reward: string) => {
-  //     setrewards(prevRewards => 
-  //         prevRewards.includes(reward) 
-  //         ? prevRewards.filter(r => r !== reward) 
-  //         : [...prevRewards, reward]
-  //     );
-  // };
+  const handleSubmit = async () => {
 
-  
+    if (fileType === 'pdf') {
+      const url = await handleUploadPdf();
+      console.log(fileType);
+      try {
+        const data = {
+          nisitNameTh,
+          nisitNameEn,
+          nisitid,
+          nisitAcademicyear,
+          age,
+          dateofBirth,
+          faculty,
+          department,
+          advisor,
+          gpa,
+          phone,
+          email,
+          address,
+          isLastTerm,
+          scholarshipId: id,
+          competitionName,
+          teamName,
+          innovationName,
+          prizeName,
+          organizer,
+          numberOfTeam,
+          ExtracurricularType,
+          activityHour,
+          attachfile: url,
+          // Include the id in the data
+        };
+
+        console.log(data); // ตรวจสอบข้อมูลก่อนส่ง
+
+        // ส่งข้อมูลไปยัง API
+        await axios.post('/api/request', data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    else if (fileType === 'image') {
+      const url = await handleUploadImage();
+      console.log(fileType);
+      try {
+        const data = {
+          nisitNameTh,
+          nisitNameEn,
+          nisitid,
+          nisitAcademicyear,
+          age,
+          dateofBirth,
+          faculty,
+          department,
+          advisor,
+          gpa,
+          phone,
+          email,
+          address,
+          isLastTerm,
+          scholarshipId: id,
+          competitionName,
+          teamName,
+          innovationName,
+          prizeName,
+          organizer,
+          numberOfTeam,
+          ExtracurricularType,
+          activityHour,
+          attachfile: url,
+          // Include the id in the data
+        };
+
+        console.log(data); // ตรวจสอบข้อมูลก่อนส่ง
+
+        // ส่งข้อมูลไปยัง API
+        await axios.post('/api/request', data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    else {
+      try {
+        const data = {
+          nisitNameTh,
+          nisitNameEn,
+          nisitid,
+          nisitAcademicyear,
+          age,
+          dateofBirth,
+          faculty,
+          department,
+          advisor,
+          gpa,
+          phone,
+          email,
+          address,
+          isLastTerm,
+          scholarshipId: id,
+          competitionName,
+          teamName,
+          innovationName,
+          prizeName,
+          organizer,
+          numberOfTeam,
+          ExtracurricularType,
+          activityHour,
+
+          // Include the id in the data
+        };
+
+        console.log(data); // ตรวจสอบข้อมูลก่อนส่ง
+
+        // ส่งข้อมูลไปยัง API
+        await axios.post('/api/request', data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -42,7 +307,7 @@ const Create = () => {
       <main className="flex-1 flex justify-center bg-gray-100 w-full mx-auto">
         <div className="w-full max-w-5xl bg-white p-6 rounded-lg shadow-lg">
           <h2 className="mb-4 text-xl font-bold text-gray-900 text-center">แบบฟอร์มเสนอรายชื่อนิสิตดีเด่นมหาสิทยาลัยเกษรศาสตร์</h2>
-          
+
           <form>
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
               <div className="sm:col-span-2">
@@ -51,7 +316,7 @@ const Create = () => {
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
             dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่อผู้สมัคร (ภาษาไทย)"
-                   />
+                  value={nisitNameTh} onChange={(e) => setNisitNameTH(e.target.value)} required />
               </div>
 
               <div className="sm:col-span-2">
@@ -60,123 +325,122 @@ const Create = () => {
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
             dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่อผู้สมัคร (ภาษาอังกฤษ)"
-                   />
+                  value={nisitNameEn} onChange={(e) => setNisitNameENG(e.target.value)} required />
               </div>
 
               <div className="flex space-x-10 sm:col-span-2">
-              <div className="relative max-w-sm">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">นิสิตชั้นปีที่</label>
-                <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+                <div className="relative max-w-sm">
+                  <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">นิสิตชั้นปีที่</label>
+                  <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
             dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="นิสิตชั้นปีที่"
-                   />
-              </div>
-              <div className="relative max-w-sm">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">รหัสนิสิต</label>
-                <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+                    value={nisitAcademicyear} onChange={(e) => setNisitAcademicyear(e.target.value)} required />
+                </div>
+                <div className="relative max-w-sm">
+                  <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">รหัสนิสิต</label>
+                  <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
             dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="รหัสนิสิต"
-                   />
-              </div>
-
-              <div className="flex space-x-10 sm:col-span-2">
-                <div className="relative max-w-sm">
-                  <label className="block mb-2 text-sm font-medium text-gray-900">เกิดวันที่</label>
-                  <DatePicker
-                    // selected={startDate}
-                    // onChange={(date) => setstartDate(date)}
-                    placeholderText="เกิดวันที่"
-                    dateFormat="dd/MM/yyyy"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
-                  />
+                    value={nisitid} onChange={(e) => setNisitID(e.target.value)} required />
                 </div>
-                <div className="relative max-w-sm">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">อายุ</label>
-                <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+
+                <div className="flex space-x-10 sm:col-span-2">
+                  <div className="relative max-w-sm">
+                    <label className="block mb-2 text-sm font-medium text-gray-900">เกิดวันที่</label>
+                    <DatePicker
+                      selected={dateofBirth}
+                      onChange={(date) => setDateofBirth(date)}
+                      placeholderText="เกิดวันที่"
+                      dateFormat="dd/MM/yyyy"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
+                    />
+                  </div>
+                  <div className="relative max-w-sm">
+                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">อายุ</label>
+                    <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
             dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="อายุ (ปี)"
-                   />
-              </div>
-              </div>
+                      value={age} onChange={(e) => setAge(Number(e.target.value))} required />
+                  </div>
+                </div>
 
-              
+
               </div>
               <div className="flex space-x-10 sm:col-span-2">
-              <div className="relative max-w-sm">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">คณะ</label>
-                <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+                <div className="relative max-w-sm">
+                  <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">คณะ</label>
+                  <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
             dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="คณะ"
-                   />
-              </div>
-              <div className="relative max-w-sm">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ภาควิชา/สาขาวิชา</label>
-                <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+                    value={faculty} onChange={(e) => setFaculty(e.target.value)} required />
+                </div>
+                <div className="relative max-w-sm">
+                  <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ภาควิชา/สาขาวิชา</label>
+                  <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
             dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ภาควิชา/สาขาวิชา"
-                   />
-              </div>
-              <div className="relative max-w-sm">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">คะแนนเฉลี่ยสะสม</label>
-                <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+                    value={department} onChange={(e) => setDepartment(e.target.value)} required />
+                </div>
+                <div className="relative max-w-sm">
+                  <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">คะแนนเฉลี่ยสะสม</label>
+                  <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
             dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="คะแนนเฉลี่ยสะสม"
-                   />
-              </div>
-              <div className="relative max-w-sm">
+                    value={gpa} onChange={(e) => setGPA(Number(e.target.value))} required />
+                </div>
+                <div className="relative max-w-sm">
                   <label htmlFor="programType" className="block mb-2 text-sm font-medium text-gray-900">ภาคการศึกษานี้เป็นภาคสุดท้ายก่อนจะจบ</label>
                   <select className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
             dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    id="programType"
-                    // value={programType}
-                    // onChange={(e) => setprogramType(e.target.value)}
+                    value={isLastTerm}
+                    onChange={(e) => setLastterm(e.target.value)}
                     required
                   >
                     <option value="">กรุณาเลือก</option>
-                    <option value="">ใช่</option>
-                    <option value="">ไม่ใช่</option>
-                    
+                    <option value="true">ใช่</option>
+                    <option value="false">ไม่ใช่</option>
+
                   </select>
                 </div>
               </div>
 
 
               <div className="flex space-x-10 sm:col-span-2">
-                
-              <div className="relative max-w-sm">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">โทรศัพท์</label>
-                <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+
+                <div className="relative max-w-sm">
+                  <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">โทรศัพท์</label>
+                  <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
             dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="โทรศัพท์"
-                   />
-              </div>
-              <div className="relative max-w-sm">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">E-mail</label>
-                <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+                    value={phone} onChange={(e) => setPhone(e.target.value)} required />
+                </div>
+                <div className="relative max-w-sm">
+                  <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">E-mail</label>
+                  <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
             dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="E-mail"
-                   />
+                    value={email} onChange={(e) => setEmail(e.target.value)} required />
+                </div>
               </div>
-              </div>
-              
+
 
               <div className="sm:col-span-2">
                 <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่ออาจารยืที่ปรึกษา</label>
                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่ออาจารยืที่ปรึกษา"
-                   />
+            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่ออาจารย์ที่ปรึกษา"
+                  value={advisor} onChange={(e) => setAdvisor(e.target.value)} required />
               </div>
 
               <div className="sm:col-span-2">
@@ -185,116 +449,200 @@ const Create = () => {
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
             dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ที่อยู่ปัจจุบัน"
-                   />
+                  value={address} onChange={(e) => setAddress(e.target.value)} required />
               </div>
+              {/* <div className="relative max-w-sm">
+                <label className="block mb-2 text-sm font-medium text-gray-900">ประเภทการสมัคร</label>
+                <select
+                  className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+                  value={ExtracurricularType}
+                  onChange={(e) => setExtracurricularType(e.target.value as ExtracurricularType)}
+                  required
+                >
+                  <option value="">กรุณาเลือก</option>
+                  <option value="UNIVERSITY_COMPETITION">เข้าร่วมการแข่งขันทางวิชาการหรือศิลปกรรม ระดับอุดมศึกษา และได้รับราลวัลใดรางวัลหนึ่งจากการแข่งขัน</option>
+                  <option value="NATIONAL_COMPETITION">เข้าร่วมการแข่งขันทางวิชาการหรือศิลปกรรม ระดับชาติ และได้รับราลวัลใดรางวัลหนึ่งจากการแข่งขัน</option>
+                  <option value="INTERNATIONAL_COMPETITION">เข้าร่วมการแข่งขันทางวิชาการหรือศิลปกรรม ระดับนานาชาติ และได้รับราลวัลใดรางวัลหนึ่งจากการแข่งขัน</option>
+                  <option value="POSITION">ดำรงตำแหน่งนายกองค์การบริหาร องค์การนิสิต ประธานสภาผู้แทนนิสิตหรือนายกสโมสรนิสิต</option>
+                  <option value="SOCIAL">เป็นนิสิตที่ดำเนินกิจกรรมและต้องแสดงให้เห็นว่าเมื่อดำเนินกิจกรรมแล้ว ชาวบ้าน 
+                    ชุมชนในท้องถิ่นหรือผู้เข้าร่วมกิจกรรมได้รับประโยชน์อย่างไรจากการดำเนินกิจกรรมก่อให้เกิดประโยชน์ต่อส่วนรวมและเป็นการสร้างเกียรติคุณต่อคณะหรือมหาลัยหรือไม่</option>
+                </select>
+              </div> */}
 
               <div className="sm:col-span-2">
-                <label className="block mb-2 text-sm font-medium text-gray-900">แนบผลงาน(ใบประกาศ) หรือเอกสารอ้างอิงที่บ่งบอกถึงการได้รับรางวัล</label>
-                <input
-                  type="file"
-                  
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
-                  required
-                />
+                <label className="block mb-2 text-sm font-medium text-gray-900">ประเภทการสมัคร</label>
+                <div onClick={() => setIsOpen(!isOpen)} className="cursor-pointer border px-4 py-2 w-full">
+                  {selectedOption || "Select an option"}
+                </div>
+                {isOpen && (
+                  <div className=" border mt-1">
+                    {options.map(opt => (
+                      <div key={opt.value} onClick={() => { setSelectedOption(opt.label); setIsOpen(false); setExtracurricularType(opt.value as ExtracurricularType) }} className="cursor-pointer px-4 py-2 hover:bg-gray-100 w-full">
+                        <p>{opt.label.split(': ')[0]}</p>
+                        <p className="text-sm text-gray-600">{opt.label.split(': ')[1]}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              <div className="flex space-x-10 sm:col-span-2">
-                <div className="relative max-w-sm">
-                  <label className="block mb-2 text-sm font-medium text-gray-900">วันที่ได้รับรางวัล</label>
-                  <DatePicker
-                    // selected={startDate}
-                    // onChange={(date) => setstartDate(date)}
-                    placeholderText="วันที่ได้รับรางวัล"
-                    dateFormat="dd/MM/yyyy"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
-                  />
-                </div>
-                
-              </div>
-              <div className="sm:grid-cols-1">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อโครงการที่แข่งขัน/เข้าร่วม</label>
-                <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+              {(ExtracurricularType === 'UNIVERSITY_COMPETITION' || ExtracurricularType === 'NATIONAL_COMPETITION' || ExtracurricularType === 'INTERNATIONAL_COMPETITION') && (
+                <div className="sm:col-span-2">
+                  <div className="sm:col-span-2">
+                    <div className="relative max-w-sm">
+                      <label className="block mb-2 text-sm font-medium text-gray-900">เลือกประเภทไฟล์</label>
+                      <select
+                        className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+                        value={fileType}
+                        onChange={(e) => setFileType(e.target.value)}
+                        required
+                      >
+                        <option value="">กรุณาเลือก</option>
+                        <option value="pdf">file .pdf</option>
+                        <option value="image">file image</option>
+                      </select>
+                    </div>
+                    {fileType === 'pdf' && (
+                      <div className="sm:col-span-2">
+                        <label className="block mb-2 text-sm font-medium text-gray-900">แนบผลงาน(ใบประกาศ) หรือเอกสารอ้างอิงที่บ่งบอกถึงการได้รับรางวัล</label>
+                        <input
+                          type="file"
+                          accept=".pdf"
+                          onChange={handleFileChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
+                          required
+                        />
+                        {pdfUrl && (
+                          <a
+                            href={pdfUrl}
+                            className="mt-4 text-green-500"
+                            target="_blank"
+                            rel="noopener noreferrer">
+                            {pdfUrl}
+                          </a>
+
+                        )}
+                      </div>
+                    )}
+                    {fileType === 'image' && (
+                      <div className="sm:col-span-2">
+                        <label className="block mb-2 text-sm font-medium text-gray-900">แนบผลงาน(ใบประกาศ) หรือเอกสารอ้างอิงที่บ่งบอกถึงการได้รับรางวัล</label>
+                        <input
+                          type="file"
+                          onChange={handleImageChange}
+                          accept="image/*"
+                          className="mb-4 w-full rounded-md border px-3 py-2"
+                        />
+                        {imageUrl && (
+                          <a
+                            href={imageUrl}
+                            className="mt-4 text-green-500"
+                            target="_blank"
+                            rel="noopener noreferrer">
+                            {imageUrl}
+                          </a>
+                        )}
+                      </div>
+                    )}
+
+                  </div>
+
+                  <div className="flex space-x-10 sm:col-span-2">
+                    <div className="relative max-w-sm">
+                      <label className="block mb-2 text-sm font-medium text-gray-900">วันที่ได้รับรางวัล</label>
+                      <DatePicker
+                        selected={awardDate}
+                        onChange={(date) => setAwardDate(date)}
+                        placeholderText="วันที่ได้รับรางวัล"
+                        dateFormat="dd/MM/yyyy"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
+                      />
+                    </div>
+
+                  </div>
+                  <div className="sm:grid-cols-1">
+                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อโครงการที่แข่งขัน/เข้าร่วม</label>
+                    <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
             dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่อโครงการที่แข่งขัน/เข้าร่วม"
-                   />
-              </div>
-              <div className="sm:grid-cols-1">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อทีม</label>
-                <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+                      value={competitionName} onChange={(e) => setCompetitionName(e.target.value)} required />
+                  </div>
+                  <div className="sm:grid-cols-1">
+                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อทีม</label>
+                    <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
             dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่อทีม"
-                   />
-              </div>
-              <div className="sm:grid-cols-1">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อผลงานที่ได้รับรางวัล</label>
-                <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+                      value={teamName} onChange={(e) => setTeamName(e.target.value)} required />
+                  </div>
+                  <div className="sm:grid-cols-1">
+                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อผลงานที่ได้รับรางวัล</label>
+                    <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
             dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่อผลงานที่ได้รับรางวัล"
-                   />
-              </div>
-              <div className="sm:grid-cols-1">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">รางวัลที่ได้รับ</label>
-                <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+                      value={innovationName} onChange={(e) => setInnovationName(e.target.value)} required />
+                  </div>
+                  <div className="sm:grid-cols-1">
+                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">รางวัลที่ได้รับ</label>
+                    <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
             dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="รางวัลที่ได้รับ"
-                   />
-              </div>
+                      value={prizeName} onChange={(e) => setPrizeName(e.target.value)} required />
+                  </div>
 
+                  <div className="sm:grid-cols-1">
+                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">หน่วยงานที่จัดการแข่งขัน/โครงการ
+                    </label>
+                    <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
+            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
+            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="รางวัลที่ได้รับ"
+                      value={organizer} onChange={(e) => setOrganizer(e.target.value)} required />
+                  </div>
 
+                  <div className="flex space-x-10 sm:col-span-2">
+                    <div className="sm:grid-cols-1">
+                      <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">จำนวนทีมที่เข้าร่วมในโครงการ/การแข่งขัน</label>
+                      <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
+            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
+            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="เช่น 5"
+                        value={numberOfTeam} onChange={(e) => setNumberOfTeam(Number(e.target.value))} required />
+                    </div>
 
-              <div className="flex space-x-10 sm:col-span-2">
-                
-                <div className="relative max-w-sm">
-                  <label htmlFor="term" className="block mb-2 text-sm font-medium text-gray-900">ระดับการประกวดการแข่งขัน/การเข้าร่วม</label>
-                  <select className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
+                    <div >
+                      <label htmlFor="programType" className="block mb-2 text-sm font-medium text-gray-900">ประเภทกิจกรรม</label>
+                      <select className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
             dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    id="term"
-                    // value={term}
-                    // onChange={(e) => setterm(e.target.value)}
-                    required
-                  >
-                    <option value="">กรุณาเลือก</option>
-                    <option value="">ระดับอุดมศึกษา</option>
-                    <option value="เทอมต้น">ระดับชาติ</option>
-                    <option value="เทอมปลาย">ระดับนานาติ</option>
-                  </select>
+                        id="programType"
+                        value={activityHour}
+                        onChange={(e) => setactivityHour(e.target.value as ActivityHour)}
+                        required
+                      >
+                        <option value="">กรุณาเลือก</option>
+                        <option value="OTHER">ส่งเสริมคุณลักษณะบัณฑิตที่พึงประสงค์ที่กำหนดโดยสถาบัน</option>
+                        <option value="SPORT">กีฬาหรือส่งเสริมสุขภาพ</option>
+                        <option value="ENVIRONMENT">บำเพ็ญประโยชน์หรือรักษาสิ่งแวดล้อม</option>
+                        <option value="VIRTUE">เสริมสร้างคุณธรรมและจริยธรรม</option>
+                        <option value="CULTURE">ส่งเสริมศิลปและวัฒนธรรม</option>
+                      </select>
+                    </div>
+
+                  </div>
                 </div>
-                <div >
-                  <label htmlFor="programType" className="block mb-2 text-sm font-medium text-gray-900">ประเภทกิจกรรม</label>
-                  <select className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    id="programType"
-                    // value={programType}
-                    // onChange={(e) => setprogramType(e.target.value)}
-                    required
-                  >
-                    <option value="">กรุณาเลือก</option>
-                    <option value="">ส่งเสริมคุณลักษณะบัณฑิตที่พึงประสงค์ที่กำหนดโดยสถาบัน</option>
-                    <option value="">กีฬาหรือส่งเสริมสุขภาพ</option>
-                    <option value="">บำเพ็ญประโยชน์หรือรักษาสิ่งแวดล้อม</option>
-                    <option value="">เสริมสร้างคุณธรรมและจริยธรรม</option>
-                    <option value="">ส่งเสริมศิลปและวัฒนธรรม</option>
-                  </select>
-                </div>
-
-              </div>
+              )}
 
 
 
-
-              
             </div>
             <button
               type="button"
-            //   onClick={handleSubmit}
+              onClick={handleSubmit}
               className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-lg"
             >
               สมัคร

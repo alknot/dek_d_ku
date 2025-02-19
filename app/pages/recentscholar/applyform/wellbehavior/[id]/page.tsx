@@ -5,11 +5,13 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import { useRouter } from "next/router"; // Import useRouter from next/router
+import { useRouter } from "next/compat/router"; // Import useRouter from next/router
+import { useSearchParams,useParams  } from 'next/navigation'
 
 import Sidebar from "@/components/sidebar";
 import { SchType } from "@prisma/client";
 import { programType } from "@prisma/client";
+import { set } from "date-fns";
 // import router from "next/dist/shared/lib/router/router";
 
 const Create = () => {
@@ -17,21 +19,33 @@ const Create = () => {
   const [nisitNameEn, setNisitNameENG] = useState<string>("");
   const [nisitid, setNisitID] = useState<string>("");
   const [nisitAcademicyear, setNisitAcademicyear] = useState<string>("");
-  const [age, setAge] = useState<number>();
+  const [age, setAge] = useState<string>("");
   const [dateofBirth, setDateofBirth] = useState<Date | null>(null);
   const [faculty, setFaculty] = useState<string>("");
   const [department, setDepartment] = useState<string>("");
   const [advisor, setAdvisor] = useState<string>("");
-  const [gpa, setGPA] = useState<number>();
+  const [gpa, setGPA] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [behavior_Detail, setBehaviorDetail] = useState("");
   const [isLastTerm, setLastterm] = useState("");
+  const [term, setTerm] = useState<string>("");
+  const [academicYear, setAcademicYear] = useState<string>("");
+  const [scholarshipId, setScholarshipId] = useState<string>("");
+  const [schType, setSchType] = useState<SchType>(SchType.WELL_BEHAVIOR);
 
+
+  
   const router = useRouter();
-  const { id, academiYear, term } = router.query;
+  
 
+  
+  const id = useParams<{ id: string}>()
+  const searchParams = useSearchParams()
+  const academicYearparam = searchParams.get('academiYear')
+  // console.log("Acade",academicYearparam)
+  const termnum = searchParams.get('term')
   const accept = ".pdf";
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -40,6 +54,17 @@ const Create = () => {
   };
 
   const handleSubmit = async () => {
+  
+  setScholarshipId(id.id)
+  // console.log("Academic",academicYearparam)
+
+  setAcademicYear(academicYearparam || "")
+
+  if (termnum == "1"){
+    setTerm("เทอมต้น")
+  }else if(termnum == "2"){
+    setTerm("เทอมปลาย")
+  }
     try {
       const data = {
         nisitNameTh,
@@ -57,14 +82,19 @@ const Create = () => {
         address,
         behavior_Detail,
         isLastTerm,
-        scholarshipId: id, // Include the id in the data
+        scholarshipId: id,
+        schType: schType,
+
+        term: term,
+        academicYear: academicYearparam,
+         // Include the id in the data
       };
 
       console.log(data); // ตรวจสอบข้อมูลก่อนส่ง
 
       // ส่งข้อมูลไปยัง API
       await axios.post('/api/request', data);
-      router.push('/thankyou');
+      
     } catch (error) {
       console.error(error);
     }
@@ -137,8 +167,8 @@ const Create = () => {
                     <input type="text" id="" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="อายุ (ปี)"
-                      value={age} onChange={(e) => setAge(Number(e.target.value))} required />
+            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="อายุ(ปี)"
+                      value={age} onChange={(e) => setAge((e.target.value))} required/>
                   </div>
                 </div>
 
@@ -150,7 +180,7 @@ const Create = () => {
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
             dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="คณะ"
-                  />
+            value={faculty} onChange={(e) => setFaculty(e.target.value)} required/>
                 </div>
                 <div className="relative max-w-sm">
                   <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ภาควิชา/สาขาวิชา</label>
@@ -158,15 +188,16 @@ const Create = () => {
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
             dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ภาควิชา/สาขาวิชา"
-                  />
+            value={department} onChange={(e) => setDepartment(e.target.value)} required/>
                 </div>
                 <div className="relative max-w-sm">
                   <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">คะแนนเฉลี่ยสะสม</label>
-                  <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm
+                  <input type="" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
             dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="คะแนนเฉลี่ยสะสม"
-                    value={gpa} onChange={(e) => setGPA(Number(e.target.value))} required />
+                    value={gpa} onChange={(e) => setGPA((e.target.value))}
+                     required />
                 </div>
                 <div className="relative max-w-sm">
                   <label htmlFor="" className="block mb-2 text-sm font-medium text-gray-900">ภาคการศึกษานี้เป็นภาคสุดท้ายก่อนจะจบ</label>
@@ -210,7 +241,7 @@ const Create = () => {
 
 
               <div className="sm:col-span-2">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่ออาจารยืที่ปรึกษา</label>
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่ออาจารย์ที่ปรึกษา</label>
                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm
             rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700
             dark:border-gray-600 dark:placeholder-gray-400 dark:text-white

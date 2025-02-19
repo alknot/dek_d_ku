@@ -164,33 +164,7 @@ const Create = () => {
                   </a>
                 )}
               </div>
-              {/* <div className="sm:col-span-2">
-            <label className="block mb-2 text-sm font-medium text-gray-900">รางวัลในแต่ละโครงการ</label>
-            <div className="flex flex-col space-y-2">
-              {["ลดค่าบำรุงมหาวิทยาลัย", "ลดค่าหน่วยกิต", "ลดค่าธรรมเนียมพิเศษคณะ", "อื่นๆ"].map((reward) => (
-                <label key={reward} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="reward"
-                    value={reward}
-                    checked={rewards.includes(reward)}
-                    onChange={() => handleRewardChange(reward)}
-                    className="mr-2"
-                  />
-                  {reward}
-                </label>
-              ))}
-              {rewards.includes("อื่นๆ") && (
-                <input
-                  
-                  type="text"
-                  value={otherReward}
-                  onChange={(e) => setotherReward(e.target.value)}
-                  placeholder="กรอกรางวัลอื่นๆ"
-                />
-              )}
-            </div>
-          </div> */}
+       
 
               <div className="flex space-x-10 sm:col-span-2">
                 <div className="relative max-w-sm">

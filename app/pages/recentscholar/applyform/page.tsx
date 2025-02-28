@@ -38,38 +38,30 @@ const Create = () => {
           <form>
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
               <div className="sm:col-span-2">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อผู้สมัคร (ภาษาไทย)</label>
+                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">ชื่อผู้สมัคร (ภาษาไทย)</label>
                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่อผู้สมัคร (ภาษาไทย)"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="ชื่อผู้สมัคร (ภาษาไทย)"
                    />
               </div>
 
               <div className="sm:col-span-2">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อผู้สมัคร (ภาษาอังกฤษ)</label>
+                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">ชื่อผู้สมัคร (ภาษาอังกฤษ)</label>
                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่อผู้สมัคร (ภาษาอังกฤษ)"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="ชื่อผู้สมัคร (ภาษาอังกฤษ)"
                    />
               </div>
 
               <div className="flex space-x-10 sm:col-span-2">
               <div className="relative max-w-sm">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">นิสิตชั้นปีที่</label>
+                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">นิสิตชั้นปีที่</label>
                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="นิสิตชั้นปีที่"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="นิสิตชั้นปีที่"
                    />
               </div>
               <div className="relative max-w-sm">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">รหัสนิสิต</label>
+                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">รหัสนิสิต</label>
                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="รหัสนิสิต"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="รหัสนิสิต"
                    />
               </div>
 
@@ -85,11 +77,9 @@ const Create = () => {
                   />
                 </div>
                 <div className="relative max-w-sm">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">อายุ</label>
+                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">อายุ</label>
                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="อายุ (ปี)"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="อายุ (ปี)"
                    />
               </div>
               </div>
@@ -98,35 +88,27 @@ const Create = () => {
               </div>
               <div className="flex space-x-10 sm:col-span-2">
               <div className="relative max-w-sm">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">คณะ</label>
+                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">คณะ</label>
                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="คณะ"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="คณะ"
                    />
               </div>
               <div className="relative max-w-sm">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ภาควิชา/สาขาวิชา</label>
+                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">ภาควิชา/สาขาวิชา</label>
                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ภาควิชา/สาขาวิชา"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="ภาควิชา/สาขาวิชา"
                    />
               </div>
               <div className="relative max-w-sm">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">คะแนนเฉลี่ยสะสม</label>
+                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">คะแนนเฉลี่ยสะสม</label>
                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="คะแนนเฉลี่ยสะสม"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="คะแนนเฉลี่ยสะสม"
                    />
               </div>
               <div className="relative max-w-sm">
                   <label htmlFor="programType" className="block mb-2 text-sm font-medium text-gray-900">ภาคการศึกษานี้เป็นภาคสุดท้ายก่อนจะจบ</label>
                   <select className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 "
                     id="programType"
                     // value={programType}
                     // onChange={(e) => setprogramType(e.target.value)}
@@ -144,47 +126,37 @@ const Create = () => {
               <div className="flex space-x-10 sm:col-span-2">
                 
               <div className="relative max-w-sm">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">โทรศัพท์</label>
+                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">โทรศัพท์</label>
                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="โทรศัพท์"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="โทรศัพท์"
                    />
               </div>
               <div className="relative max-w-sm">
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">E-mail</label>
+                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">E-mail</label>
                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="E-mail"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="E-mail"
                    />
               </div>
               </div>
               
 
               <div className="sm:col-span-2">
-                <label  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่ออาจารยืที่ปรึกษา</label>
+                <label  className="block mb-2 text-sm font-medium text-gray-900 ">ชื่ออาจารยืที่ปรึกษา</label>
                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่ออาจารยืที่ปรึกษา"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="ชื่ออาจารยืที่ปรึกษา"
                    />
               </div>
 
               <div className="sm:col-span-2">
-                <label  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ที่อยู่ปัจจุบัน</label>
+                <label  className="block mb-2 text-sm font-medium text-gray-900 ">ที่อยู่ปัจจุบัน</label>
                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ที่อยู่ปัจจุบัน"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="ที่อยู่ปัจจุบัน"
                    />
               </div>
               <div className="sm:col-span-2">
-                <label  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">บรรยายความประพฤติดี</label>
+                <label  className="block mb-2 text-sm font-medium text-gray-900 ">บรรยายความประพฤติดี</label>
                 <textarea rows={6} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="บรรยายความประพฤติดี"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="บรรยายความประพฤติดี"
                    />
               </div>
             </div>

@@ -45,7 +45,7 @@ const toggleSidebar = () => {
       try {
         setLoading(true);
         const response = await axios.get("/api/users"); // แก้ endpoint ให้ตรงกับ backend
-        setUsers(response.data);
+        // setUsers(response.data);
       } catch (err) {
         setError("Failed to fetch users");
       } finally {
@@ -72,7 +72,7 @@ const toggleSidebar = () => {
       alert("Role assigned successfully!");
       // Refresh user list
       const response = await axios.get("/api/users");
-      setUsers(response.data);
+      // setUsers(response.data);
     } catch (err) {
       setError("Failed to assign role.");
     } finally {

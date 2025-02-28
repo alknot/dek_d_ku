@@ -118,7 +118,7 @@ export default function Home() {
                 <input
                   type="text"
                   
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
                   placeholder="รหัสนิสิต"
                   value={academiYear}
                   onChange={(e) => setAcademicYear(e.target.value)}
@@ -130,53 +130,10 @@ export default function Home() {
               >
                 ค้นหา
               </button>
-              {/* Dropdown 2 */}
-              {/* <select
-                className="border-gray-300 rounded-lg p-2"
-                value={programType}
-                onChange={(e) => setProgramType(e.target.value)}
-              >
-                <option value="">ประเภทย่อย</option>
-                <option value="THAI">เข้าร่วมการแข่งขันทางวิชาการหรือศิลปกรรม</option>
-                <option value="INTERNATIONAL">การดำรงตำแหน่ง</option>
-                <option value="INTERNATIONAL">นิสิตที่ดำเนินกิจกรรมสร้างเกียรติคุณต่อคณะหรือมหาลัย</option>
-              </select> */}
-              {/* Dropdown 3 */}
-              {/* <select
-                className="border-gray-300 rounded-lg p-2"
-                value={term}
-                onChange={(e) => setTerm(e.target.value)}
-              >
-                <option value="">ระดับการแข่งขัน</option>
-                <option value="เทอมต้น">ระดับอุดมศึกษา</option>
-                <option value="เทอมปลาย">ระดับชาติ</option>
-                <option value="เทอมปลาย">ระดับนานาชาติ</option>
-              </select> */}
-              {/* Dropdown 4 */}
-              {/* <select
-                className="border-gray-300 rounded-lg p-2"
-                value={schType}
-                onChange={(e) => setSchType(e.target.value)}
-              >
-                <option value="">สถานะการตัดสิน</option>
-                <option value="WELL_BEHAVIOR">รอการพิจารณา</option>
-                <option value="EXTRACURRICULAR">ผ่านการพิจารณา</option>
-                <option value="ACADEMIC">ไม่ผ่านการพิจารณา</option>
-              </select> */}
-              {/* Dropdown 5 */}
               
-              {/* Dropdown 6 */}
               
             </div>
-            {/* ปุ่มค้นหา */}
-            {/* <div className="text-center">
-              <button
-                onClick={handleSearch}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-500"
-              >
-                ค้นหา
-              </button>
-            </div> */}
+          
           </div>
 
           {/* ตาราง */}

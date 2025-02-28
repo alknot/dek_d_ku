@@ -161,7 +161,7 @@ export default function Home() {
                 <input
                   type="text"
                   id="academicYear"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
                   placeholder="ปีการศึกษา"
                   value={academiYear}
                   onChange={(e) => setAcademicYear(e.target.value)}
@@ -248,7 +248,7 @@ export default function Home() {
                       <td className="px-4 py-2 border text-center w-80">
                         {format(new Date(scholarship.startDate), "dd MMMM yyyy", { locale: th })} -{" "}
                         {format(new Date(scholarship.endDate), "dd MMMM yyyy", { locale: th })}<br />
-                        {daysLeft > 0 ? (
+                        {daysLeft >= 0 ? (
                           <button className={`px-2 py-1 rounded-lg ${buttonColor}`}>
                             คงเหลือ {daysLeft} วัน
                           </button>
@@ -257,7 +257,7 @@ export default function Home() {
                         )}
                       </td>
 
-                      {daysLeft > 0 && (
+                      {daysLeft >= 0 && (
                         <td className="px-4 py-2 border text-center w-40">
                           <button
                             className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400"

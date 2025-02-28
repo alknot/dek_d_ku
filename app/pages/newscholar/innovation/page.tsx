@@ -138,11 +138,9 @@ const Create = () => {
           <form>
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
               <div>
-                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อโครงการ</label>
+                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">ชื่อโครงการ</label>
                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่อโครงการ"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="ชื่อโครงการ"
                   value={schName} onChange={(e) => setschName(e.target.value)} required />
 
               </div>
@@ -165,33 +163,6 @@ const Create = () => {
                   </a>
                 )}
               </div>
-              {/* <div className="sm:col-span-2">
-            <label className="block mb-2 text-sm font-medium text-gray-900">รางวัลในแต่ละโครงการ</label>
-            <div className="flex flex-col space-y-2">
-              {["ลดค่าบำรุงมหาวิทยาลัย", "ลดค่าหน่วยกิต", "ลดค่าธรรมเนียมพิเศษคณะ", "อื่นๆ"].map((reward) => (
-                <label key={reward} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="reward"
-                    value={reward}
-                    checked={rewards.includes(reward)}
-                    onChange={() => handleRewardChange(reward)}
-                    className="mr-2"
-                  />
-                  {reward}
-                </label>
-              ))}
-              {rewards.includes("อื่นๆ") && (
-                <input
-                  
-                  type="text"
-                  value={otherReward}
-                  onChange={(e) => setotherReward(e.target.value)}
-                  placeholder="กรอกรางวัลอื่นๆ"
-                />
-              )}
-            </div>
-          </div> */}
 
               <div className="flex space-x-10 sm:col-span-2">
                 <div className="relative max-w-sm">
@@ -220,9 +191,7 @@ const Create = () => {
                 <div className="relative max-w-sm">
                   <label className="block mb-2 text-sm font-medium text-gray-900">ปีการศึกษา</label>
                   <input className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 "
                     type="number"
                     value={academiYear}
                     onChange={(e) => setacademicYear((e.target.value))}
@@ -233,9 +202,7 @@ const Create = () => {
                 <div className="relative max-w-sm">
                   <label htmlFor="term" className="block mb-2 text-sm font-medium text-gray-900">ภาคการศึกษา</label>
                   <select className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 "
                     id="term"
                     value={term}
                     onChange={(e) => setterm(e.target.value)}
@@ -249,9 +216,7 @@ const Create = () => {
                 <div >
                   <label htmlFor="programType" className="block mb-2 text-sm font-medium text-gray-900">สำหรับหลักสูตร</label>
                   <select className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 "
                     id="programType"
                     value={programType}
                     onChange={(e) => setprogramType(e.target.value)}

@@ -85,6 +85,15 @@ enum reward {
   CREDITPRICE
 }
 
+enum QuestionType {
+  TEXT
+  CHOICE
+  CHECKBOX
+  DATE
+}
+
+
+
 model User { //ku all login user name ลด faculty+department
   id                String  @id @default(cuid()) @map("_id") // รหัสนิสิต หรือ รหัสเจ้าหน้าที่
   userprincipalname String  @unique
@@ -146,6 +155,7 @@ model Form {
   activityImageUrl String?
 
   staticQuestions Question[]
+  dynamicQuestions DynamicQuestionResponse[]
 
   innovation      InnovationQuestion?
   wellBehavior    WellBehaviorQuestion?
@@ -159,6 +169,23 @@ model Form {
   // user            User        @relation("UserForm", fields: [createdBy], references: [id])
   scholarship     Scholarship @relation("ScholarshipForm", fields: [scholarshipID], references: [id])
   certificateFile File?       @relation("FileForm", fields: [certificate], references: [id])
+}
+
+type DynamicQuestionResponse {
+  question     String
+  type         QuestionType
+  options      String[]
+  required     Boolean
+  answer       String?
+  selectedDate DateTime?
+}
+
+
+type DynamicQuestionTemplate {
+  question String
+  type     QuestionType
+  options  String[]
+  required Boolean
 }
 
 model Scholarship {
@@ -177,6 +204,7 @@ model Scholarship {
   // otherReward String?
   programType programType
   form      Form[]    @relation("ScholarshipForm")
+   dynamicQuestions DynamicQuestionTemplate[]
   pdfUrl    String
   // file      File?      @relation("ScholarshipFile", fields: [attachment], references: [id])
   // termprice Termprice @relation("TermpriceScholarship", fields: [price], references: [id])

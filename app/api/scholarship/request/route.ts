@@ -1,4 +1,3 @@
-import { getFieldValue } from '@/app/libs/common';
 import { generateCuid } from '@/app/libs/utils';
 import { Form, PrismaClient, RequestStatus, Role, SchType } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
@@ -7,36 +6,44 @@ const db = new PrismaClient();
 
 export async function GET(req: NextRequest) {
   try {
+    // ตัวอย่างตรวจสอบ token (สำหรับระบบ Auth จริงควรตรวจสอบและ decode token)
     const token = req.headers.get('Authorization');
+    if (!token) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
 
-    if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    // mock userId สำหรับทดสอบ (เปลี่ยนเมื่อมีระบบ Auth จริง)
+    const userId = 'mockUserIdForTest';
 
-    // Do something to verify token and get id
-    const userid = '';
-    const user = await db.user.findUnique({ where: { id: userid } });
+    const user = await db.user.findUnique({ where: { id: userId } });
     if (!user) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
+    // เลือก query ตาม role ของ user
     switch (user.role) {
-      case Role.SA_STAFF:
+      case Role.SA_STAFF: {
         const saRequests = await db.form.findMany();
         return NextResponse.json(saRequests ?? [], { status: 200 });
-      case Role.DEPARTMENT_HEAD:
+      }
+      case Role.DEPARTMENT_HEAD: {
         const deptHeadRequests = await db.form.findMany({
-          where: { approveStatus: 'PENDING_DEPARTMENT_HEAD' },
+          where: { approveStatus: RequestStatus.PENDING_DEPARTMENT_HEAD },
         });
         return NextResponse.json(deptHeadRequests ?? [], { status: 200 });
-      case Role.FACULTY_STAFF:
+      }
+      case Role.FACULTY_STAFF: {
         const facultyRequests = await db.form.findMany({
-          where: { approveStatus: 'PENDING_FACULTY' },
+          where: { approveStatus: RequestStatus.PENDING_FACULTY },
         });
         return NextResponse.json(facultyRequests ?? [], { status: 200 });
-      case Role.DEAN:
+      }
+      case Role.DEAN: {
         const deanRequests = await db.form.findMany({
-          where: { approveStatus: 'PENDING_DEAN' },
+          where: { approveStatus: RequestStatus.PENDING_DEAN },
         });
         return NextResponse.json(deanRequests ?? [], { status: 200 });
+      }
       default:
         return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
@@ -48,27 +55,19 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const token = req.headers.get('Authorization');
-
+    // ตัวอย่างตรวจสอบ token (สำหรับระบบ Auth จริงควรตรวจสอบและ decode token)
+    // const token = req.headers.get('Authorization');
     // if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
-    // Do something to verify token and get id
-    const userid = '';
-    // const user = await db.user.findUnique({ where: { id: userid } });
-    // if (!user) {
-    //   return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    // }
+    // mock userId สำหรับทดสอบ
+    // const userId = 'mockUserIdForTest';
+
     const body = await req.json();
 
-    // Check if the body is null or not an object
-    // if (!body || typeof body !== 'object') {
-    //   return NextResponse.json({ message: 'Invalid or missing request body' }, { status: 400 });
-    // }
-
+    // ตรวจสอบ field ที่จำเป็น (สามารถปรับปรุงเพิ่มเติมได้ตามต้องการ)
     const requiredFields = [
       'forScholarship',
       'schType',
-
       'nisitNameTh',
       'nisitNameEn',
       'nisitAcademicyear',
@@ -82,33 +81,17 @@ export async function POST(req: NextRequest) {
       'phone',
       'email',
       'address',
+      'isLastTerm'
     ];
-
-    let dynamicQusetionField: string[] = [];
-
-    switch (body.schType) {
-      case SchType.WELL_BEHAVIOR:
-        dynamicQusetionField = ['wellBehavior'];
-        break;
-      case SchType.EXTRACURRICULAR:
-        dynamicQusetionField = ['extraCurricular'];
-        break;
-      case SchType.INNOVATION:
-        dynamicQusetionField = ['innovation'];
-        break;
+    for (const field of requiredFields) {
+      if (!body[field]) {
+        return NextResponse.json({ message: `${field} is missing` }, { status: 400 });
+      }
     }
 
-    // Validate required fields
-    // const missingField = requiredFields
-    //   .concat(dynamicQusetionField)
-    //   .find((field) => !getFieldValue(body, field));
-    // if (missingField) {
-    //   return NextResponse.json({ message: `${missingField} is missing` }, { status: 400 });
-    // }
-
+    // สร้างข้อมูลฟอร์มใหม่ โดยใช้ข้อมูล static จาก body
     const newFormData: Form = {
       id: generateCuid(),
-      // createdBy: userid,
       scholarshipID: body.forScholarship,
       schType: body.schType,
       approveStatus: RequestStatus.PENDING_DEPARTMENT_HEAD,
@@ -129,9 +112,10 @@ export async function POST(req: NextRequest) {
       isLastTerm: body.isLastTerm,
       certificate: body.certificate,
       activityImageUrl: body.activityImageUrl,
-
-      staticQuestions: body.staticQuestions,
-
+      staticQuestions : body.staticQuestions,
+      // ฟิลด์ staticQuestions (หรือ staticData ถ้ามีการปรับ schema ใหม่)
+      dynamicQuestions: body.dynamicQuestions ?? [],
+      // ตั้งค่า default สำหรับ dynamic question fields
       wellBehavior: null,
       extracurricular: null,
       innovation: null,
@@ -139,22 +123,40 @@ export async function POST(req: NextRequest) {
       commentedBy: null
     };
 
+    // สร้าง Form ตามประเภททุน (schType)
     switch (body.schType) {
-      case SchType.WELL_BEHAVIOR:
+      case SchType.WELL_BEHAVIOR: {
         const wbForm = await db.form.create({
-          data: { ...newFormData, wellBehavior: body.wellBehavior },
+          data: { ...newFormData, wellBehavior: body.wellBehavior || null },
         });
         return NextResponse.json(wbForm, { status: 201 });
-      case SchType.EXTRACURRICULAR:
+      }
+      case SchType.EXTRACURRICULAR: {
+        // เปลี่ยนจาก extraCurricular เป็น extracurricular ให้ตรงกับ Prisma schema
         const ecForm = await db.form.create({
-          data: { ...newFormData, extracurricular: body.extraCurricular },
+          data: { ...newFormData, extracurricular: body.extracurricular || null },
         });
         return NextResponse.json(ecForm, { status: 201 });
-      case SchType.INNOVATION:
+      }
+      case SchType.INNOVATION: {
         const ivForm = await db.form.create({
-          data: { ...newFormData, innovation: body.innovation },
+          data: { ...newFormData, innovation: body.innovation || null },
         });
         return NextResponse.json(ivForm, { status: 201 });
+      }
+      case SchType.OTHER: {
+        // สำหรับทุน OTHER เราสร้าง Form โดยไม่มีข้อมูล dynamic เฉพาะเพิ่มเติม
+        const otherForm = await db.form.create({
+          data: { ...newFormData },
+        });
+        return NextResponse.json(otherForm, { status: 201 });
+      }
+      default: {
+        return NextResponse.json(
+          { message: 'Unknown scholarship type' },
+          { status: 400 }
+        );
+      }
     }
   } catch (e: any) {
     console.error(e);

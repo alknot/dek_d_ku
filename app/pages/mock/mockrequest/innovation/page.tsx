@@ -102,38 +102,30 @@ const Create = () => {
                     <form>
                         <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
                             <div className="sm:col-span-2">
-                                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อผู้สมัคร (ภาษาไทย)</label>
+                                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">ชื่อผู้สมัคร (ภาษาไทย)</label>
                                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่อผู้สมัคร (ภาษาไทย)"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="ชื่อผู้สมัคร (ภาษาไทย)"
                                     value={nisitNameTh} onChange={(e) => setNisitNameTH(e.target.value)} required />
                             </div>
 
                             <div className="sm:col-span-2">
-                                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อผู้สมัคร (ภาษาอังกฤษ)</label>
+                                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">ชื่อผู้สมัคร (ภาษาอังกฤษ)</label>
                                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่อผู้สมัคร (ภาษาอังกฤษ)"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="ชื่อผู้สมัคร (ภาษาอังกฤษ)"
                                     value={nisitNameEn} onChange={(e) => setNisitNameENG(e.target.value)} required />
                             </div>
 
                             <div className="flex space-x-10 sm:col-span-2">
                                 <div className="relative max-w-sm">
-                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">นิสิตชั้นปีที่</label>
+                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">นิสิตชั้นปีที่</label>
                                     <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="นิสิตชั้นปีที่"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="นิสิตชั้นปีที่"
                                         value={nisitAcademicyear} onChange={(e) => setNisitAcademicyear(e.target.value)} required />
                                 </div>
                                 <div className="relative max-w-sm">
-                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">รหัสนิสิต</label>
+                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">รหัสนิสิต</label>
                                     <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="รหัสนิสิต"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="รหัสนิสิต"
                                         value={nisitid} onChange={(e) => setNisitID(e.target.value)} required />
                                 </div>
 
@@ -149,11 +141,9 @@ const Create = () => {
                                         />
                                     </div>
                                     <div className="relative max-w-sm">
-                                        <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">อายุ</label>
+                                        <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">อายุ</label>
                                         <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="อายุ (ปี)"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="อายุ (ปี)"
                                             value={age} onChange={(e) => setAge(Number(e.target.value))} required />
                                     </div>
                                 </div>
@@ -162,35 +152,27 @@ const Create = () => {
                             </div>
                             <div className="flex space-x-10 sm:col-span-2">
                                 <div className="relative max-w-sm">
-                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">คณะ</label>
+                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">คณะ</label>
                                     <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="คณะ"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="คณะ"
                                         value={faculty} onChange={(e) => setFaculty(e.target.value)} required />
                                 </div>
                                 <div className="relative max-w-sm">
-                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ภาควิชา/สาขาวิชา</label>
+                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">ภาควิชา/สาขาวิชา</label>
                                     <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ภาควิชา/สาขาวิชา"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="ภาควิชา/สาขาวิชา"
                                         value={department} onChange={(e) => setDepartment(e.target.value)} required />
                                 </div>
                                 <div className="relative max-w-sm">
-                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">คะแนนเฉลี่ยสะสม</label>
+                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">คะแนนเฉลี่ยสะสม</label>
                                     <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="คะแนนเฉลี่ยสะสม"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="คะแนนเฉลี่ยสะสม"
                                         value={gpa} onChange={(e) => setGPA(Number(e.target.value))} required />
                                 </div>
                                 <div className="relative max-w-sm">
                                     <label htmlFor="programType" className="block mb-2 text-sm font-medium text-gray-900">ภาคการศึกษานี้เป็นภาคสุดท้ายก่อนจะจบ</label>
                                     <select className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 "
                                         value={isLastTerm}
                                         onChange={(e) => setLastterm(e.target.value)}
                                         required
@@ -207,39 +189,31 @@ const Create = () => {
                             <div className="flex space-x-10 sm:col-span-2">
 
                                 <div className="relative max-w-sm">
-                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">โทรศัพท์</label>
+                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">โทรศัพท์</label>
                                     <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="โทรศัพท์"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="โทรศัพท์"
                                         value={phone} onChange={(e) => setPhone(e.target.value)} required />
                                 </div>
                                 <div className="relative max-w-sm">
-                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">E-mail</label>
+                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">E-mail</label>
                                     <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="E-mail"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="E-mail"
                                         value={email} onChange={(e) => setEmail(e.target.value)} required />
                                 </div>
                             </div>
 
 
                             <div className="sm:col-span-2">
-                                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่ออาจารยืที่ปรึกษา</label>
+                                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">ชื่ออาจารยืที่ปรึกษา</label>
                                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่ออาจารย์ที่ปรึกษา"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="ชื่ออาจารย์ที่ปรึกษา"
                                     value={advisor} onChange={(e) => setAdvisor(e.target.value)} required />
                             </div>
 
                             <div className="sm:col-span-2">
-                                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ที่อยู่ปัจจุบัน</label>
+                                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">ที่อยู่ปัจจุบัน</label>
                                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ที่อยู่ปัจจุบัน"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="ที่อยู่ปัจจุบัน"
                                     value={address} onChange={(e) => setAddress(e.target.value)} required />
                             </div>
 
@@ -267,35 +241,27 @@ const Create = () => {
 
                             </div>
                             <div className="sm:grid-cols-1">
-                                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อโครงการที่แข่งขัน/เข้าร่วม</label>
+                                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">ชื่อโครงการที่แข่งขัน/เข้าร่วม</label>
                                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่อโครงการที่แข่งขัน/เข้าร่วม"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="ชื่อโครงการที่แข่งขัน/เข้าร่วม"
                                     value={competitionName} onChange={(e) => setCompetitionName(e.target.value)} required />
                             </div>
                             <div className="sm:grid-cols-1">
-                                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อทีม</label>
+                                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">ชื่อทีม</label>
                                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่อทีม"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="ชื่อทีม"
                                     value={teamName} onChange={(e) => setTeamName(e.target.value)} required />
                             </div>
                             <div className="sm:grid-cols-1">
-                                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อผลงานที่ได้รับรางวัล</label>
+                                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">ชื่อผลงานที่ได้รับรางวัล</label>
                                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่อผลงานที่ได้รับรางวัล"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="ชื่อผลงานที่ได้รับรางวัล"
                                     value={innovationName} onChange={(e) => setInnovationName(e.target.value)} required />
                             </div>
                             <div className="sm:grid-cols-1">
-                                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">รางวัลที่ได้รับ</label>
+                                <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">รางวัลที่ได้รับ</label>
                                 <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="รางวัลที่ได้รับ"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="รางวัลที่ได้รับ"
                                     value={prizeName} onChange={(e) => setPrizeName(e.target.value)} required />
                             </div>
 
@@ -303,19 +269,15 @@ const Create = () => {
 
                             <div className="flex space-x-10 sm:col-span-2">
                                 <div className="sm:grid-cols-1">
-                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">จำนวนทีมที่เข้าร่วมในโครงการ/การแข่งขัน</label>
+                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">จำนวนทีมที่เข้าร่วมในโครงการ/การแข่งขัน</label>
                                     <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="เช่น 5"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="เช่น 5"
                                         value={numberOfTeam} onChange={(e) => setNumberOfTeam(Number(e.target.value))} required />
                                 </div>
                                 <div className="relative max-w-sm">
                                     <label htmlFor="term" className="block mb-2 text-sm font-medium text-gray-900">ระดับการประกวดการแข่งขัน/การเข้าร่วม</label>
                                     <select className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 "
 
                                         value={competitiveLevel}
                                         onChange={(e) => setCompetitiveLevel(e.target.value as CompetitiveLevel)}
@@ -330,9 +292,7 @@ const Create = () => {
                                 <div >
                                     <label htmlFor="programType" className="block mb-2 text-sm font-medium text-gray-900">ประเภทกิจกรรม</label>
                                     <select className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 "
                                         id="programType"
                                         value={activityHour}
                                         onChange={(e) => setactivityHour(e.target.value as ActivityHour)}
@@ -348,8 +308,68 @@ const Create = () => {
                                 </div>
 
                             </div>
+                            <div className="flex justify-center items-center sm:col-span-2 text-center">
+                                <h2 className="mb-4 text-xl font-bold text-gray-900">คำถามเพิ่มเติม</h2>
+                            </div>
 
-
+                            <div className="flex justify-center items-center sm:col-span-2 text-center">
+                                <h2 className="mb-4 text-xl font-bold text-gray-900">ส่วนการเงิน</h2>
+                            </div>
+                            <p className="mb-2 text-gray-900 ">ภาคการศึกษานี้เป็นภาคสุดท้ายก่อนจะจบ</p>
+                            <p className="mb-2 text-gray-900 font-bold">จำนวนเงินเต็มที่ควรเก็บได้</p>
+                            <div className="flex space-x-10 sm:col-span-2">
+                                <div className="sm:grid-cols-1">
+                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">ค่าบำรุงมหาลัย</label>
+                                    <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+                                           rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder=""
+                                         />
+                                </div>
+                                <div className="sm:grid-cols-1">
+                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">ค่าบำรุงคณะ</label>
+                                    <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+                                           rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder=""
+                                         />
+                                </div>
+                                <div className="sm:grid-cols-1">
+                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">ค่าหน่วยกิต</label>
+                                    <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+                                           rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder=""
+                                         />
+                                </div>
+                                <div className="sm:grid-cols-1">
+                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">รวม</label>
+                                    <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+                                           rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder=""
+                                         />
+                                </div>
+                            </div>
+                            <p className="mb-2 text-gray-900 font-bold">จำนวนเงินที่ควรเก็บได้จริง</p>
+                            <div className="flex space-x-10 sm:col-span-2">
+                                <div className="sm:grid-cols-1">
+                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">ค่าบำรุงมหาลัย</label>
+                                    <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+                                           rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder=""
+                                         />
+                                </div>
+                                <div className="sm:grid-cols-1">
+                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">ค่าบำรุงคณะ</label>
+                                    <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+                                           rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder=""
+                                         />
+                                </div>
+                                <div className="sm:grid-cols-1">
+                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">ค่าหน่วยกิต</label>
+                                    <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+                                           rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder=""
+                                         />
+                                </div>
+                                <div className="sm:grid-cols-1">
+                                    <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 ">รวม</label>
+                                    <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
+                                           rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder=""
+                                         />
+                                </div>
+                            </div>
 
 
 
@@ -365,6 +385,15 @@ const Create = () => {
 
                             {/* ปุ่มตัดสิน (ขวาสุด) */}
                             <div className="flex space-x-3">
+
+                                <button
+                                    type="button"
+                                    className=" px-4 py-2 bg-blue-500 text-white rounded-lg"
+                                >
+                                    comment
+                                </button>
+
+
                                 <button
                                     type="button"
                                     className=" px-4 py-2 bg-red-500 text-white rounded-lg"

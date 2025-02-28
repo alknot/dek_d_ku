@@ -3,76 +3,84 @@
 import { useState } from "react";
 import Sidebar from "@/components/sidebar";
 import { useSession, signIn, signOut } from "next-auth/react";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
 
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  const { data: session } = useSession();
+  const router = useRouter();
 
   return (
     <div className="min-h-screen flex flex-col">
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
-      {/* Header Section */}
-      <header
-        className="shadow-md flex items-center justify-between"
-        style={{ backgroundColor: "rgb(0, 104, 95)" }}
-      >
-        <div className="px-4 py-4">
-          {/* Sidebar Toggle Button */}
-          <button
-            onClick={toggleSidebar}
-            className="text-white focus:outline-none"
+      {/* Header */}
+      <header className="flex items-center justify-between px-4 py-4 bg-teal-700 shadow-md">
+        <button
+          onClick={toggleSidebar}
+          className="text-white focus:outline-none"
+          aria-label="Toggle Sidebar"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16m-7 6h7"
-              />
-            </svg>
-          </button>
-        </div>
-        <h1 className="text-3xl font-bold text-white text-center flex-1">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16m-7 6h7"
+            />
+          </svg>
+        </button>
+        <h1 className="flex-1 text-center text-3xl font-bold text-white">
           Dek-D KU
         </h1>
-        <div className="w-10"></div> {/* ใช้เพื่อเว้นช่องให้ Header ตรงกลาง */}
+        {/* Spacer */}
+        <div className="w-10" />
       </header>
 
-      {/* Main Section (Full Screen) */}
-      <main className="flex-1 flex items-center justify-center bg-gray-100">
-        {/* <div className="text-center">
-          <h2 className="text-4xl font-bold text-gray-800">Hello, World!</h2>
-          <p className="mt-4 text-lg text-gray-600">
-            This main section is now fully stretched to cover the page.
+      {/* Main Content */}
+      <main className="flex-1 flex items-center justify-center bg-gray-100 px-4">
+        <div className="max-w-3xl w-full text-center">
+          <h2 className="text-4xl font-bold text-gray-800 mb-4">
+            Welcome to Dek-D KU
+          </h2>
+          <p className="text-lg text-gray-600 mb-8">
+            {session ? `Logged in as ${session.user?.name}` : "Please log in to continue."}
           </p>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400" onClick={() => signIn("keycloak")}>
-        Log in
-      </button>
+          <div className="space-x-4">
+            {!session ? (
+              <button
+                className="bg-blue-500 hover:bg-blue-400 text-white px-6 py-2 rounded-lg transition"
+                onClick={() => signIn("keycloak")}
+              >
+                Log in
+              </button>
+            ) : (
+              <button
+                className="bg-red-500 hover:bg-red-400 text-white px-6 py-2 rounded-lg transition"
+                onClick={() => signOut({ callbackUrl: "/api/auth/logout" })}
+              >
+                Log out
+              </button>
+            )}
+          </div>
         </div>
-
-        <button
-          className="button is-primary"
-          onClick={() => signOut({ callbackUrl: "/api/auth/logout" })}
-        >
-          Log out
-        </button> */}
       </main>
 
-      {/* Footer Section */}
-      <footer className="bg-gray-800 text-white py-6">
+      {/* Footer */}
+      <footer className="bg-gray-800 text-white py-4">
         <div className="container mx-auto text-center">
-          <p>&copy; นายกุลชัย </p>
+          <p>&copy; 2025 นายกุลชัย. All rights reserved.</p>
         </div>
       </footer>
     </div>

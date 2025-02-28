@@ -73,7 +73,7 @@ enum CompetitiveLevel {
   INTERNATIONAL
 }
 
-enum programType {
+enum ProgramType {
   THAI
   INTERNATIONAL
   BOTHTHAIANDINTERNATIONAL
@@ -92,9 +92,7 @@ enum QuestionType {
   DATE
 }
 
-
-
-model User { //ku all login user name ลด faculty+department
+model User {
   id                String  @id @default(cuid()) @map("_id") // รหัสนิสิต หรือ รหัสเจ้าหน้าที่
   userprincipalname String  @unique
   prenameTh         String // คำนำหน้าชื่อ
@@ -130,11 +128,11 @@ model User { //ku all login user name ลด faculty+department
 }
 
 model Form {
-  id             String        @id @map("_id")
+  id            String        @id @map("_id")
   // createdBy      String
   scholarshipID String
-  schType        SchType
-  approveStatus  RequestStatus
+  schType       SchType
+  approveStatus RequestStatus
 
   nisitNameTh       String
   nisitNameEn       String
@@ -151,10 +149,10 @@ model Form {
   address           String
   isLastTerm        Boolean
   // Depend on scholarship type (innovation, extracurricular)
-  certificate      String?
-  activityImageUrl String?
+  certificate       String?
+  activityImageUrl  String?
 
-  staticQuestions Question[]
+  staticQuestions  Question[]
   dynamicQuestions DynamicQuestionResponse[]
 
   innovation      InnovationQuestion?
@@ -165,10 +163,9 @@ model Form {
   commentedBy String?
 
   // Relationships
-  commentedUser   User?       @relation("CommentedUserForm", fields: [commentedBy], references: [id])
+  commentedUser   User? @relation("CommentedUserForm", fields: [commentedBy], references: [id])
   // user            User        @relation("UserForm", fields: [createdBy], references: [id])
-  scholarship     Scholarship @relation("ScholarshipForm", fields: [scholarshipID], references: [id])
-  certificateFile File?       @relation("FileForm", fields: [certificate], references: [id])
+  certificateFile File? @relation("FileForm", fields: [certificate], references: [id])
 }
 
 type DynamicQuestionResponse {
@@ -180,7 +177,6 @@ type DynamicQuestionResponse {
   selectedDate DateTime?
 }
 
-
 type DynamicQuestionTemplate {
   question String
   type     QuestionType
@@ -189,36 +185,35 @@ type DynamicQuestionTemplate {
 }
 
 model Scholarship {
-  id          String   @id @default(cuid()) @map("_id")
-  schName     String
-  description String
-  academiYear String
-  term        String
+  id               String                    @id @default(cuid()) @map("_id")
+  schName          String
+  description      String
+  academiYear      String
+  term             String
   // amount      Float
-  startDate   DateTime
-  endDate     DateTime
-  schType     SchType
+  startDate        DateTime
+  endDate          DateTime
+  schType          SchType
   // attachment  String?
   // price       String
   // reward      reward
   // otherReward String?
-  programType programType
-  form      Form[]    @relation("ScholarshipForm")
-   dynamicQuestions DynamicQuestionTemplate[]
-  pdfUrl    String
+  programType      ProgramType
+  dynamicQuestions DynamicQuestionTemplate[]
+  pdfUrl           String
   // file      File?      @relation("ScholarshipFile", fields: [attachment], references: [id])
   // termprice Termprice @relation("TermpriceScholarship", fields: [price], references: [id])
 }
 
 model File {
-  id       String @id @default(cuid()) @map("_id")
-  
+  id String @id @default(cuid()) @map("_id")
+
   filename String
   mimetype String
   data     String
 
   // Relationships
-  form        Form[]        @relation("FileForm")
+  form Form[] @relation("FileForm")
   // scholarship Scholarship[] @relation("ScholarshipFile")
 }
 
@@ -238,8 +233,8 @@ model Termprice {
   // Relationships
   // scholarship Scholarship[] @relation("TermpriceScholarship")
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 type Question {

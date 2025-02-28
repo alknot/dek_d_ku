@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
       'email',
       'address',
     ];
-    console.log("working0");
+    console.log('working0');
     // เพิ่มฟิลด์เฉพาะตามประเภททุน
     if (body.schType === SchType.WELL_BEHAVIOR) {
       requiredFields.push('wellBehavior');
@@ -92,9 +92,14 @@ export async function POST(req: NextRequest) {
         { message: `Field '${missingField}' is missing or empty` },
         { status: 400 }
       );
-      
     }
-    console.log("working1");
+    const scholarship = await db.scholarship.findUnique({
+      where: { id: body.scholarshipID },
+    });
+    if (!scholarship) {
+      return NextResponse.json({ message: 'Scholarship not found' }, { status: 404 });
+    }
+    console.log('working1');
     // สร้าง newFormData โดยแปลงค่าต่าง ๆ ให้ตรงกับ Prisma schema
     const newFormData: Form = {
       id: generateCuid(),
@@ -117,43 +122,41 @@ export async function POST(req: NextRequest) {
       address: body.address,
       isLastTerm: !!body.isLastTerm,
 
-      certificate: body.certificate ?? null,
-      activityImageUrl: body.activityImageUrl ?? null,
-      staticQuestions: body.staticQuestions ?? null,
+      certificate: body.certificate ?? undefined,
+      activityImageUrl: body.activityImageUrl ?? undefined,
+      staticQuestions: body.staticQuestions ?? undefined,
       dynamicQuestions: body.dynamicQuestions ?? [],
       wellBehavior: null,
       extracurricular: null,
       innovation: null,
       comment: null,
       commentedBy: null,
-      
     };
-    console.log("working2");
+    console.log('working2');
 
     // สร้าง record ตาม schType
     switch (body.schType) {
       case SchType.WELL_BEHAVIOR: {
         const wbForm = await db.form.create({
-          data: { ...newFormData, wellBehavior: body.wellBehavior },
+          data: { ...newFormData, wellBehavior: body.wellBehavior, schType: body.schType },
         });
         return NextResponse.json(wbForm, { status: 201 });
       }
       case SchType.EXTRACURRICULAR: {
         const ecForm = await db.form.create({
-          data: { ...newFormData, extracurricular: body.extraCurricular },
+          data: { ...newFormData, extracurricular: body.extraCurricular, schType: body.schType },
         });
         return NextResponse.json(ecForm, { status: 201 });
       }
       case SchType.INNOVATION: {
         const ivForm = await db.form.create({
-          data: { ...newFormData, innovation: body.innovation },
+          data: { ...newFormData, innovation: body.innovation, schType: body.schType },
         });
         return NextResponse.json(ivForm, { status: 201 });
       }
       default:
         return NextResponse.json({ message: 'Unknown schType' }, { status: 400 });
     }
-    
   } catch (e: any) {
     return handleError(e);
   }

@@ -69,7 +69,7 @@ async function createUserThroughAPI(userId: string, tokenData: any) {
 
       body: JSON.stringify({
         id: userId,
-        userprincipalname: tokenData.userprincipalname || '',
+        userprincipalname: tokenData.email || '',
         prenameTh: tokenData.thaiprename || '',
         firstnameTh: tokenData['first-name'] || '',
         lastnameTh: tokenData['last-name'] || '',
@@ -138,7 +138,7 @@ export const authOptions: NextAuthOptions = {
 
           // console.log("--------------USER ID---------------");
           // console.log({userId});
-
+          console.log('working');
           const user = await db.user.findUnique({ where: { id: userId } });
           // console.log({user});
           if (!user) {

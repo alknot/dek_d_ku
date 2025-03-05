@@ -22,9 +22,9 @@ const db = new PrismaClient();
 export async function GET(req: NextRequest) {
   try {
     const token = req.headers.get('Authorization');
-    if (!token) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
+    // if (!token) {
+    //   return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    // }
 
     // Mock userId (ควรเปลี่ยนเป็น decode token จริง)
     // const userid = '';

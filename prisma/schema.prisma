@@ -95,10 +95,10 @@ enum QuestionType {
 model User {
   id                String  @id @default(cuid()) @map("_id") // รหัสนิสิต หรือ รหัสเจ้าหน้าที่
   userprincipalname String  @unique
-  prenameTh         String // คำนำหน้าชื่อ
+  prenameTh         String? // คำนำหน้าชื่อ
   firstnameTh       String // ชื่อจริง ภาษาไทย
   lastnameTh        String // นามสกุล ภาษาไทย
-  prenameEn         String
+  prenameEn         String?
   firstnameEn       String // ชื่อจริง ภาษาอังกฤษ
   lastnameEn        String // นามสกุล ภาษาอังกฤษ
   role              Role[]

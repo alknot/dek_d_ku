@@ -13,7 +13,7 @@ export default function Home() {
 
   console.log('sesion:', session);
 
-  const role = session?.userProfile.role;
+  const role = session?.userProfile;
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 

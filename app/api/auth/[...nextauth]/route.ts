@@ -9,14 +9,34 @@ declare module 'next-auth' {
   interface Session {
     account: any;
     profile: any;
+    roles: any;
+    userProfile: {
+      advisor: string;
+      createdAt: string;
+      department: string;
+      departmentId: string;
+      email: string;
+      faculty: string;
+      firstnameEn: string;
+      firstnameTh: string;
+      gpa: string;
+      id: string;
+      lastnameEn: string;
+      lastnameTh: string;
+      major: string;
+      mobilePhone: string;
+      position: string;
+      positionId: string;
+      prenameEn: string;
+      prenameTh: string;
+      role: Role[];
+      updatedAt: string;
+      userprincipalname: string;
+    };
   }
 
   interface Profile {
     realm_access: any;
-  }
-
-  interface Session {
-    roles: any;
   }
 }
 
@@ -66,6 +86,7 @@ async function createUserThroughAPI(userId: string, tokenData: any) {
       console.error('Failed to create user via API');
     } else {
       console.log('User created via API');
+      return res.json();
     }
   } catch (error) {
     console.error('Error calling API:', error);
@@ -88,6 +109,7 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, account, profile }) {
+      console.log({ token, account, profile });
       try {
         if (account) {
           console.log('--------------ACCESS TOKEN ---------------');
@@ -122,7 +144,10 @@ export const authOptions: NextAuthOptions = {
           if (!user) {
             // user does not exist, create user
             console.log('User not found, creating user');
-            await createUserThroughAPI(userId, tokenData);
+            const newUser = await createUserThroughAPI(userId, tokenData);
+            token.userProfile = newUser;
+          } else {
+            token.userProfile = user;
           }
 
           // user exists
@@ -130,6 +155,7 @@ export const authOptions: NextAuthOptions = {
       } catch (error) {
         console.log(error);
       }
+
       return token;
     },
     async session({ session, token }) {
@@ -138,6 +164,7 @@ export const authOptions: NextAuthOptions = {
       session.account = token.account;
       session.profile = token.profile;
       session.roles = token.client_roles;
+      session.userProfile = token.userProfile as any;
       return session;
     },
   },

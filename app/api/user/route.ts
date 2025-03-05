@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 
   if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
-  if (user?.role !== Role.SA_STAFF)
+  if (!user?.role.includes(Role.SA_STAFF))
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
 
   const users = await db.user.findMany();
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
       prenameEn: body.prenameEn,
       firstnameEn: body.firstnameEn,
       lastnameEn: body.lastnameEn,
-      role: typePerson === TypePerson.STUDENT ? Role.STUDENT : Role.NOT_ASSIGNED, // Pending admin approval
+      role: [typePerson === TypePerson.STUDENT ? Role.STUDENT : Role.NOT_ASSIGNED], // Pending admin approval
       faculty: body.faculty,
       email: body.email,
 

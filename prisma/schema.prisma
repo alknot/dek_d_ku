@@ -101,7 +101,7 @@ model User {
   prenameEn         String
   firstnameEn       String // ชื่อจริง ภาษาอังกฤษ
   lastnameEn        String // นามสกุล ภาษาอังกฤษ
-  role              Role
+  role              Role[]
   major             String? // คณะ (เฉพาะนิสิต)
   faculty           String? // สังกัด, คณะ
 

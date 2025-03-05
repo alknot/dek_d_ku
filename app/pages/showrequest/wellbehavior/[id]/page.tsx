@@ -132,7 +132,7 @@ export default function ShowRequestFormPage() {
           throw new Error(`Error fetching termprice: ${response.status}`);
         }
         const data = await response.json();
-        setTermPriceData(data); // สมมติว่าเราเก็บข้อมูลไว้ใน state ชื่อ termpriceData
+        setTermPriceData(data[0]); // สมมติว่าเราเก็บข้อมูลไว้ใน state ชื่อ termpriceData
         console.log(data);
       } catch (err) {
         console.error(err);

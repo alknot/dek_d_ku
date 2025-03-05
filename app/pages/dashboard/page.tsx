@@ -1,8 +1,7 @@
+'use client';
 
-"use client";
-
-import { useState } from "react";
-import Sidebar from "@/components/sidebar";
+import Sidebar from '@/components/sidebar';
+import { useState } from 'react';
 
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -12,28 +11,23 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col">
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Header Section */}
       <header
-        className="shadow-md flex items-center justify-between"
-        style={{ backgroundColor: "rgb(0, 104, 95)" }}
-      >
+        className="flex items-center justify-between shadow-md"
+        style={{ backgroundColor: 'rgb(0, 104, 95)' }}>
         <div className="px-4 py-4">
           {/* Sidebar Toggle Button */}
-          <button
-            onClick={toggleSidebar}
-            className="text-white focus:outline-none"
-          >
+          <button onClick={toggleSidebar} className="text-white focus:outline-none">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+              stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -43,27 +37,25 @@ export default function Home() {
             </svg>
           </button>
         </div>
-        <h1 className="text-3xl font-bold text-white text-center flex-1">
-          Dek-D KU
-        </h1>
+        <h1 className="flex-1 text-center text-3xl font-bold text-white">Dek-D KU</h1>
         <div className="w-10"></div> {/* ใช้เพื่อเว้นช่องให้ Header ตรงกลาง */}
       </header>
 
       {/* Main Section (Full Screen) */}
-      <main className="flex-1 flex items-center justify-center bg-gray-100">
+      <main className="flex flex-1 items-center justify-center bg-gray-100">
         <div className="text-center">
           <h2 className="text-4xl font-bold text-gray-800">Hello, World!</h2>
           <p className="mt-4 text-lg text-gray-600">
             This main section is now fully stretched to cover the page.
           </p>
-          <button className="mt-6 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-500 transition">
+          <button className="mt-6 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white shadow transition hover:bg-blue-500">
             Get Started
           </button>
         </div>
       </main>
 
       {/* Footer Section */}
-      <footer className="bg-gray-800 text-white py-6">
+      <footer className="bg-gray-800 py-6 text-white">
         <div className="container mx-auto text-center">
           <p>&copy; นายกุลชัย </p>
         </div>

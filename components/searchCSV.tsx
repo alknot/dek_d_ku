@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { apiService } from "@/common/apiService";
+import { apiService } from '@/common/apiService';
+import React, { useState } from 'react';
 
 interface TermPrice {
   academicYear: number;
@@ -15,8 +15,8 @@ interface TermPrice {
 }
 
 const SearchCSV = () => {
-  const [academicYear, setAcademicYear] = useState<number | string>("");
-  const [term, setTerm] = useState<string>("");
+  const [academicYear, setAcademicYear] = useState<number | string>('');
+  const [term, setTerm] = useState<string>('');
   const [data, setData] = useState<TermPrice[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,28 +27,21 @@ const SearchCSV = () => {
         const response = await apiService.fetchData(academicYear.toString(), term);
         setData(response as TermPrice[]);
       } catch (err) {
-        setError("Failed to fetch data. Please try again.");
+        setError('Failed to fetch data. Please try again.');
       }
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-top bg-gray-100">
-      <div className="w-full max-w-7xl bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="text-xl font-bold justify-center text-center mb-4">
-          แสดงข้อมูลจากไฟล์ CSV
-        </h2>
+    <div className="justify-top flex min-h-screen flex-col items-center bg-gray-100">
+      <div className="w-full max-w-7xl rounded-lg bg-white p-6 shadow-lg">
+        <h2 className="mb-4 justify-center text-center text-xl font-bold">แสดงข้อมูลจากไฟล์ CSV</h2>
 
-        <div className="flex space-x-10 sm:col-span-2 mb-4">
+        <div className="mb-4 flex space-x-10 sm:col-span-2">
           <div className="relative max-w-sm">
-            <label className="block mb-2 text-sm font-medium text-gray-900">
-              ปีการศึกษา
-            </label>
+            <label className="mb-2 block text-sm font-medium text-gray-900">ปีการศึกษา</label>
             <input
-              className="bg-white-50 border border-gray-300 text-gray-900 
-              text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 
-              dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
-              dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="bg-white-50 block rounded-lg border border-gray-300 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
               type="number"
               value={academicYear}
               onChange={(e) => setAcademicYear(Number(e.target.value))}
@@ -57,10 +50,7 @@ const SearchCSV = () => {
           </div>
           <div className="relative max-w-sm">
             {/* Label */}
-            <label
-              htmlFor="term"
-              className="block text-sm font-medium text-gray-900"
-            >
+            <label htmlFor="term" className="block text-sm font-medium text-gray-900">
               ภาคการศึกษา
             </label>
             {/* กลุ่ม select และปุ่มค้นหาอยู่ในแถวเดียวกัน */}
@@ -69,17 +59,12 @@ const SearchCSV = () => {
                 id="term"
                 value={term}
                 onChange={(e) => setTerm(e.target.value)}
-                className="mt-1 bg-white-50 border border-gray-300 text-gray-900 
-                text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
-              >
+                className="bg-white-50 mt-1 block rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500">
                 <option value="">เลือกภาคการศึกษา</option>
                 <option value="เทอมต้น">เทอมต้น</option>
                 <option value="เทอมปลาย">เทอมปลาย</option>
               </select>
-              <button
-                onClick={fetchData}
-                className="mt-1 bg-blue-500 text-white p-2 rounded"
-              >
+              <button onClick={fetchData} className="mt-1 rounded bg-blue-500 p-2 text-white">
                 ค้นหา
               </button>
             </div>
@@ -93,14 +78,14 @@ const SearchCSV = () => {
             <tr>
               {/* <th className="py-2 px-4 border-b">ปีการศึกษา</th>
               <th className="py-2 px-4 border-b">ภาคการศึกษา</th> */}
-              <th className="py-2 px-4 border-b">คณะ</th>
-              <th className="py-2 px-4 border-b">ภาควิชา</th>
-              <th className="py-2 px-4 border-b">ค่าธรรมเนียมคณะ</th>
-              <th className="py-2 px-4 border-b">ค่าบำรุงมหาวิทยาลัย</th>
-              <th className="py-2 px-4 border-b">ค่าหน่วยกิต</th>
-              <th className="py-2 px-4 border-b">โปรแกรมการเรียน</th>
-              <th className="py-2 px-4 border-b">รูปแบบภาคการเรียน</th>
-              <th className="py-2 px-4 border-b">รวม</th>
+              <th className="border-b px-4 py-2">คณะ</th>
+              <th className="border-b px-4 py-2">ภาควิชา</th>
+              <th className="border-b px-4 py-2">ค่าธรรมเนียมคณะ</th>
+              <th className="border-b px-4 py-2">ค่าบำรุงมหาวิทยาลัย</th>
+              <th className="border-b px-4 py-2">ค่าหน่วยกิต</th>
+              <th className="border-b px-4 py-2">โปรแกรมการเรียน</th>
+              <th className="border-b px-4 py-2">รูปแบบภาคการเรียน</th>
+              <th className="border-b px-4 py-2">รวม</th>
             </tr>
           </thead>
           <tbody>
@@ -108,14 +93,14 @@ const SearchCSV = () => {
               <tr key={index}>
                 {/* <td className="py-2 px-4 border-b">{item.academicYear}</td>
                 <td className="py-2 px-4 border-b">{item.term}</td> */}
-                <td className="py-2 px-4 border-b">{item.faculty}</td>
-                <td className="py-2 px-4 border-b">{item.department}</td>
-                <td className="py-2 px-4 border-b">{item.price1}</td>
-                <td className="py-2 px-4 border-b">{item.price2}</td>
-                <td className="py-2 px-4 border-b">{item.price3}</td>
-                <td className="py-2 px-4 border-b">{item.programType}</td>
-                <td className="py-2 px-4 border-b">{item.study}</td>
-                <td className="py-2 px-4 border-b">{item.sumPrice}</td>
+                <td className="border-b px-4 py-2">{item.faculty}</td>
+                <td className="border-b px-4 py-2">{item.department}</td>
+                <td className="border-b px-4 py-2">{item.price1}</td>
+                <td className="border-b px-4 py-2">{item.price2}</td>
+                <td className="border-b px-4 py-2">{item.price3}</td>
+                <td className="border-b px-4 py-2">{item.programType}</td>
+                <td className="border-b px-4 py-2">{item.study}</td>
+                <td className="border-b px-4 py-2">{item.sumPrice}</td>
               </tr>
             ))}
           </tbody>

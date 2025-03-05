@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -6,9 +6,8 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => (
   <header
-    className="shadow-md flex items-center justify-between"
-    style={{ backgroundColor: "rgb(0, 104, 95)" }}
-  >
+    className="flex items-center justify-between shadow-md"
+    style={{ backgroundColor: 'rgb(0, 104, 95)' }}>
     <div className="px-4 py-4">
       <button onClick={toggleSidebar} className="text-white focus:outline-none">
         <svg
@@ -16,8 +15,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => (
           className="h-6 w-6"
           fill="none"
           viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
+          stroke="currentColor">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -27,12 +25,9 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => (
         </svg>
       </button>
     </div>
-    <h1 className="text-3xl font-bold text-white text-center flex-1">
-      Dek-D KU
-    </h1>
+    <h1 className="flex-1 text-center text-3xl font-bold text-white">Dek-D KU</h1>
     <div className="w-1"></div>
   </header>
 );
 
 export default Header;
-

@@ -6,8 +6,6 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const db = new PrismaClient();
 
-
-
 export async function GET(req: NextRequest) {
   const token = req.headers.get('Authorization'); // userid
 

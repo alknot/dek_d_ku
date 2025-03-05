@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Sidebar from "@/components/sidebar";
-import Footer from "@/components/footer";
-import Header from "@/components/header";
-import CsvUploader from "@/components/uploadCSV";
-import SearchFinancePage from "@/components/searchCSV";
+import Footer from '@/components/footer';
+import Header from '@/components/header';
+import SearchFinancePage from '@/components/searchCSV';
+import Sidebar from '@/components/sidebar';
+import CsvUploader from '@/components/uploadCSV';
+import { useState } from 'react';
 
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState("searchfinance");
+  const [currentPage, setCurrentPage] = useState('searchfinance');
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -17,16 +17,16 @@ export default function Home() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case "uploadfile":
+      case 'uploadfile':
         return <CsvUploader />;
-      case "searchfinance":
+      case 'searchfinance':
       default:
         return <SearchFinancePage />;
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col">
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
@@ -34,27 +34,25 @@ export default function Home() {
       <Header toggleSidebar={toggleSidebar} />
 
       {/* Main Section */}
-      <main className="flex-1 flex flex-col items-center justify-center bg-gray-100">
-        <div className="w-full max-w-5xl bg-white p-6 rounded-lg shadow-lg mb-4">
-          <div className="flex justify-center space-x-4 mb-4">
+      <main className="flex flex-1 flex-col items-center justify-center bg-gray-100">
+        <div className="mb-4 w-full max-w-5xl rounded-lg bg-white p-6 shadow-lg">
+          <div className="mb-4 flex justify-center space-x-4">
             <button
-              onClick={() => setCurrentPage("searchfinance")}
-              className={`px-4 py-2 rounded ${
-                currentPage === "searchfinance"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-800"
-              }`}
-            >
+              onClick={() => setCurrentPage('searchfinance')}
+              className={`rounded px-4 py-2 ${
+                currentPage === 'searchfinance'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-200 text-gray-800'
+              }`}>
               Search Finance
             </button>
             <button
-              onClick={() => setCurrentPage("uploadfile")}
-              className={`px-4 py-2 rounded ${
-                currentPage === "uploadfile"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-800"
-              }`}
-            >
+              onClick={() => setCurrentPage('uploadfile')}
+              className={`rounded px-4 py-2 ${
+                currentPage === 'uploadfile'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-200 text-gray-800'
+              }`}>
               Upload File
             </button>
           </div>

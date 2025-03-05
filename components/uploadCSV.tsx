@@ -1,11 +1,12 @@
-"use client";
-import React, { useState } from "react";
-import Papa from "papaparse";
-import { apiService } from "@/common/apiService";
+'use client';
+
+import { apiService } from '@/common/apiService';
+import Papa from 'papaparse';
+import React, { useState } from 'react';
 
 const CsvUploader = () => {
-  const [academicYear, setAcademicYear] = useState<string>(""); 
-  const [term, setTerm] = useState("");
+  const [academicYear, setAcademicYear] = useState<string>('');
+  const [term, setTerm] = useState('');
   const [file, setFile] = useState<File | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,7 +19,7 @@ const CsvUploader = () => {
     e.preventDefault();
 
     if (!file || !academicYear || !term) {
-      alert("กรุณากรอกปีการศึกษา ภาคการศึกษา และเลือกไฟล์");
+      alert('กรุณากรอกปีการศึกษา ภาคการศึกษา และเลือกไฟล์');
       return;
     }
 
@@ -27,14 +28,13 @@ const CsvUploader = () => {
       skipEmptyLines: true,
       complete: async (result) => {
         if (result.errors.length) {
-          console.error("Error parsing CSV:", result.errors);
-          alert("เกิดข้อผิดพลาดในการอ่านไฟล์ CSV");
+          console.error('Error parsing CSV:', result.errors);
+          alert('เกิดข้อผิดพลาดในการอ่านไฟล์ CSV');
           return;
         }
 
         const parsedData = result.data as Record<string, string>[];
-        console.log("Parsed data:", parsedData);
-  
+        console.log('Parsed data:', parsedData);
 
         await apiService.uploadTermPrice(parsedData, academicYear, term);
       },
@@ -51,7 +51,7 @@ const CsvUploader = () => {
             type="text"
             value={academicYear}
             onChange={(e) => setAcademicYear(e.target.value)}
-            className="border rounded p-2 w-full"
+            className="w-full rounded border p-2"
             placeholder="2568"
             required
           />
@@ -61,9 +61,8 @@ const CsvUploader = () => {
           <select
             value={term}
             onChange={(e) => setTerm(e.target.value)}
-            className="border rounded p-2 w-full"
-            required
-          >
+            className="w-full rounded border p-2"
+            required>
             <option value="">เลือกภาคการศึกษา</option>
             <option value="เทอมต้น">เทอมต้น</option>
             <option value="เทอมปลาย">เทอมปลาย</option>
@@ -75,14 +74,11 @@ const CsvUploader = () => {
             type="file"
             accept=".csv"
             onChange={handleFileChange}
-            className="border rounded p-2 w-full"
+            className="w-full rounded border p-2"
             required
           />
         </div>
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
+        <button type="submit" className="rounded bg-blue-500 px-4 py-2 text-white">
           อัปโหลด
         </button>
       </form>

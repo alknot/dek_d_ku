@@ -1,50 +1,50 @@
-"use client";
-import axios from "axios";
-import DatePicker from "react-datepicker";
-import React, {ChangeEvent, useEffect,useState} from "react";
-import "react-datepicker/dist/react-datepicker.css";
-import Header from "@/components/header";
-import Footer from "@/components/footer";
-import { useRouter } from "next/compat/router";
+'use client';
 
-import Sidebar from "@/components/sidebar";
-import { SchType } from "@prisma/client";
-import { programType } from "@prisma/client";
+import Footer from '@/components/footer';
+import Header from '@/components/header';
+import Sidebar from '@/components/sidebar';
+import { SchType } from '@prisma/client';
+import { programType } from '@prisma/client';
+import axios from 'axios';
+import { useRouter } from 'next/compat/router';
+import React, { ChangeEvent, useEffect, useState } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+
 // import router from "next/dist/shared/lib/router/router";
 
-
 const Create = () => {
-    const [schName, setschName] = useState("")
-    const [description, setdescription] = useState<string>("")
-    const [academiYear, setacademicYear] = useState<string>("")
-    const [term, setterm] = useState<string>("")
-    const [startDate, setstartDate] = useState<Date | null>(null)
-    const [endDate, setendDate] = useState<Date | null>(null)
-    const [schType, setSchType] = useState<SchType>(SchType.INNOVATION);
-    const [attachment, setattachment] = useState<File>()
-    
-    const [programType, setprogramType] = useState<string>("")
-    const [amount, setAmount] = useState<string>("")
-    // const [rewards, setrewards] = useState<string[]>(['อื่นๆ', 'ลดค่าบำรุงมหาวิทยาลัย', 'ลดค่าหน่วยกิต', 'ลดค่าธรรมเนียมพิเศษคณะ'])
-    // const [otherReward, setotherReward] = useState<string>("")
-    const router = useRouter();
-    const accept = ".csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, .pdf";
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const toggleSidebar = () => {
-      setIsSidebarOpen(!isSidebarOpen);
-    };
+  const [schName, setschName] = useState('');
+  const [description, setdescription] = useState<string>('');
+  const [academiYear, setacademicYear] = useState<string>('');
+  const [term, setterm] = useState<string>('');
+  const [startDate, setstartDate] = useState<Date | null>(null);
+  const [endDate, setendDate] = useState<Date | null>(null);
+  const [schType, setSchType] = useState<SchType>(SchType.INNOVATION);
+  const [attachment, setattachment] = useState<File>();
 
-    // const handleRewardChange = (reward: string) => {
-    //     setrewards(prevRewards => 
-    //         prevRewards.includes(reward) 
-    //         ? prevRewards.filter(r => r !== reward) 
-    //         : [...prevRewards, reward]
-    //     );
-    // };
+  const [programType, setprogramType] = useState<string>('');
+  const [amount, setAmount] = useState<string>('');
+  // const [rewards, setrewards] = useState<string[]>(['อื่นๆ', 'ลดค่าบำรุงมหาวิทยาลัย', 'ลดค่าหน่วยกิต', 'ลดค่าธรรมเนียมพิเศษคณะ'])
+  // const [otherReward, setotherReward] = useState<string>("")
+  const router = useRouter();
+  const accept =
+    '.csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, .pdf';
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
+  // const handleRewardChange = (reward: string) => {
+  //     setrewards(prevRewards =>
+  //         prevRewards.includes(reward)
+  //         ? prevRewards.filter(r => r !== reward)
+  //         : [...prevRewards, reward]
+  //     );
+  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
       const data = {
@@ -56,21 +56,20 @@ const Create = () => {
         endDate,
         schType,
         // attachment,
-        programType
+        programType,
       };
-    
+
       console.log(data); // ตรวจสอบข้อมูลก่อนส่ง
-    
+
       // ส่งข้อมูลไปยัง API
       await axios.post('/api/scholarship', data);
-    
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col">
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
@@ -78,33 +77,43 @@ const Create = () => {
       <Header toggleSidebar={toggleSidebar} />
 
       {/* Main Section (Full Screen) */}
-      <main className="flex-1 flex justify-center bg-gray-100 w-full mx-auto">
-        <div className="w-full max-w-5xl bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="mb-4 text-xl font-bold text-gray-900 text-center">สร้างโครงการความคืดสร้างสรรค์และนวัตกรรม</h2>
-      <h1 className="mb-4 font-bold text-gray-900 text-center">กรอกข้อมูลของโครงการ</h1>
-      <form>
-      <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
-      <div>
-            <label htmlFor="schName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ชื่อโครงการ</label>
-            <input type="text" id="schName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ชื่อโครงการ" 
-            value={schName} onChange={(e) => setschName(e.target.value)} required />
-          
-        </div>
-        <div className="sm:col-span-2">
-          <label className="block mb-2 text-sm font-medium text-gray-900">ประกาศโครงการ (PDF)</label>
-          <input
-            type="file"
-            accept={accept}
-            onChange={(e) => setattachment(e.target.files?.[0])}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
-            required
-          />
-          
-        </div>
-        {/* <div className="sm:col-span-2">
+      <main className="mx-auto flex w-full flex-1 justify-center bg-gray-100">
+        <div className="w-full max-w-5xl rounded-lg bg-white p-6 shadow-lg">
+          <h2 className="mb-4 text-center text-xl font-bold text-gray-900">
+            สร้างโครงการความคืดสร้างสรรค์และนวัตกรรม
+          </h2>
+          <h1 className="mb-4 text-center font-bold text-gray-900">กรอกข้อมูลของโครงการ</h1>
+          <form>
+            <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
+              <div>
+                <label
+                  htmlFor="schName"
+                  className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                  ชื่อโครงการ
+                </label>
+                <input
+                  type="text"
+                  id="schName"
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                  placeholder="ชื่อโครงการ"
+                  value={schName}
+                  onChange={(e) => setschName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="mb-2 block text-sm font-medium text-gray-900">
+                  ประกาศโครงการ (PDF)
+                </label>
+                <input
+                  type="file"
+                  accept={accept}
+                  onChange={(e) => setattachment(e.target.files?.[0])}
+                  className="focus:ring-primary-600 focus:border-primary-600 w-full rounded-lg border border-gray-300 px-3 py-2"
+                  required
+                />
+              </div>
+              {/* <div className="sm:col-span-2">
             <label className="block mb-2 text-sm font-medium text-gray-900">รางวัลในแต่ละโครงการ</label>
             <div className="flex flex-col space-y-2">
               {["ลดค่าบำรุงมหาวิทยาลัย", "ลดค่าหน่วยกิต", "ลดค่าธรรมเนียมพิเศษคณะ", "อื่นๆ"].map((reward) => (
@@ -131,104 +140,102 @@ const Create = () => {
               )}
             </div>
           </div> */}
-          
-        <div className="flex space-x-10 sm:col-span-2">
-          <div className="relative max-w-sm">
-            <label className="block mb-2 text-sm font-medium text-gray-900">วันที่เริ่มโครงการ</label>
-            <DatePicker
-              selected={startDate}
-              onChange={(date) => setstartDate(date)}
-              placeholderText="Start date"
-              dateFormat="dd/MM/yyyy"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
-            />
-          </div>
-          <div className="relative max-w-sm">
-            <label className="block mb-2 text-sm font-medium text-gray-900">วันที่จบโครงการ</label>
-            <DatePicker
-              selected={endDate}
-              onChange={(date) => setendDate(date)}
-              placeholderText="End date"
-              dateFormat="dd/MM/yyyy"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
-            />
-          </div>
-        </div>
-        
-        <div className="flex space-x-10 sm:col-span-2">
-           <div className="relative max-w-sm">
-          <label className="block mb-2 text-sm font-medium text-gray-900">ปีการศึกษา</label>
-          <input className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            type="number"
-            value={academiYear}
-            onChange={(e) => setacademicYear((e.target.value))}
-            placeholder="2568"
-            required
-          />
-          </div>
-          <div className="relative max-w-sm">
-          <label htmlFor="term" className="block mb-2 text-sm font-medium text-gray-900">ภาคการศึกษา</label>
-          <select className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            id="term"
-            value={term}
-            onChange={(e) => setterm(e.target.value)}
-            required
-          >
-            <option value="">กรุณาเลือก</option>
-            <option value="เทอมต้น">เทอมต้น</option>
-            <option value="เทอมปลาย">เทอมปลาย</option>
-          </select>
-          </div>
-          <div >
-          <label htmlFor="programType" className="block mb-2 text-sm font-medium text-gray-900">สำหรับหลักสูตร</label>
-          <select className="bg-white-50 border border-gray-300 text-gray-900 text-sm 
-            rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            id="programType"
-            value={programType}
-            onChange={(e) => setprogramType(e.target.value)}
-            required
-          >
-            <option value="">กรุณาเลือก</option>
-            <option value="THAI">ภาคไทย</option>
-            <option value="INTERNATIONAL">ภาคนานาชาติ</option>
-            <option value="BOTHTHAIANDINTERNATIONAL">ทั้งภาคไทยและนานาชาติ</option>
-          </select>
-          </div>
-          
-          </div>
-          
-            
-          
-        
-        <div className="sm:col-span-2">
-          <label className="block mb-2 text-sm font-medium text-gray-900">รายละเอียดโครงการ</label>
-          <textarea
-            value={description}
-            onChange={(e) => setdescription(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
-            placeholder="รายละเอียดโครงการ"
-            rows={6}
-            required
-          />
-        </div>
-      </div>
-      <button
-        type="button"
-        onClick={handleSubmit}
-        className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-lg"
-      >
-        ไปหน้าถัดไป
-      </button>
-    </form>
 
+              <div className="flex space-x-10 sm:col-span-2">
+                <div className="relative max-w-sm">
+                  <label className="mb-2 block text-sm font-medium text-gray-900">
+                    วันที่เริ่มโครงการ
+                  </label>
+                  <DatePicker
+                    selected={startDate}
+                    onChange={(date) => setstartDate(date)}
+                    placeholderText="Start date"
+                    dateFormat="dd/MM/yyyy"
+                    className="focus:ring-primary-600 focus:border-primary-600 w-full rounded-lg border border-gray-300 px-3 py-2"
+                  />
+                </div>
+                <div className="relative max-w-sm">
+                  <label className="mb-2 block text-sm font-medium text-gray-900">
+                    วันที่จบโครงการ
+                  </label>
+                  <DatePicker
+                    selected={endDate}
+                    onChange={(date) => setendDate(date)}
+                    placeholderText="End date"
+                    dateFormat="dd/MM/yyyy"
+                    className="focus:ring-primary-600 focus:border-primary-600 w-full rounded-lg border border-gray-300 px-3 py-2"
+                  />
+                </div>
+              </div>
+
+              <div className="flex space-x-10 sm:col-span-2">
+                <div className="relative max-w-sm">
+                  <label className="mb-2 block text-sm font-medium text-gray-900">ปีการศึกษา</label>
+                  <input
+                    className="bg-white-50 block rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                    type="number"
+                    value={academiYear}
+                    onChange={(e) => setacademicYear(e.target.value)}
+                    placeholder="2568"
+                    required
+                  />
+                </div>
+                <div className="relative max-w-sm">
+                  <label htmlFor="term" className="mb-2 block text-sm font-medium text-gray-900">
+                    ภาคการศึกษา
+                  </label>
+                  <select
+                    className="bg-white-50 block rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                    id="term"
+                    value={term}
+                    onChange={(e) => setterm(e.target.value)}
+                    required>
+                    <option value="">กรุณาเลือก</option>
+                    <option value="เทอมต้น">เทอมต้น</option>
+                    <option value="เทอมปลาย">เทอมปลาย</option>
+                  </select>
+                </div>
+                <div>
+                  <label
+                    htmlFor="programType"
+                    className="mb-2 block text-sm font-medium text-gray-900">
+                    สำหรับหลักสูตร
+                  </label>
+                  <select
+                    className="bg-white-50 block rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                    id="programType"
+                    value={programType}
+                    onChange={(e) => setprogramType(e.target.value)}
+                    required>
+                    <option value="">กรุณาเลือก</option>
+                    <option value="THAI">ภาคไทย</option>
+                    <option value="INTERNATIONAL">ภาคนานาชาติ</option>
+                    <option value="BOTHTHAIANDINTERNATIONAL">ทั้งภาคไทยและนานาชาติ</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="mb-2 block text-sm font-medium text-gray-900">
+                  รายละเอียดโครงการ
+                </label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setdescription(e.target.value)}
+                  className="focus:ring-primary-600 focus:border-primary-600 w-full rounded-lg border border-gray-300 px-3 py-2"
+                  placeholder="รายละเอียดโครงการ"
+                  rows={6}
+                  required
+                />
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="mt-4 w-full rounded-lg bg-blue-500 px-4 py-2 text-white">
+              ไปหน้าถัดไป
+            </button>
+          </form>
         </div>
       </main>
 
@@ -236,8 +243,6 @@ const Create = () => {
       <Footer />
     </div>
   );
-}
+};
 
 export default Create;
-
-

@@ -1,14 +1,15 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { useRouter, useParams, useSearchParams } from "next/navigation";
-import Sidebar from "@/components/sidebar";
-import Header from "@/components/header";
-import Footer from "@/components/footer";
-import { apiService } from "@/common/apiService";
+'use client';
 
-type QuestionType = "text" | "choice" | "checkbox" | "date";
+import { apiService } from '@/common/apiService';
+import Footer from '@/components/footer';
+import Header from '@/components/header';
+import Sidebar from '@/components/sidebar';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+
+type QuestionType = 'text' | 'choice' | 'checkbox' | 'date';
 
 interface DynamicQuestionResponse {
   id: number;
@@ -42,7 +43,6 @@ interface StaticData {
 
   programType: string;
   study: string;
-
 }
 
 interface Termprice {
@@ -59,30 +59,28 @@ interface Termprice {
   sumPrice: number;
 }
 
-
 export default function ApplyScholarshipPage() {
   // Static fields state
   const [staticData, setStaticData] = useState<StaticData>({
-    nisitNameTh: "",
-    nisitNameEn: "",
-    nisitAcademicyear: "",
-    nisitid: "",
-    faculty: "",
-    department: "",
-    advisor: "",
-    gpa: "",
+    nisitNameTh: '',
+    nisitNameEn: '',
+    nisitAcademicyear: '',
+    nisitid: '',
+    faculty: '',
+    department: '',
+    advisor: '',
+    gpa: '',
     dateofBirth: null,
-    age: "",
-    phone: "",
-    email: "",
-    address: "",
-    beahavior_detail: "",
+    age: '',
+    phone: '',
+    email: '',
+    address: '',
+    beahavior_detail: '',
     isLastTerm: false,
-    academicYear: "",
-    term: "",
-    programType: "", // สมมติว่ามี field นี้ในฟอร์ม
-    study: "", // สมมติว่ามี field นี้ในฟอร์ม
-
+    academicYear: '',
+    term: '',
+    programType: '', // สมมติว่ามี field นี้ในฟอร์ม
+    study: '', // สมมติว่ามี field นี้ในฟอร์ม
   });
 
   // Dynamic question responses state
@@ -95,12 +93,8 @@ export default function ApplyScholarshipPage() {
   // สมมติว่า scholarship id อยู่ใน URL เช่น /apply/[id]
   const scholarshipId = params.id; // id: string
   // นอกจากนี้ อาจมี query params สำหรับ academicYear และ term
-  const academicYearParam = searchParams.get("academicYear") || "";
-  const termParam = searchParams.get("term") || "";
-
-
-
-
+  const academicYearParam = searchParams.get('academicYear') || '';
+  const termParam = searchParams.get('term') || '';
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -108,19 +102,14 @@ export default function ApplyScholarshipPage() {
   const [facultyOptions, setFacultyOptions] = useState<string[]>([]);
   const [departmentOptions, setDepartmentOptions] = useState<string[]>([]);
 
-
   const [data, setData] = useState<Termprice[]>([]);
-
-
-
-
 
   // โหลด dynamic question template จาก Scholarship record (ถ้ามี)
   useEffect(() => {
     if (!scholarshipId) return;
     fetch(`/api/scholarship/${scholarshipId}`)
       .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch scholarship");
+        if (!res.ok) throw new Error('Failed to fetch scholarship');
         return res.json();
       })
       .then((data) => {
@@ -132,7 +121,7 @@ export default function ApplyScholarshipPage() {
             type: dq.type.toLowerCase(), // สมมติใน DB เป็น "TEXT", "CHOICE", ฯลฯ
             options: dq.options,
             required: dq.required,
-            answer: "",
+            answer: '',
             selectedDate: null,
           }));
           setDynamicResponses(loaded);
@@ -146,23 +135,21 @@ export default function ApplyScholarshipPage() {
     setStaticData((prev) => ({ ...prev, [field]: value }));
   };
 
-
-
   useEffect(() => {
     if (!academicYearParam || !termParam) return;
 
     const normalizedTerm =
-      termParam === "1" ? "เทอมต้น" : termParam === "2" ? "เทอมปลาย" : termParam;
+      termParam === '1' ? 'เทอมต้น' : termParam === '2' ? 'เทอมปลาย' : termParam;
 
     const fetchTermPriceOptions = async () => {
       try {
         // เรียก API ผ่าน service
         const response = await apiService.fetchData(academicYearParam.toString(), normalizedTerm);
-        console.log("Fetching termprice options from:", response);
+        console.log('Fetching termprice options from:', response);
 
         // ได้ผลลัพธ์เป็น data
         const result: Termprice[] = response as Termprice[];
-        console.log("data0", result);
+        console.log('data0', result);
 
         // เก็บลง state data (อันนี้สำคัญ!)
         setData(result);
@@ -180,16 +167,13 @@ export default function ApplyScholarshipPage() {
     fetchTermPriceOptions();
   }, [academicYearParam, termParam]);
 
-
   useEffect(() => {
     // console.log("working1");
     // console.log("data", data);
 
     const filteredDepartments = Array.from(
       new Set(
-        data
-          .filter((item) => item.faculty === staticData.faculty)
-          .map((item) => item.department)
+        data.filter((item) => item.faculty === staticData.faculty).map((item) => item.department)
       )
     );
 
@@ -199,14 +183,8 @@ export default function ApplyScholarshipPage() {
     setDepartmentOptions(filteredDepartments);
   }, [staticData.faculty, data]);
 
-
-
   // จัดการ dynamic question response
-  const updateDynamicResponse = (
-    id: number,
-    field: keyof DynamicQuestionResponse,
-    value: any
-  ) => {
+  const updateDynamicResponse = (id: number, field: keyof DynamicQuestionResponse, value: any) => {
     setDynamicResponses((prev) =>
       prev.map((resp) => (resp.id === id ? { ...resp, [field]: value } : resp))
     );
@@ -216,13 +194,14 @@ export default function ApplyScholarshipPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!scholarshipId) {
-      alert("Scholarship ID not found");
+      alert('Scholarship ID not found');
       return;
     }
     // Prepare payload (แปลงวันที่ให้เป็น ISO string)
     const payload = {
       scholarshipID: scholarshipId,
-      ...staticData, schType: "WELL_BEHAVIOR",
+      ...staticData,
+      schType: 'WELL_BEHAVIOR',
       dateofBirth: staticData.dateofBirth ? staticData.dateofBirth.toISOString() : null,
       academicYear: academicYearParam,
       term: termParam,
@@ -230,13 +209,13 @@ export default function ApplyScholarshipPage() {
       dynamicQuestions: dynamicResponses.map((resp) => ({
         question: resp.question,
         type:
-          resp.type === "text"
-            ? "TEXT"
-            : resp.type === "choice"
-              ? "CHOICE"
-              : resp.type === "checkbox"
-                ? "CHECKBOX"
-                : "DATE",
+          resp.type === 'text'
+            ? 'TEXT'
+            : resp.type === 'choice'
+              ? 'CHOICE'
+              : resp.type === 'checkbox'
+                ? 'CHECKBOX'
+                : 'DATE',
         options: resp.options,
         required: resp.required,
         answer: resp.answer,
@@ -245,47 +224,43 @@ export default function ApplyScholarshipPage() {
     };
 
     try {
-      console.log("Sending payload:", payload);
-      const res = await fetch("/api/request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      console.log('Sending payload:', payload);
+      const res = await fetch('/api/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       if (res.ok) {
-        alert("ส่งฟอร์มสมัครทุนสำเร็จ!");
-        router.push("/pages/recentscholar"); // เปลี่ยน path ตามที่ต้องการ
+        alert('ส่งฟอร์มสมัครทุนสำเร็จ!');
+        router.push('/pages/recentscholar'); // เปลี่ยน path ตามที่ต้องการ
       } else {
-        alert("เกิดข้อผิดพลาดในการส่งฟอร์ม");
+        alert('เกิดข้อผิดพลาดในการส่งฟอร์ม');
       }
     } catch (error) {
       console.error(error);
-      alert("An error occurred while submitting the form.");
+      alert('An error occurred while submitting the form.');
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col">
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       <Header toggleSidebar={toggleSidebar} />
-      <main className="flex-1 flex justify-center bg-gray-100 w-full mx-auto">
-        <div className="w-full max-w-5xl bg-white p-6 rounded-lg shadow-lg">
-          <h1 className="text-xl font-bold text-center mb-4">
-            กรอกฟอร์มสมัครทุนประพฤติดี
-          </h1>
+      <main className="mx-auto flex w-full flex-1 justify-center bg-gray-100">
+        <div className="w-full max-w-5xl rounded-lg bg-white p-6 shadow-lg">
+          <h1 className="mb-4 text-center text-xl font-bold">กรอกฟอร์มสมัครทุนประพฤติดี</h1>
           <form onSubmit={handleSubmit}>
             {/* Static Fields */}
             <section className="mb-8">
-              <h2 className="text-lg font-semibold mb-2">
-                ข้อมูลนิสิต
-              </h2>
+              <h2 className="mb-2 text-lg font-semibold">ข้อมูลนิสิต</h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium">ชื่อนิสิต (ไทย)</label>
                   <input
                     type="text"
                     value={staticData.nisitNameTh}
-                    onChange={(e) => handleStaticChange("nisitNameTh", e.target.value)}
-                    className="border p-2 w-full"
+                    onChange={(e) => handleStaticChange('nisitNameTh', e.target.value)}
+                    className="w-full border p-2"
                     required
                   />
                 </div>
@@ -294,8 +269,8 @@ export default function ApplyScholarshipPage() {
                   <input
                     type="text"
                     value={staticData.nisitNameEn}
-                    onChange={(e) => handleStaticChange("nisitNameEn", e.target.value)}
-                    className="border p-2 w-full"
+                    onChange={(e) => handleStaticChange('nisitNameEn', e.target.value)}
+                    className="w-full border p-2"
                     required
                   />
                 </div>
@@ -304,8 +279,8 @@ export default function ApplyScholarshipPage() {
                   <input
                     type="text"
                     value={staticData.nisitAcademicyear}
-                    onChange={(e) => handleStaticChange("nisitAcademicyear", e.target.value)}
-                    className="border p-2 w-full"
+                    onChange={(e) => handleStaticChange('nisitAcademicyear', e.target.value)}
+                    className="w-full border p-2"
                     required
                   />
                 </div>
@@ -314,8 +289,8 @@ export default function ApplyScholarshipPage() {
                   <input
                     type="text"
                     value={staticData.nisitid}
-                    onChange={(e) => handleStaticChange("nisitid", e.target.value)}
-                    className="border p-2 w-full"
+                    onChange={(e) => handleStaticChange('nisitid', e.target.value)}
+                    className="w-full border p-2"
                     required
                   />
                 </div>
@@ -325,30 +300,28 @@ export default function ApplyScholarshipPage() {
                     value={staticData.programType}
                     onChange={(e) => {
                       const value = e.target.value;
-                      handleStaticChange("programType", value);
+                      handleStaticChange('programType', value);
                       // ถ้าเลือกนานาชาติให้รีเซ็ต study เป็นค่าว่าง (หรือ null)
-                      if (value === "INTERNATIONAL") {
-                        handleStaticChange("study", "");
+                      if (value === 'INTERNATIONAL') {
+                        handleStaticChange('study', '');
                       }
                     }}
-                    className="border p-2 w-full"
-                    required
-                  >
+                    className="w-full border p-2"
+                    required>
                     <option value="">กรุณาเลือกหลักสูตร</option>
                     <option value="THAI">ไทย</option>
                     <option value="INTERNATIONAL">นานาชาติ</option>
                   </select>
                 </div>
 
-                {staticData.programType === "THAI" && (
+                {staticData.programType === 'THAI' && (
                   <div>
                     <label className="block text-sm font-medium">ภาค</label>
                     <select
                       value={staticData.study}
-                      onChange={(e) => handleStaticChange("study", e.target.value)}
-                      className="border p-2 w-full"
-                      required
-                    >
+                      onChange={(e) => handleStaticChange('study', e.target.value)}
+                      className="w-full border p-2"
+                      required>
                       <option value="">กรุณาเลือกภาค</option>
                       <option value="ปกติ">ปกติ</option>
                       <option value="พิเศษ">พิเศษ</option>
@@ -360,10 +333,9 @@ export default function ApplyScholarshipPage() {
                   <label className="block text-sm font-medium">คณะ</label>
                   <select
                     value={staticData.faculty}
-                    onChange={(e) => handleStaticChange("faculty", e.target.value)}
-                    className="border p-2 w-full"
-                    required
-                  >
+                    onChange={(e) => handleStaticChange('faculty', e.target.value)}
+                    className="w-full border p-2"
+                    required>
                     <option value="">กรุณาเลือกคณะ</option>
                     {facultyOptions.map((fac) => (
                       <option key={fac} value={fac}>
@@ -377,10 +349,9 @@ export default function ApplyScholarshipPage() {
                   <label className="block text-sm font-medium">ภาควิชา/สาขาวิชา</label>
                   <select
                     value={staticData.department}
-                    onChange={(e) => handleStaticChange("department", e.target.value)}
-                    className="border p-2 w-full"
-                    required
-                  >
+                    onChange={(e) => handleStaticChange('department', e.target.value)}
+                    className="w-full border p-2"
+                    required>
                     <option value="">กรุณาเลือกภาควิชา</option>
                     {departmentOptions.map((dept) => (
                       <option key={dept} value={dept}>
@@ -394,8 +365,8 @@ export default function ApplyScholarshipPage() {
                   <input
                     type="text"
                     value={staticData.advisor}
-                    onChange={(e) => handleStaticChange("advisor", e.target.value)}
-                    className="border p-2 w-full"
+                    onChange={(e) => handleStaticChange('advisor', e.target.value)}
+                    className="w-full border p-2"
                     required
                   />
                 </div>
@@ -405,8 +376,8 @@ export default function ApplyScholarshipPage() {
                     <input
                       type="text"
                       value={staticData.gpa}
-                      onChange={(e) => handleStaticChange("gpa", e.target.value)}
-                      className="border p-2 w-full"
+                      onChange={(e) => handleStaticChange('gpa', e.target.value)}
+                      className="w-full border p-2"
                       required
                     />
                   </div>
@@ -414,8 +385,8 @@ export default function ApplyScholarshipPage() {
                     <label className="block text-sm font-medium">วันเกิด</label>
                     <DatePicker
                       selected={staticData.dateofBirth}
-                      onChange={(date) => handleStaticChange("dateofBirth", date)}
-                      className="border p-2 w-full"
+                      onChange={(date) => handleStaticChange('dateofBirth', date)}
+                      className="w-full border p-2"
                       dateFormat="dd/MM/yyyy"
                     />
                   </div>
@@ -424,8 +395,8 @@ export default function ApplyScholarshipPage() {
                     <input
                       type="text"
                       value={staticData.age}
-                      onChange={(e) => handleStaticChange("age", e.target.value)}
-                      className="border p-2 w-full"
+                      onChange={(e) => handleStaticChange('age', e.target.value)}
+                      className="w-full border p-2"
                       required
                     />
                   </div>
@@ -435,8 +406,8 @@ export default function ApplyScholarshipPage() {
                   <input
                     type="text"
                     value={staticData.phone}
-                    onChange={(e) => handleStaticChange("phone", e.target.value)}
-                    className="border p-2 w-full"
+                    onChange={(e) => handleStaticChange('phone', e.target.value)}
+                    className="w-full border p-2"
                     required
                   />
                 </div>
@@ -445,8 +416,8 @@ export default function ApplyScholarshipPage() {
                   <input
                     type="email"
                     value={staticData.email}
-                    onChange={(e) => handleStaticChange("email", e.target.value)}
-                    className="border p-2 w-full"
+                    onChange={(e) => handleStaticChange('email', e.target.value)}
+                    className="w-full border p-2"
                     required
                   />
                 </div>
@@ -455,21 +426,20 @@ export default function ApplyScholarshipPage() {
                   <input
                     type="text"
                     value={staticData.address}
-                    onChange={(e) => handleStaticChange("address", e.target.value)}
-                    className="border p-2 w-full"
+                    onChange={(e) => handleStaticChange('address', e.target.value)}
+                    className="w-full border p-2"
                     required
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium">ภาคการศึกษานี้เป็นภาคสุดท้ายก่อนจบ</label>
+                  <label className="block text-sm font-medium">
+                    ภาคการศึกษานี้เป็นภาคสุดท้ายก่อนจบ
+                  </label>
                   <select
-                    value={staticData.isLastTerm ? "true" : "false"}
-                    onChange={(e) =>
-                      handleStaticChange("isLastTerm", e.target.value === "true")
-                    }
-                    className="border p-2 w-full"
-                    required
-                  >
+                    value={staticData.isLastTerm ? 'true' : 'false'}
+                    onChange={(e) => handleStaticChange('isLastTerm', e.target.value === 'true')}
+                    className="w-full border p-2"
+                    required>
                     <option value="">กรุณาเลือก</option>
                     <option value="true">ใช่</option>
                     <option value="false">ไม่ใช่</option>
@@ -479,10 +449,9 @@ export default function ApplyScholarshipPage() {
                   <label className="block text-sm font-medium">บรรยายความประพฤติดี</label>
                   <textarea
                     rows={6}
-
                     value={staticData.beahavior_detail}
-                    onChange={(e) => handleStaticChange("beahavior_detail", e.target.value)}
-                    className="border p-2 w-full"
+                    onChange={(e) => handleStaticChange('beahavior_detail', e.target.value)}
+                    className="w-full border p-2"
                     required
                   />
                 </div>
@@ -491,23 +460,23 @@ export default function ApplyScholarshipPage() {
 
             {/* Dynamic Questions Section */}
             <section className="mb-8">
-              <h2 className="text-lg font-semibold mb-2">คำถามเพิ่มเติม </h2>
+              <h2 className="mb-2 text-lg font-semibold">คำถามเพิ่มเติม </h2>
               {dynamicResponses.map((dr, idx) => (
-                <div key={dr.id} className="border p-4 mb-4 rounded">
-                  <p className="font-bold">Q{idx + 1}: {dr.question}</p>
-                  {dr.type === "text" && (
+                <div key={dr.id} className="mb-4 rounded border p-4">
+                  <p className="font-bold">
+                    Q{idx + 1}: {dr.question}
+                  </p>
+                  {dr.type === 'text' && (
                     <input
                       type="text"
                       value={dr.answer}
-                      onChange={(e) =>
-                        updateDynamicResponse(dr.id, "answer", e.target.value)
-                      }
-                      className="border p-2 w-full"
+                      onChange={(e) => updateDynamicResponse(dr.id, 'answer', e.target.value)}
+                      className="w-full border p-2"
                       placeholder="กรอกคำตอบ"
                       required={dr.required}
                     />
                   )}
-                  {dr.type === "choice" && (
+                  {dr.type === 'choice' && (
                     <div>
                       {dr.options.map((opt, i) => (
                         <div key={i} className="flex items-center space-x-2">
@@ -516,17 +485,17 @@ export default function ApplyScholarshipPage() {
                             name={`choice_${dr.id}`}
                             value={opt}
                             checked={dr.answer === opt}
-                            onChange={() => updateDynamicResponse(dr.id, "answer", opt)}
+                            onChange={() => updateDynamicResponse(dr.id, 'answer', opt)}
                           />
                           <label>{opt}</label>
                         </div>
                       ))}
                     </div>
                   )}
-                  {dr.type === "checkbox" && (
+                  {dr.type === 'checkbox' && (
                     <div>
                       {dr.options.map((opt, i) => {
-                        const selectedValues = dr.answer ? dr.answer.split(",") : [];
+                        const selectedValues = dr.answer ? dr.answer.split(',') : [];
                         const isChecked = selectedValues.includes(opt);
                         const toggleCheckbox = () => {
                           let newArr = [...selectedValues];
@@ -535,26 +504,22 @@ export default function ApplyScholarshipPage() {
                           } else {
                             newArr.push(opt);
                           }
-                          updateDynamicResponse(dr.id, "answer", newArr.join(","));
+                          updateDynamicResponse(dr.id, 'answer', newArr.join(','));
                         };
                         return (
                           <div key={i} className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
-                              checked={isChecked}
-                              onChange={toggleCheckbox}
-                            />
+                            <input type="checkbox" checked={isChecked} onChange={toggleCheckbox} />
                             <label>{opt}</label>
                           </div>
                         );
                       })}
                     </div>
                   )}
-                  {dr.type === "date" && (
+                  {dr.type === 'date' && (
                     <DatePicker
                       selected={dr.selectedDate || null}
-                      onChange={(date) => updateDynamicResponse(dr.id, "selectedDate", date)}
-                      className="border p-2 w-full"
+                      onChange={(date) => updateDynamicResponse(dr.id, 'selectedDate', date)}
+                      className="w-full border p-2"
                       dateFormat="dd/MM/yyyy"
                     />
                   )}
@@ -584,7 +549,7 @@ export default function ApplyScholarshipPage() {
               </div> */}
             </section>
 
-            <button type="submit" className="bg-blue-500 text-white w-full p-2 rounded">
+            <button type="submit" className="w-full rounded bg-blue-500 p-2 text-white">
               ส่งฟอร์มสมัครทุน
             </button>
           </form>

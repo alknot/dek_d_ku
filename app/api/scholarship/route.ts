@@ -1,14 +1,11 @@
 import { getFieldValue } from '@/app/libs/common';
 import { generateCuid, handleError } from '@/app/libs/utils';
 import { PrismaClient, ProgramType, Role, SchType } from '@prisma/client';
-
 import { NextRequest, NextResponse } from 'next/server';
-
 
 const db = new PrismaClient();
 
 export async function GET(req: NextRequest) {
-  
   // const token = req.headers.get('Authorization');
 
   // if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -28,8 +25,8 @@ export async function GET(req: NextRequest) {
       where: {
         academiYear: academiYear ? academiYear : undefined,
         term: term || undefined,
-        programType: programType as ProgramType || undefined,
-        schType: schType as SchType || undefined,
+        programType: (programType as ProgramType) || undefined,
+        schType: (schType as SchType) || undefined,
       },
     });
 
@@ -91,7 +88,7 @@ export async function POST(req: NextRequest) {
     //     { status: 400 }
     //   );
     // }
-    
+
     // Perform transaction
     const result = await db.$transaction(async (tx) => {
       // Create the related entities first

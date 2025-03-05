@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 
 const Footer: React.FC = () => (
-  <footer className="bg-gray-800 text-white py-6">
+  <footer className="bg-gray-800 py-6 text-white">
     <div className="container mx-auto text-center">
       <p>&copy; นายกุลชัย </p>
     </div>
@@ -9,4 +9,3 @@ const Footer: React.FC = () => (
 );
 
 export default Footer;
-

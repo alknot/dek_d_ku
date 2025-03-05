@@ -2,19 +2,19 @@ import { getFieldValue } from '@/app/libs/common';
 import { generateCuid, handleError } from '@/app/libs/utils';
 import { PrismaClient, Role, Termprice } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
-import Papa from "papaparse";
+import Papa from 'papaparse';
 
 const db = new PrismaClient();
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const academicYearParam = searchParams.get("academicYear");
-    const termParam = searchParams.get("term");
-    const facultyParam = searchParams.get("faculty");
-    const departmentParam = searchParams.get("department");
-    const programTypeParam = searchParams.get("programType");
-    const studyParam = searchParams.get("study");
+    const academicYearParam = searchParams.get('academicYear');
+    const termParam = searchParams.get('term');
+    const facultyParam = searchParams.get('faculty');
+    const departmentParam = searchParams.get('department');
+    const programTypeParam = searchParams.get('programType');
+    const studyParam = searchParams.get('study');
 
     // สร้าง object สำหรับ filter โดยเริ่มจาก academicYear และ term
     const filter: {
@@ -34,10 +34,10 @@ export async function GET(request: Request) {
     }
     if (termParam) {
       let normalizedTerm = termParam;
-      if (termParam === "1") {
-        normalizedTerm = "เทอมต้น";
-      } else if (termParam === "2") {
-        normalizedTerm = "เทอมปลาย";
+      if (termParam === '1') {
+        normalizedTerm = 'เทอมต้น';
+      } else if (termParam === '2') {
+        normalizedTerm = 'เทอมปลาย';
       }
       filter.term = normalizedTerm;
     }
@@ -49,10 +49,10 @@ export async function GET(request: Request) {
       filter.department = departmentParam;
     }
     if (programTypeParam) {
-      if (programTypeParam === "THAI") {
-        filter.programType = "ไทย";
-      } else if (programTypeParam === "INTERNATIONAL") {
-        filter.programType = "นานาชาติ";
+      if (programTypeParam === 'THAI') {
+        filter.programType = 'ไทย';
+      } else if (programTypeParam === 'INTERNATIONAL') {
+        filter.programType = 'นานาชาติ';
       } else {
         filter.programType = programTypeParam;
       }
@@ -70,7 +70,6 @@ export async function GET(request: Request) {
     return handleError(e);
   }
 }
-
 
 export async function POST(req: NextRequest) {
   try {
@@ -148,8 +147,8 @@ export async function DELETE(request: Request) {
   try {
     // อ่าน query parameters จาก URL
     const { searchParams } = new URL(request.url);
-    const academicYearParam = searchParams.get("academicYear");
-    const termParam = searchParams.get("term");
+    const academicYearParam = searchParams.get('academicYear');
+    const termParam = searchParams.get('term');
 
     // สร้าง object สำหรับเงื่อนไข filter
     const filter: { academicYear?: string; term?: string } = {};

@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
       }
       case Role.FACULTY_STAFF: {
         const facultyRequests = await db.form.findMany({
-          where: { approveStatus: RequestStatus.PENDING_SUBDEAN},
+          where: { approveStatus: RequestStatus.PENDING_SUBDEAN },
         });
         return NextResponse.json(facultyRequests ?? [], { status: 200 });
       }
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
       'phone',
       'email',
       'address',
-      'isLastTerm'
+      'isLastTerm',
     ];
     for (const field of requiredFields) {
       if (!body[field]) {
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
 
       certificate: body.certificate,
       activityImageUrl: body.activityImageUrl,
-      staticQuestions : body.staticQuestions,
+      staticQuestions: body.staticQuestions,
       // ฟิลด์ staticQuestions (หรือ staticData ถ้ามีการปรับ schema ใหม่)
       dynamicQuestions: body.dynamicQuestions ?? [],
       // ตั้งค่า default สำหรับ dynamic question fields
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
       extracurricular: null,
       innovation: null,
       comment: null,
-      commentedBy: null
+      commentedBy: null,
     };
 
     // สร้าง Form ตามประเภททุน (schType)
@@ -159,10 +159,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(otherForm, { status: 201 });
       }
       default: {
-        return NextResponse.json(
-          { message: 'Unknown scholarship type' },
-          { status: 400 }
-        );
+        return NextResponse.json({ message: 'Unknown scholarship type' }, { status: 400 });
       }
     }
   } catch (e: any) {

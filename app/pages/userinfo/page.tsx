@@ -7,7 +7,6 @@
 // import { useSession } from "next-auth/react";
 // import SessionProvider from "@/components/sessionProvider";
 
-
 // export default function Home() {
 //   const { data: session, status } = useSession();
 //   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

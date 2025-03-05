@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
             value: 'X-Requested-With, Content-Type, Authorization',
           },
           {
-            key: "Content-Security-Policy",
+            key: 'Content-Security-Policy',
             value: "script-src 'self' 'unsafe-eval';",
           },
         ],

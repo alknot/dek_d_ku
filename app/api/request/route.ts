@@ -31,13 +31,15 @@ export async function GET(req: NextRequest) {
     // const user = await db.user.findUnique({ where: { id: userid } });
 
     const { searchParams } = new URL(req.url);
-    const scholarshipID = searchParams.get("scholarshipID");
-    const academicYear = searchParams.get("academicYear");
-    
-    const term = searchParams.get("term") === 'เทอมต้น' ? '1' 
-                      : searchParams.get("term") === 'เทอมปลาย' ? '2' 
-                      : searchParams.get("term");
-    
+    const scholarshipID = searchParams.get('scholarshipID');
+    const academicYear = searchParams.get('academicYear');
+
+    const term =
+      searchParams.get('term') === 'เทอมต้น'
+        ? '1'
+        : searchParams.get('term') === 'เทอมปลาย'
+          ? '2'
+          : searchParams.get('term');
 
     // ค้นหาข้อมูลโดยใช้เงื่อนไขที่สร้างขึ้น
     const forms = await db.form.findMany({

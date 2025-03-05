@@ -28,7 +28,7 @@ enum Role {
 
 enum RequestStatus {
   PENDING_DEPARTMENT_HEAD
-  PENDING_SUBDEAN
+  PENDING_DEPUTY_DEAN
   PENDING_DEAN
   PENDING_JUDGING
   PENDING_EDIT
@@ -129,7 +129,7 @@ model User {
 
 model Form {
   id            String        @id @map("_id")
-  // createdBy      String
+  createdBy      String
   scholarshipID String
   schType       SchType
   approveStatus RequestStatus

@@ -148,7 +148,8 @@ export async function POST(req: NextRequest) {
       id: generateCuid(),
       scholarshipID: body.scholarshipID, // ใช้ scholarshipID
       schType: body.schType,
-      approveStatus: RequestStatus.PENDING_SUBDEAN,
+      approveStatus: RequestStatus.PENDING_DEPUTY_DEAN,
+      createdBy: body.createdBy,
 
       nisitNameTh: body.nisitNameTh,
       nisitNameEn: body.nisitNameEn,

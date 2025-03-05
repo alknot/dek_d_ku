@@ -4,6 +4,8 @@ import { apiService } from '@/common/apiService';
 import Footer from '@/components/footer';
 import Header from '@/components/header';
 import Sidebar from '@/components/sidebar';
+import { create } from 'axios';
+import { useSession } from 'next-auth/react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
@@ -24,6 +26,7 @@ interface DynamicQuestionResponse {
 interface StaticData {
   nisitNameTh: string;
   nisitNameEn: string;
+  createdby: string;
   nisitAcademicyear: string;
   nisitid: string;
   faculty: string;
@@ -60,11 +63,13 @@ interface Termprice {
 }
 
 export default function ApplyScholarshipPage() {
+  const { data: session } = useSession();
   // Static fields state
   const [staticData, setStaticData] = useState<StaticData>({
     nisitNameTh: '',
     nisitNameEn: '',
     nisitAcademicyear: '',
+    createdby: '',
     nisitid: '',
     faculty: '',
     department: '',
@@ -205,6 +210,7 @@ export default function ApplyScholarshipPage() {
       dateofBirth: staticData.dateofBirth ? staticData.dateofBirth.toISOString() : null,
       academicYear: academicYearParam,
       term: termParam,
+      createdby: session?.userProfile?.id,
 
       dynamicQuestions: dynamicResponses.map((resp) => ({
         question: resp.question,

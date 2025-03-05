@@ -69,7 +69,7 @@ async function createUserThroughAPI(userId: string, tokenData: any) {
 
       body: JSON.stringify({
         id: userId,
-        userprincipalname: tokenData.email || '',
+        userprincipalname: tokenData.email || tokenData['office365-mail'],
         prenameTh: tokenData.thaiprename || '',
         firstnameTh: tokenData['first-name'] || '',
         lastnameTh: tokenData['last-name'] || '',

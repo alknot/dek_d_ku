@@ -6,6 +6,7 @@ import { useRouter, useParams, useSearchParams } from "next/navigation";
 import Sidebar from "@/components/sidebar";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import { apiService } from "@/common/apiService";
 
 type QuestionType = "text" | "choice" | "checkbox" | "date";
 
@@ -35,8 +36,29 @@ interface StaticData {
   address: string;
   isLastTerm: boolean;
   beahavior_detail: string;
-  
+
+  academicYear: string;
+  term: string;
+
+  programType: string;
+  study: string;
+
 }
+
+interface Termprice {
+  id: string;
+  faculty: string;
+  department: string;
+  academicYear: string;
+  term: string;
+  programType: string;
+  study: string;
+  price1: number;
+  price2: number;
+  price3: number;
+  sumPrice: number;
+}
+
 
 export default function ApplyScholarshipPage() {
   // Static fields state
@@ -55,8 +77,12 @@ export default function ApplyScholarshipPage() {
     email: "",
     address: "",
     beahavior_detail: "",
-
     isLastTerm: false,
+    academicYear: "",
+    term: "",
+    programType: "", // สมมติว่ามี field นี้ในฟอร์ม
+    study: "", // สมมติว่ามี field นี้ในฟอร์ม
+
   });
 
   // Dynamic question responses state
@@ -69,11 +95,25 @@ export default function ApplyScholarshipPage() {
   // สมมติว่า scholarship id อยู่ใน URL เช่น /apply/[id]
   const scholarshipId = params.id; // id: string
   // นอกจากนี้ อาจมี query params สำหรับ academicYear และ term
-  const academicYearParam = searchParams.get("academiYear") || "";
+  const academicYearParam = searchParams.get("academicYear") || "";
   const termParam = searchParams.get("term") || "";
+
+
+
+
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+  const [facultyOptions, setFacultyOptions] = useState<string[]>([]);
+  const [departmentOptions, setDepartmentOptions] = useState<string[]>([]);
+
+
+  const [data, setData] = useState<Termprice[]>([]);
+
+
+
+
 
   // โหลด dynamic question template จาก Scholarship record (ถ้ามี)
   useEffect(() => {
@@ -106,6 +146,61 @@ export default function ApplyScholarshipPage() {
     setStaticData((prev) => ({ ...prev, [field]: value }));
   };
 
+
+
+  useEffect(() => {
+    if (!academicYearParam || !termParam) return;
+
+    const normalizedTerm =
+      termParam === "1" ? "เทอมต้น" : termParam === "2" ? "เทอมปลาย" : termParam;
+
+    const fetchTermPriceOptions = async () => {
+      try {
+        // เรียก API ผ่าน service
+        const response = await apiService.fetchData(academicYearParam.toString(), normalizedTerm);
+        console.log("Fetching termprice options from:", response);
+
+        // ได้ผลลัพธ์เป็น data
+        const result: Termprice[] = response as Termprice[];
+        console.log("data0", result);
+
+        // เก็บลง state data (อันนี้สำคัญ!)
+        setData(result);
+
+        // สร้างตัวเลือกที่ไม่ซ้ำกันสำหรับคณะ
+        const faculties = Array.from(new Set(result.map((item) => item.faculty)));
+        // และภาควิชา
+        const departments = Array.from(new Set(result.map((item) => item.department)));
+        setFacultyOptions(faculties);
+        setDepartmentOptions(departments);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchTermPriceOptions();
+  }, [academicYearParam, termParam]);
+
+
+  useEffect(() => {
+    // console.log("working1");
+    // console.log("data", data);
+
+    const filteredDepartments = Array.from(
+      new Set(
+        data
+          .filter((item) => item.faculty === staticData.faculty)
+          .map((item) => item.department)
+      )
+    );
+
+    // console.log("item.faculty", data.filter((item) => item.faculty === staticData.faculty));
+    // console.log("staticData.faculty", staticData.faculty);
+    // console.log("filteredDepartments", filteredDepartments);
+    setDepartmentOptions(filteredDepartments);
+  }, [staticData.faculty, data]);
+
+
+
   // จัดการ dynamic question response
   const updateDynamicResponse = (
     id: number,
@@ -127,21 +222,21 @@ export default function ApplyScholarshipPage() {
     // Prepare payload (แปลงวันที่ให้เป็น ISO string)
     const payload = {
       scholarshipID: scholarshipId,
-      ...staticData,schType: "WELL_BEHAVIOR",
+      ...staticData, schType: "WELL_BEHAVIOR",
       dateofBirth: staticData.dateofBirth ? staticData.dateofBirth.toISOString() : null,
       academicYear: academicYearParam,
       term: termParam,
-      
+
       dynamicQuestions: dynamicResponses.map((resp) => ({
         question: resp.question,
         type:
           resp.type === "text"
             ? "TEXT"
             : resp.type === "choice"
-            ? "CHOICE"
-            : resp.type === "checkbox"
-            ? "CHECKBOX"
-            : "DATE",
+              ? "CHOICE"
+              : resp.type === "checkbox"
+                ? "CHECKBOX"
+                : "DATE",
         options: resp.options,
         required: resp.required,
         answer: resp.answer,
@@ -158,7 +253,7 @@ export default function ApplyScholarshipPage() {
       });
       if (res.ok) {
         alert("ส่งฟอร์มสมัครทุนสำเร็จ!");
-        router.push("/newscholarship/success"); // เปลี่ยน path ตามที่ต้องการ
+        router.push("/pages/recentscholar"); // เปลี่ยน path ตามที่ต้องการ
       } else {
         alert("เกิดข้อผิดพลาดในการส่งฟอร์ม");
       }
@@ -181,7 +276,7 @@ export default function ApplyScholarshipPage() {
             {/* Static Fields */}
             <section className="mb-8">
               <h2 className="text-lg font-semibold mb-2">
-                ข้อมูลนิสิต 
+                ข้อมูลนิสิต
               </h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
@@ -205,7 +300,7 @@ export default function ApplyScholarshipPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium">ปีการศึกษา</label>
+                  <label className="block text-sm font-medium">นิสิตชั้นปีที่</label>
                   <input
                     type="text"
                     value={staticData.nisitAcademicyear}
@@ -225,24 +320,74 @@ export default function ApplyScholarshipPage() {
                   />
                 </div>
                 <div>
+                  <label className="block text-sm font-medium">หลักสูตร</label>
+                  <select
+                    value={staticData.programType}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      handleStaticChange("programType", value);
+                      // ถ้าเลือกนานาชาติให้รีเซ็ต study เป็นค่าว่าง (หรือ null)
+                      if (value === "INTERNATIONAL") {
+                        handleStaticChange("study", "");
+                      }
+                    }}
+                    className="border p-2 w-full"
+                    required
+                  >
+                    <option value="">กรุณาเลือกหลักสูตร</option>
+                    <option value="THAI">ไทย</option>
+                    <option value="INTERNATIONAL">นานาชาติ</option>
+                  </select>
+                </div>
+
+                {staticData.programType === "THAI" && (
+                  <div>
+                    <label className="block text-sm font-medium">ภาค</label>
+                    <select
+                      value={staticData.study}
+                      onChange={(e) => handleStaticChange("study", e.target.value)}
+                      className="border p-2 w-full"
+                      required
+                    >
+                      <option value="">กรุณาเลือกภาค</option>
+                      <option value="ปกติ">ปกติ</option>
+                      <option value="พิเศษ">พิเศษ</option>
+                    </select>
+                  </div>
+                )}
+
+                <div>
                   <label className="block text-sm font-medium">คณะ</label>
-                  <input
-                    type="text"
+                  <select
                     value={staticData.faculty}
                     onChange={(e) => handleStaticChange("faculty", e.target.value)}
                     className="border p-2 w-full"
                     required
-                  />
+                  >
+                    <option value="">กรุณาเลือกคณะ</option>
+                    {facultyOptions.map((fac) => (
+                      <option key={fac} value={fac}>
+                        {fac}
+                      </option>
+                    ))}
+                  </select>
                 </div>
+                {/* เปลี่ยน input ของ department เป็น select จาก termprice */}
                 <div>
                   <label className="block text-sm font-medium">ภาควิชา/สาขาวิชา</label>
-                  <input
-                    type="text"
+                  <select
                     value={staticData.department}
                     onChange={(e) => handleStaticChange("department", e.target.value)}
                     className="border p-2 w-full"
                     required
-                  />
+                  >
+                    <option value="">กรุณาเลือกภาควิชา</option>
+                    {departmentOptions.map((dept) => (
+                      <option key={dept} value={dept}>
+                        {dept}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium">อาจารย์ที่ปรึกษา</label>
@@ -254,34 +399,36 @@ export default function ApplyScholarshipPage() {
                     required
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium">เกรดเฉลี่ย</label>
-                  <input
-                    type="text"
-                    value={staticData.gpa}
-                    onChange={(e) => handleStaticChange("gpa", e.target.value)}
-                    className="border p-2 w-full"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">วันเกิด</label>
-                  <DatePicker
-                    selected={staticData.dateofBirth}
-                    onChange={(date) => handleStaticChange("dateofBirth", date)}
-                    className="border p-2 w-full"
-                    dateFormat="dd/MM/yyyy"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">อายุ</label>
-                  <input
-                    type="text"
-                    value={staticData.age}
-                    onChange={(e) => handleStaticChange("age", e.target.value)}
-                    className="border p-2 w-full"
-                    required
-                  />
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium">เกรดเฉลี่ย</label>
+                    <input
+                      type="text"
+                      value={staticData.gpa}
+                      onChange={(e) => handleStaticChange("gpa", e.target.value)}
+                      className="border p-2 w-full"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium">วันเกิด</label>
+                    <DatePicker
+                      selected={staticData.dateofBirth}
+                      onChange={(date) => handleStaticChange("dateofBirth", date)}
+                      className="border p-2 w-full"
+                      dateFormat="dd/MM/yyyy"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium">อายุ (ปี)</label>
+                    <input
+                      type="text"
+                      value={staticData.age}
+                      onChange={(e) => handleStaticChange("age", e.target.value)}
+                      className="border p-2 w-full"
+                      required
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium">โทรศัพท์</label>
@@ -332,7 +479,7 @@ export default function ApplyScholarshipPage() {
                   <label className="block text-sm font-medium">บรรยายความประพฤติดี</label>
                   <textarea
                     rows={6}
-                    
+
                     value={staticData.beahavior_detail}
                     onChange={(e) => handleStaticChange("beahavior_detail", e.target.value)}
                     className="border p-2 w-full"

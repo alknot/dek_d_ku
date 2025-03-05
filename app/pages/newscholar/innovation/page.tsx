@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation'
 
 import Sidebar from "@/components/sidebar";
 import { SchType } from "@prisma/client";
-import { programType } from "@prisma/client";
+// import { programType } from "@prisma/client";
 // import router from "next/dist/shared/lib/router/router";
 
 

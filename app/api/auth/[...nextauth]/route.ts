@@ -1,147 +1,154 @@
-// import NextAuth, { NextAuthOptions, Profile, Session } from "next-auth"
-// import KeycloakProvider from "next-auth/providers/keycloak"
-// import { decodeToken } from "react-jwt"
+import NextAuth, { NextAuthOptions, Profile, Session } from "next-auth";
+import KeycloakProvider from "next-auth/providers/keycloak";
+import { decodeToken } from "react-jwt";
 
-// declare module "next-auth" {
-//   interface Session {
-//     // you can be more specific here with your types.
-//     account: any
-//     profile: any
-//   }
+import { PrismaClient, Role } from "@prisma/client";
 
-//   interface Profile {
-//     // Could be realm, client, etc.
-//     realm_access: any
-//   }
+const db = new PrismaClient();
 
-//   interface Session {
-//     // While we added the roles on profile, maybe you want an easier way to access? Group all realm/client roles?
-//     // You could ignore this completly.
-//     roles: any
-//   }
-// }
+declare module "next-auth" {
+  interface Session {
+    account: any;
+    profile: any;
+  }
 
-// // For more information on each option (and a full list of options) go to
-// // https://next-auth.js.org/configuration/options
+  interface Profile {
+    realm_access: any;
+  }
 
-// // console.log(
-// //   KeycloakProvider({
-// //     wellKnown:
-// //       "https://sso-dev.ku.ac.th/realms/KU-Alllogin/.well-known/openid-configuration",
-// //     clientId: process.env.CLIENT_ID as string,
-// //     clientSecret: process.env.SECRET as string,
-// //     authorization: {
-// //       params: {
-// //         scope: "basic openid",
-// //         redirect_uri: `${process.env.NEXTAUTH_URL}/auth/redirect`,
-// //       },
-// //     },
-// //     // scope
+  interface Session {
+    roles: any;
+  }
+}
 
-// //     issuer: process.env.KEYCLOAK_URL as string,
-// //   })
-// // )
 
-// export const authOptions: NextAuthOptions = {
-//   // https://next-auth.js.org/configuration/providers/oauth
-//   providers: [
-//     KeycloakProvider({
-//       wellKnown:
-//         "https://sso-dev.ku.ac.th/realms/KU-Alllogin/.well-known/openid-configuration",
-//       clientId: process.env.CLIENT_ID as string,
-//       clientSecret: process.env.SECRET as string,
-//       authorization: {
-//         params: {
-//           scope: "basic openid",
-//           redirect_uri: `${process.env.NEXTAUTH_URL}/auth/redirect`,
-//         },
-//       },
+
+async function createUserThroughAPI(userId: string, tokenData: any) {
+
+  console.log("--------------CREATE USER VIA API---------------");
+  console.log({userId, tokenData});
+
+  console.log({
+    resultBody:{
+      id: userId,
+      userprincipalname: tokenData.userprincipalname || "",
+      prenameTh: tokenData.thaiprename || "",
+      firstnameTh: tokenData["first-name"] || "",
+      lastnameTh: tokenData["last-name"] || "",
+      prenameEn: tokenData.prenameEn || "",
+      firstnameEn: tokenData.given_name || "",
+      lastnameEn: tokenData.family_name || "",
+      role: "NOT_ASSIGNED",
+      faculty: tokenData.faculty,
+      email: tokenData["google-mail"],
+      typePerson: tokenData["type-person"],
+    }
+  });
+
+  const API_BASE_URL = process.env.NEXTAUTH_URL || "http://localhost:3000";
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/user`, {
+      method: "POST",
       
-      
-//       // scope
+      body: JSON.stringify({
+        id: userId,
+        userprincipalname: tokenData.userprincipalname || "",
+        prenameTh: tokenData.thaiprename || "",
+        firstnameTh: tokenData["first-name"] || "",
+        lastnameTh: tokenData["last-name"] || "",
+        prenameEn: tokenData.prenameEn || "",
+        firstnameEn: tokenData.given_name || "",
+        lastnameEn: tokenData.family_name || "",
+        role: "NOT_ASSIGNED",
+        faculty: tokenData.faculty,
+        email: tokenData["google-mail"],
+        typePerson: tokenData["type-person"],
+      }),
+    });
+    if (!res.ok) {
+      console.error("Failed to create user via API");
+    } else {
+      console.log("User created via API");
+    }
+  } catch (error) {
+    console.error("Error calling API:", error);
+  }
+}
 
-//       // issuer: process.env.KEYCLOAK_URL as string,
-//     }),
-//     // {
-//     //   id: "KU-Alllogin",
-//     //   name: "KU-Alllogin",
-//     //   type: "oauth",
-//     //   version: "2.0",
-//     //   profile(profile: any, token: any) {
-//     //     return {
-//     //       id: profile.sub,
-//     //       name: profile.name ?? profile.preferred_username,
-//     //       email: profile.email,
-//     //       image: profile.picture,
-//     //     }
-//     //   },
-//     //   wellKnown:
-//     //     "https://sso-dev.ku.ac.th/realms/KU-Alllogin/.well-known/openid-configuration",
-//     //   clientId: process.env.CLIENT_ID as string,
-//     //   clientSecret: process.env.SECRET as string,
-//     //   authorization: {
-//     //     params: {
-//     //       scope: "basic openid",
-//     //       redirect_uri: `${process.env.NEXTAUTH_URL}/auth/redirect`,
-//     //     },
-//     //   },
-//     //   // scope
+export const authOptions: NextAuthOptions = {
+  
+  providers: [
+    KeycloakProvider({
+      wellKnown:
+        "https://sso-dev.ku.ac.th/realms/KU-Alllogin/.well-known/openid-configuration",
+      clientId: process.env.CLIENT_ID as string,
+      clientSecret: process.env.SECRET as string,
+      authorization: {
+        params: {
+          scope: "basic openid",
+          redirect_uri: `${process.env.NEXTAUTH_URL}/auth/redirect`,
+        },
+      },
+    }),
+  ],
+  callbacks: {
+    async jwt({ token, account, profile }) {
+      try {
+        if (account) {
+          console.log("--------------ACCESS TOKEN ---------------");
+          const decodedToken = decodeToken(account.access_token as any);
+          if (token == null) {
+            throw new Error("Unable to decode token");
+          }
+          // console.log(decodedToken);
+          const userId = token.sub as string;
+          // console.log("--------------USER ID---------------");
+          // console.log(userId);
+          // console.log("--------------ROLES---------------");
+          profile = decodedToken as Profile;
+          token.account = account;
+        }
+        if (profile) {
+          // console.log("--------------PROFILE---------------");
+          // console.log(profile);
+          token.profile = profile;
+          const clientRoles = profile.realm_access.roles;
+          token.client_roles = clientRoles;
+        }
+        if (profile && account) {
+          const userId = token.sub as string;
+          const tokenData = profile;
 
-//     //   // issuer: process.env.KEYCLOAK_URL as string,
-//     // },
-//   ],
-//   callbacks: {
-//     async jwt({ token, account, profile }) {
-//       try {
-//         if (account) {
-//           console.log("--------------ACCESS TOKEN ---------------")
-//           const decodedToken = decodeToken(account.access_token as any)
-//           if (token == null) {
-//             throw new Error("Unnable to decode token")
-//           }
-//           console.log(decodedToken)
-//           console.log("--------------ROLES---------------")
-//           // console.log(decodedToken.resource_access)
-//           // Do something here to add more info, maybe just overwrite profile (thats the one that should have this info)
-//           profile = decodedToken as Profile
-//           token.account = account
-//         }
-//         if (profile) {
-//           console.log("--------------PROFILE---------------")
-//           console.log(profile)
-//           token.profile = profile
-//           // Then do here the assignation of roles elements to token so session has access
-//           // This can be modified so uses by client, realm or account BE AWARE OF THAT!
-//           // Modify the "resource_access['next-auth-AFB']" value to the one your resource/realm/accout
-//           // json scope roles you need
+          // console.log("--------------USER ID---------------");
+          // console.log({userId});
 
-//           // While the info is already on profile, we could make a new key on the json response of session
-//           const clientRoles = profile.realm_access.roles
-//           token.client_roles = clientRoles
-//         }
-//       } catch (error) {
-//         console.log(error)
-//       }
-//       return token
-//     },
-//     async session({ session, token, trigger }) {
-//       // Token interceptor to add token info to the session to use on the pages.
-//       console.log("async session accessed")
+          const user = await db.user.findUnique({ where: { id: userId } });
+          // console.log({user});
+          if (!user) {
+            // user does not exist, create user
+            console.log("User not found, creating user");
+            await createUserThroughAPI(userId, tokenData);
+          }
 
-//       session.account = token.account
-//       session.profile = token.profile
-//       session.roles = token.client_roles
-//       return session
-//     },
-//     // async redirect({ url, baseUrl }) {
-//     //   console.log("async redirect accessed")
-//     //   console.log(url)
-//     //   console.log(baseUrl)
-//     //   return "/api/auth/callback/keycloak"
-//     // },
-//   },
-// }
+          // user exists
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      console.log("async session accessed");
 
-// const handler = NextAuth(authOptions)
+      session.account = token.account;
+      session.profile = token.profile;
+      session.roles = token.client_roles;
+      return session;
+    },
+  },
+};
 
-// export { handler as GET, handler as POST }
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };

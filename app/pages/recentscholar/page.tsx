@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "@/components/sidebar";
 import Modal from "@/components/Modal";
@@ -8,16 +8,15 @@ import { format, differenceInDays } from "date-fns";
 import { th } from "date-fns/locale";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedScholarship, setSelectedScholarship] = useState<Scholarship | null>(null);
 
+  // Scholarship interface
   interface Scholarship {
-    schType: any;
-    
+    schType: string;
     id: number;
     academiYear: string;
     term: string;
@@ -34,10 +33,84 @@ export default function Home() {
   const [term, setTerm] = useState("");
   const [programType, setProgramType] = useState("");
   const [schType, setSchType] = useState("");
-  const router = useRouter();
- 
-  
 
+  // สำหรับ Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10; // แสดง 10 แถวต่อหน้า
+
+  // หา totalPages = เพดาน(จำนวนรายการ / 10)
+  const totalPages = Math.ceil(scholarships.length / pageSize);
+
+  // ตัด array scholarships ให้เหลือเฉพาะข้อมูลของหน้านั้น
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const displayedScholarships = scholarships.slice(startIndex, endIndex);
+
+  const router = useRouter();
+
+  // ฟังก์ชันเปิด/ปิด Sidebar
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  // ดึงข้อมูลทุน (Scholarship) จาก /api/scholarship
+  const fetchScholarships = async () => {
+    try {
+      const response = await axios.get("/api/scholarship", {
+        params: {
+          academiYear,
+          term,
+          programType,
+          schType,
+        },
+      });
+      // สมมติว่า API ส่งกลับมาในรูปแบบ { scholarships: Scholarship[] }
+      const data = response.data as { scholarships: Scholarship[] };
+      setScholarships(data.scholarships);
+      setCurrentPage(1); // รีเซ็ตเป็นหน้าแรกเมื่อมีการค้นหาใหม่
+    } catch (error) {
+      console.error("Failed to fetch scholarships:", error);
+    }
+  };
+
+  // โหลดข้อมูลครั้งแรก
+  useEffect(() => {
+    fetchScholarships();
+  }, []);
+
+  // ฟังก์ชันค้นหา
+  const handleSearch = () => {
+    fetchScholarships();
+  };
+
+  // ตัวอย่างฟังก์ชันสำหรับไปหน้าถัดไป
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // ตัวอย่างฟังก์ชันสำหรับไปหน้าก่อนหน้า
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Modal เกี่ยวกับ Scholarship (ถ้าใช้งาน)
+  const [selectedScholarship, setSelectedScholarship] = useState<Scholarship | null>(null);
+
+  const handleOpenModal = (scholarship: Scholarship) => {
+    setSelectedScholarship(scholarship);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedScholarship(null);
+  };
+
+  // ตัวอย่างฟังก์ชันเมื่อกด "สมัครโครงการนี้"
   const navigateToForm = (scholarship: Scholarship) => {
     // Here you can either set state or use routing to navigate
     // For example, using React Router:
@@ -96,78 +169,37 @@ export default function Home() {
     }
   }
 
-  
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-
-  const fetchScholarships = async () => {
-    try {
-      const response = await axios.get("/api/scholarship", {
-        params: {
-          academiYear: academiYear,
-          term: term,
-          programType: programType,
-          schType: schType,
-          
-        },
-      });
-      const data = response.data as { scholarships: Scholarship[] };
-      setScholarships(data.scholarships);
-    } catch (error) {
-      console.error("Failed to fetch scholarships:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchScholarships();
-  }, []);
-
-  const handleSearch = () => {
-    fetchScholarships();
-  };
-
-  const handleOpenModal = (scholarship: Scholarship) => {
-    setSelectedScholarship(scholarship);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedScholarship(null);
-  };
 
   return (
     <div className="min-h-screen flex flex-col">
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
-      {/* Header Section */}
+      {/* Header */}
       <Header toggleSidebar={toggleSidebar} />
 
-      {/* Main Section (Full Screen) */}
+      {/* Main */}
       <main className=" flex-1 flex  justify-center bg-gray-100 w-full mx-auto">
         <div className="p-6 space-y-6 bg-gray-50">
-          {/* หัวข้อ */}
           <h1 className="text-2xl font-bold text-center text-gray-800">
             โครงการที่เปิดรับสมัคร
           </h1>
 
-          {/* ช่องค้นหา */}
+          {/* Search */}
           <div className="bg-white shadow rounded-lg p-4 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {/* Dropdown 1 */}
+              {/* Field 1: ปีการศึกษา */}
               <div>
                 <input
                   type="text"
-                  id="academicYear"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
                   placeholder="ปีการศึกษา"
                   value={academiYear}
                   onChange={(e) => setAcademicYear(e.target.value)}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                 />
               </div>
-              {/* Dropdown 2 */}
+
+              {/* Field 2: เทอม */}
               <select
                 className="border-gray-300 rounded-lg p-2"
                 value={term}
@@ -177,11 +209,8 @@ export default function Home() {
                 <option value="เทอมต้น">เทอมต้น</option>
                 <option value="เทอมปลาย">เทอมปลาย</option>
               </select>
-              {/* Dropdown 3 */}
 
-              {/* Dropdown 4 */}
-
-              {/* Dropdown 5 */}
+              {/* Field 3: หลักสูตร */}
               <select
                 className="border-gray-300 rounded-lg p-2"
                 value={programType}
@@ -191,7 +220,8 @@ export default function Home() {
                 <option value="THAI">หลักสูตรไทย</option>
                 <option value="INTERNATIONAL">หลักสูตรนานาชาติ</option>
               </select>
-              {/* Dropdown 6 */}
+
+              {/* Field 4: ประเภทโครงการ */}
               <select
                 className="border-gray-300 rounded-lg p-2"
                 value={schType}
@@ -214,9 +244,9 @@ export default function Home() {
             </div>
           </div>
 
-          {/* ตาราง */}
+          {/* ตารางแสดงผล (Pagination) */}
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-gray-200">
+          <table className="w-full border-collapse border border-gray-200">
               <thead className="bg-blue-800 text-white">
                 <tr>
                   <th className="px-4 py-2 text-left text-center">ที่</th>
@@ -229,7 +259,7 @@ export default function Home() {
                 </tr>
               </thead>
               <tbody>
-                {scholarships.map((scholarship, index) => {
+                {displayedScholarships.map((scholarship, index) => {
                   const daysLeft = differenceInDays(new Date(scholarship.endDate), new Date());
                   let buttonColor = "bg-green-600";
                   if (daysLeft <= 14 && daysLeft > 7) {
@@ -240,14 +270,25 @@ export default function Home() {
 
                   return (
                     <tr key={scholarship.id}>
-                      <td className="px-4 py-2 border w-12">{index + 1}</td>
-                      <td className="px-2 py-2 border w-28 text-center">{scholarship.academiYear}</td>
-                      <td className="px-4 py-2 border w-28 text-center">{scholarship.term}</td>
-                      <td className="px-4 py-2 border w-28">{scholarship.programType}</td>
-                      <td className="px-4 py-2 border">{scholarship.schName}</td>
-                      <td className="px-4 py-2 border text-center w-80">
+                      <td className="px-4 py-2 border text-center px-4 w-12">
+                        {(currentPage - 1) * pageSize + index + 1}
+                      </td>
+                      <td className="px-4 py-2 border text-center w-28">
+                        {scholarship.academiYear}
+                      </td>
+                      <td className="px-4 py-2 border text-center w-28">
+                        {scholarship.term}
+                      </td>
+                      <td className="px-4 py-2 border text-center w-28">
+                        {scholarship.programType}
+                      </td>
+                      <td className="px-4 py-2 border ">
+                        {scholarship.schName}
+                      </td>
+                      <td className="px-4 py-2 border text-center  w-80">
                         {format(new Date(scholarship.startDate), "dd MMMM yyyy", { locale: th })} -{" "}
-                        {format(new Date(scholarship.endDate), "dd MMMM yyyy", { locale: th })}<br />
+                        {format(new Date(scholarship.endDate), "dd MMMM yyyy", { locale: th })}
+                        <br />
                         {daysLeft >= 0 ? (
                           <button className={`px-2 py-1 rounded-lg ${buttonColor}`}>
                             คงเหลือ {daysLeft} วัน
@@ -256,23 +297,45 @@ export default function Home() {
                           <span className="text-red-600">หมดเขต</span>
                         )}
                       </td>
-
-                      {daysLeft >= 0 && (
-                        <td className="px-4 py-2 border text-center w-40">
+                      <td className="px-4 py-2 border text-center w-40">
+                        {daysLeft >= 0 && (
                           <button
                             className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400"
                             onClick={() => handleOpenModal(scholarship)}
                           >
                             รายละเอียด
                           </button>
-                        </td>
-                      )}
+                        )}
+                      </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
           </div>
+
+          {/* แถบ Pagination */}
+          {scholarships.length > pageSize && (
+            <div className="flex items-center justify-center space-x-4 mt-4">
+              <button
+                onClick={() => prevPage()}
+                disabled={currentPage === 1}
+                className="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:bg-gray-200"
+              >
+                ก่อนหน้า
+              </button>
+              <span>
+                หน้าที่ {currentPage} / {totalPages}
+              </span>
+              <button
+                onClick={() => nextPage()}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:bg-gray-200"
+              >
+                ถัดไป
+              </button>
+            </div>
+          )}
         </div>
       </main>
 
@@ -306,7 +369,7 @@ export default function Home() {
   )}
 </Modal>
 
-      {/* Footer Section */}
+      {/* Footer */}
       <Footer />
     </div>
   );

@@ -10,8 +10,7 @@ import { useSearchParams,useParams  } from 'next/navigation'
 
 import Sidebar from "@/components/sidebar";
 import { SchType } from "@prisma/client";
-import { programType } from "@prisma/client";
-import { set } from "date-fns";
+
 // import router from "next/dist/shared/lib/router/router";
 
 const Create = () => {

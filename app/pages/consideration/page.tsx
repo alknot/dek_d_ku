@@ -16,6 +16,8 @@ export default function Home() {
   const [selectedScholarship, setSelectedScholarship] = useState<Scholarship | null>(null);
 
   interface Scholarship {
+    schType: any;
+    
     id: number;
     academiYear: string;
     term: string;
@@ -24,7 +26,7 @@ export default function Home() {
     description: string;
     startDate: string;
     endDate: string;
-    pdf: string;
+    pdfUrl: string;
   }
 
   const [scholarships, setScholarships] = useState<Scholarship[]>([]);
@@ -33,17 +35,66 @@ export default function Home() {
   const [programType, setProgramType] = useState("");
   const [schType, setSchType] = useState("");
   const router = useRouter();
+ 
+  
 
+  const navigateToForm = (scholarship: Scholarship) => {
+    // Here you can either set state or use routing to navigate
+    // For example, using React Router:
+    if (!scholarship) {
+      console.error("No scholarship selected");
+      return;
+    }
+  
+    setIsModalOpen(false); // Close the modal first
+  
+    // Navigate based on the scholarship type
+    switch(scholarship.schType) {
+      case "WELL_BEHAVIOR":
+        if (scholarship.term === "เทอมต้น") {
+          const term=1;
+          const url = `../../../../../../../../../../../../pages/consideration/showReq/wellbehavior/${scholarship.id}?academiYear=${encodeURIComponent(scholarship.academiYear)}&term=${encodeURIComponent(term)}`;
+        router.push(url);
+        }
+        else if (scholarship.term === "เทอมปลาย") {
+          const term=2;
+          const url = `../../../../../../../../../../../../pages/consideration/showReq/wellbehavior/${scholarship.id}?term=${encodeURIComponent(term)}&academicYear=${encodeURIComponent(scholarship.academiYear)}`;
+        router.push(url);
+        }
+        
+        break;
+      case "EXTRACURRICULAR":
+        
+      if (scholarship.term === "เทอมต้น") {
+        const term=1;
+        const url = `../../../../../../../../../../../../pages/consideration/showReq/extracurricular/${scholarship.id}?academiYear=${encodeURIComponent(scholarship.academiYear)}&term=${encodeURIComponent(term)}`;
+      router.push(url);
+      }
+      else if (scholarship.term === "เทอมปลาย") {
+        const term=2;
+        const url = `../../../../../../../../../../../../pages/consideration/showReq/extracurricular/${scholarship.id}?term=${encodeURIComponent(term)}&academicYear=${encodeURIComponent(scholarship.academiYear)}`;
+      router.push(url);
+      }
+        
+        break;
+      case "INNOVATION":
 
-  // const navigateToForm = (scholarship: Scholarship) => {
-  //   // Here you can either set state or use routing to navigate
-  //   // For example, using React Router:
-    
-  //   router.push(`../../../pages/recentscholar/applyform/${selectedScholarship?.id}`);
-  //   setIsModalOpen(false); // Close the modal first
-  //   // Alternatively, set some state to conditionally render the form in the current component
-  //   setSelectedScholarship(scholarship); // assuming this triggers the form display
-  // };
+      if (scholarship.term === "เทอมต้น") {
+        const term=1;
+        const url = `../../../../../../../../../../../../pages/consideration/showReq/innovation/${scholarship.id}?academiYear=${encodeURIComponent(scholarship.academiYear)}&term=${encodeURIComponent(term)}`;
+      router.push(url);
+      }
+      else if (scholarship.term === "เทอมปลาย") {
+        const term=2;
+        const url = `../../../../../../../../../../../../pages/consideration/showReq/innovation/${scholarship.id}?term=${encodeURIComponent(term)}&academicYear=${encodeURIComponent(scholarship.academiYear)}`;
+      router.push(url);
+      }
+        
+        break;
+      default:
+        console.error("Unsupported scholarship type:", scholarship.schType);
+    }
+  }
 
   
   const toggleSidebar = () => {
@@ -99,7 +150,7 @@ export default function Home() {
         <div className="p-6 space-y-6 bg-gray-50">
           {/* หัวข้อ */}
           <h1 className="text-2xl font-bold text-center text-gray-800">
-            พิจารณาผลการสมัครเข้าร่วมโครงการ
+            โครงการที่เปิดรับสมัคร
           </h1>
 
           {/* ช่องค้นหา */}
@@ -174,7 +225,7 @@ export default function Home() {
                   <th className="px-4 py-2 text-left text-center">หลักสูตรที่เปิดรับ</th>
                   <th className="px-4 py-2 text-left text-center">โครงการ</th>
                   <th className="px-9 py-2 text-left text-center">กำหนดการ</th>
-                  <th className="px-9 py-2 text-left text-center">พิจารณาผล</th>
+                  <th className="px-9 py-2 text-left text-center">รายละเอียด</th>
                 </tr>
               </thead>
               <tbody>
@@ -197,7 +248,7 @@ export default function Home() {
                       <td className="px-4 py-2 border text-center w-80">
                         {format(new Date(scholarship.startDate), "dd MMMM yyyy", { locale: th })} -{" "}
                         {format(new Date(scholarship.endDate), "dd MMMM yyyy", { locale: th })}<br />
-                        {daysLeft > 0 ? (
+                        {daysLeft >= 0 ? (
                           <button className={`px-2 py-1 rounded-lg ${buttonColor}`}>
                             คงเหลือ {daysLeft} วัน
                           </button>
@@ -205,14 +256,17 @@ export default function Home() {
                           <span className="text-red-600">หมดเขต</span>
                         )}
                       </td>
-                      <td className="px-4 py-2 border text-center w-40">
-                        <button
-                          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400"
-                          onClick={() => handleOpenModal(scholarship)}
-                        >
-                          พิจารณาผล
-                        </button>
-                      </td>
+
+                      {(
+                        <td className="px-4 py-2 border text-center w-40">
+                          <button
+                            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400"
+                            onClick={() => handleOpenModal(scholarship)}
+                          >
+                            รายละเอียด
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   );
                 })}
@@ -227,16 +281,26 @@ export default function Home() {
   {selectedScholarship && (
     <div>
       <h2 className="text-xl font-bold mb-4">{selectedScholarship.schName}</h2>
+      <div className="flex items-center space-x-2">
+              <p><strong>เอกสารประจำโครงการ:</strong></p>
+              <button
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400"
+                onClick={() => window.open(selectedScholarship.pdfUrl, '_blank')}
+              >
+                แสดงเอกสาร
+              </button>
+            </div>
       <p><strong>ปีการศึกษา:</strong> {selectedScholarship.academiYear}</p>
       <p><strong>เทอม:</strong> {selectedScholarship.term}</p>
       <p><strong>หลักสูตรที่เปิดรับ:</strong> {selectedScholarship.programType}</p>
       <p><strong>รายละเอียดโครงการ:</strong> {selectedScholarship.description}</p>
       <p><strong>กำหนดการ:</strong> {format(new Date(selectedScholarship.startDate), "dd MMMM yyyy", { locale: th })} - {format(new Date(selectedScholarship.endDate), "dd MMMM yyyy", { locale: th })}</p>
+      
       <button
         className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-lg"
-        // onClick={() => navigateToForm(selectedScholarship)}
+        onClick={() => navigateToForm(selectedScholarship)}
       >
-        พิจารณาผลการสมัครเข้าร่วมโครงการนี้
+        พิจารณาผล
       </button>
     </div>
   )}

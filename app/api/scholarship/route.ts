@@ -1,6 +1,6 @@
 import { getFieldValue } from '@/app/libs/common';
 import { generateCuid, handleError } from '@/app/libs/utils';
-import { PrismaClient, programType, Role, SchType } from '@prisma/client';
+import { PrismaClient, ProgramType, Role, SchType } from '@prisma/client';
 
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
       where: {
         academiYear: academiYear ? academiYear : undefined,
         term: term || undefined,
-        programType: programType as programType || undefined,
+        programType: programType as ProgramType || undefined,
         schType: schType as SchType || undefined,
       },
     });

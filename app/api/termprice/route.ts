@@ -8,13 +8,23 @@ const db = new PrismaClient();
 
 export async function GET(request: Request) {
   try {
-    // อ่าน query parameters จาก URL
     const { searchParams } = new URL(request.url);
     const academicYearParam = searchParams.get("academicYear");
     const termParam = searchParams.get("term");
+    const facultyParam = searchParams.get("faculty");
+    const departmentParam = searchParams.get("department");
+    const programTypeParam = searchParams.get("programType");
+    const studyParam = searchParams.get("study");
 
-    // สร้าง object สำหรับเงื่อนไข filter
-    const filter: { academicYear?: string; term?: string } = {};
+    // สร้าง object สำหรับ filter โดยเริ่มจาก academicYear และ term
+    const filter: {
+      academicYear?: string;
+      term?: string;
+      faculty?: string;
+      department?: string;
+      programType?: string;
+      study?: string;
+    } = {};
 
     if (academicYearParam) {
       const academicYear = Number(academicYearParam);
@@ -23,10 +33,34 @@ export async function GET(request: Request) {
       }
     }
     if (termParam) {
-      filter.term = termParam;
+      let normalizedTerm = termParam;
+      if (termParam === "1") {
+        normalizedTerm = "เทอมต้น";
+      } else if (termParam === "2") {
+        normalizedTerm = "เทอมปลาย";
+      }
+      filter.term = normalizedTerm;
+    }
+    // เพิ่ม filter สำหรับ faculty, department, programType และ study
+    if (facultyParam) {
+      filter.faculty = facultyParam;
+    }
+    if (departmentParam) {
+      filter.department = departmentParam;
+    }
+    if (programTypeParam) {
+      if (programTypeParam === "THAI") {
+        filter.programType = "ไทย";
+      } else if (programTypeParam === "INTERNATIONAL") {
+        filter.programType = "นานาชาติ";
+      } else {
+        filter.programType = programTypeParam;
+      }
+    }
+    if (studyParam) {
+      filter.study = studyParam;
     }
 
-    // ดึงข้อมูลโดย filter ตาม academicYear และ term (ถ้ามี)
     const termPrices = await db.termprice.findMany({
       where: filter,
     });
@@ -36,6 +70,7 @@ export async function GET(request: Request) {
     return handleError(e);
   }
 }
+
 
 export async function POST(req: NextRequest) {
   try {

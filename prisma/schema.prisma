@@ -28,7 +28,7 @@ enum Role {
 
 enum RequestStatus {
   PENDING_DEPARTMENT_HEAD
-  PENDING_FACULTY
+  PENDING_SUBDEAN
   PENDING_DEAN
   PENDING_JUDGING
   PENDING_EDIT
@@ -103,7 +103,7 @@ model User {
   lastnameEn        String // นามสกุล ภาษาอังกฤษ
   role              Role
   major             String? // คณะ (เฉพาะนิสิต)
-  faculty           String // สังกัด, คณะ
+  faculty           String? // สังกัด, คณะ
 
   // birthdate DateTime?
   advisor String? // อาจารย์ที่ปรึกษา (เฉพาะนิสิต)
@@ -148,6 +148,14 @@ model Form {
   email             String
   address           String
   isLastTerm        Boolean
+
+  programType  ProgramType
+  study        String?
+
+  academicYear String
+  term         String
+
+
   // Depend on scholarship type (innovation, extracurricular)
   certificate       String?
   activityImageUrl  String?
@@ -202,7 +210,16 @@ model Scholarship {
   dynamicQuestions DynamicQuestionTemplate[]
   pdfUrl           String
   // file      File?      @relation("ScholarshipFile", fields: [attachment], references: [id])
-  // termprice Termprice @relation("TermpriceScholarship", fields: [price], references: [id])
+  termprice Termprice? @relation("TermpriceScholarship", fields: [termpriceid], references: [id])
+  termpriceid String?
+}
+
+model assignrole {
+  id        String @id @default(cuid()) @map("_id")
+  usergmail String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model File {
@@ -224,14 +241,14 @@ model Termprice {
   academicYear String
   term         String
   programType  String // ไทย,นานาชาติ
-  study        String // ปกติ,พิเศษ
+  study        String? // ปกติ,พิเศษ
   price1       Float
   price2       Float
   price3       Float
   sumPrice     Float // ค่าเทอมแบ่งเป็นส่วนย่อย 3 ส่วน
 
   // Relationships
-  // scholarship Scholarship[] @relation("TermpriceScholarship")
+  scholarship Scholarship[] @relation("TermpriceScholarship")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

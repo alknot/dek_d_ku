@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
       }
       case Role.FACULTY_STAFF: {
         const facultyRequests = await db.form.findMany({
-          where: { approveStatus: RequestStatus.PENDING_FACULTY },
+          where: { approveStatus: RequestStatus.PENDING_SUBDEAN},
         });
         return NextResponse.json(facultyRequests ?? [], { status: 200 });
       }
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     // const userId = 'mockUserIdForTest';
 
     const body = await req.json();
-
+    console.log(body);
     // ตรวจสอบ field ที่จำเป็น (สามารถปรับปรุงเพิ่มเติมได้ตามต้องการ)
     const requiredFields = [
       'forScholarship',
@@ -110,6 +110,13 @@ export async function POST(req: NextRequest) {
       email: body.email,
       address: body.address,
       isLastTerm: body.isLastTerm,
+
+      academicYear: body.academicYear,
+      term: body.term,
+
+      programType: body.programType,
+      study: body.study,
+
       certificate: body.certificate,
       activityImageUrl: body.activityImageUrl,
       staticQuestions : body.staticQuestions,

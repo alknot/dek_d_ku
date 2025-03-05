@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       'prenameTh',
       'firstnameTh',
       'lastnameTh',
-      'prenameEn',
+      // 'prenameEn',
       'firstnameEn',
       'lastnameEn',
       'faculty',

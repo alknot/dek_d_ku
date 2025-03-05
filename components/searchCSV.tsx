@@ -25,7 +25,7 @@ const SearchCSV = () => {
     if (academicYear && term) {
       try {
         const response = await apiService.fetchData(academicYear.toString(), term);
-        setData(response);
+        setData(response as TermPrice[]);
       } catch (err) {
         setError("Failed to fetch data. Please try again.");
       }

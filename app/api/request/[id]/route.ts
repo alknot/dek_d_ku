@@ -8,14 +8,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     const token = req.headers.get('Authorization');
 
-    if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    // if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
     // Do something to verify token and get id
     const userid = '';
     const user = await db.user.findUnique({ where: { id: userid } });
-    if (!user) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
+    // if (!user) {
+    //   return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    // }
 
     const request = await db.form.findUnique({ where: { id } });
 
@@ -34,18 +34,18 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     const token = req.headers.get('Authorization');
 
-    if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    // if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
     // Do something to verify token and get id
     const userid = '';
     const user = await db.user.findUnique({ where: { id: userid } });
-    if (!user) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
+    // if (!user) {
+    //   return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    // }
 
-    if (user.role !== Role.SA_STAFF) {
-      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
-    }
+    // if (user.role !== Role.SA_STAFF) {
+    //   return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    // }
 
     const body = await req.json();
 

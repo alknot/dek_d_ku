@@ -15,6 +15,8 @@ export default function Home() {
 
   const role = session?.userProfile;
 
+  const token = session?.account.access_token as string | undefined;
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {

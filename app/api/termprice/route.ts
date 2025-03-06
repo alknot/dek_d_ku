@@ -20,10 +20,10 @@ export async function GET(request: Request) {
     const filter: {
       academicYear?: string;
       term?: string;
-      faculty?: string;
-      department?: string;
       programType?: string;
       study?: string;
+      faculty?: string;
+      department?: string;
     } = {};
 
     if (academicYearParam) {
@@ -121,13 +121,16 @@ export async function POST(req: NextRequest) {
       id: generateCuid(),
       academicYear: body.academicYear,
       term: body.term,
-      department: body.department,
+
+      programType: body.programType,
+      study: body.study,
       faculty: body.faculty,
+      department: body.department,
+
       price1: body.price1,
       price2: body.price2,
       price3: body.price3,
-      programType: body.programType,
-      study: body.study,
+
       sumPrice: body.sumPrice,
       createdAt: new Date(),
       updatedAt: new Date(),

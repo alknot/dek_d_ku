@@ -169,16 +169,46 @@ export async function POST(req: NextRequest) {
       programType: body.programType,
       study: body.study,
 
+      universityPrice: body.universityPrice ?? undefined,
+      facultyPrice: body.facultyPrice ?? undefined,
+      creditPrice: body.creditPrice ?? undefined,
+      sumPrice: body.sumPrice ?? undefined,
+
+      newUniversityPrice: body.newuniversityPrice ?? undefined,
+      newFacultyPrice: body.newfacultyPrice ?? undefined,
+      newCreditPrice: body.newcreditPrice ?? undefined,
+      newSumPrice: body.newsumPrice ?? undefined,
+
       certificate: body.certificate ?? undefined,
       activityImageUrl: body.activityImageUrl ?? undefined,
       staticQuestions: body.staticQuestions ?? undefined,
       dynamicQuestions: body.dynamicQuestions ?? [],
-      wellBehavior: null,
+      wellBehavior:
+        body.schType === SchType.WELL_BEHAVIOR
+          ? {
+              beahavior_detail: body.beahavior_detail || null,
+            }
+          : null,
+      innovation:
+        body.schType === SchType.INNOVATION
+          ? {
+              innovationType: body.innovationType || null, // ควรเป็นค่าที่ตรงกับ enum ExtracurricularType
+              awardDate: body.awardDate ? new Date(body.awardDate) : new Date(), // ถ้าเป็นวันที่
+              competitionName: body.competitionName || null,
+              teamName: body.teamName || null,
+              innovationName: body.innovationName || null,
+              prizeName: body.prizeName || null,
+              organizer: body.organizer || null,
+              competitiveLevel: body.competitiveLevel || null,
+              numberOfTeam: body.numberOfTeam || null,
+              activityHour: body.activityHour || null,
+              attachfile: body.attachfile || null,
+            }
+          : null,
       extracurricular: null,
-      innovation: null,
       comment: null,
       commentedBy: null,
-
+      currentStage: true,
       academicYear: body.academicYear,
       term: body.term,
     };

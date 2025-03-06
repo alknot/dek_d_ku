@@ -133,12 +133,12 @@ export default function DynamicQuestionPage() {
     <div className="flex min-h-screen flex-col">
       {/* Sidebar / Header ตามต้องการ */}
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-      <Header toggleSidebar={toggleSidebar} />
+      <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
       <main className="mx-auto flex w-full flex-1 justify-center bg-gray-100">
         <div className="w-full max-w-5xl rounded-lg bg-white p-6 shadow-lg">
           <h2 className="mb-4 text-center text-xl font-bold text-gray-900">
-            เพิ่มคำถาม (Dynamic Question) ให้ Scholarship
+            เพิ่มคำถาม ให้ Scholarship
           </h2>
 
           {/* ใช้ form เดียวเท่านั้น, onSubmit={handleFormSubmit} */}

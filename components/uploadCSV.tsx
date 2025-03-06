@@ -64,8 +64,8 @@ const CsvUploader = () => {
             className="w-full rounded border p-2"
             required>
             <option value="">เลือกภาคการศึกษา</option>
-            <option value="เทอมต้น">เทอมต้น</option>
-            <option value="เทอมปลาย">เทอมปลาย</option>
+            <option value="เทอมต้น">ภาคต้น</option>
+            <option value="เทอมปลาย">ภาคปลาย</option>
           </select>
         </div>
         <div>

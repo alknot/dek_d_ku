@@ -1,85 +1,435 @@
 'use client';
 
+import { apiService } from '@/common/apiService';
 import Footer from '@/components/footer';
 import Header from '@/components/header';
 import Sidebar from '@/components/sidebar';
-import { ActivityHour, CompetitiveLevel, SchType } from '@prisma/client';
 import axios from 'axios';
-import { useRouter } from 'next/compat/router';
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import { log } from 'console';
+import { useSession } from 'next-auth/react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-// import { programType } from "@prisma/client";
-// import router from "next/dist/shared/lib/router/router";
+type QuestionType = 'text' | 'choice' | 'checkbox' | 'date';
 
-const Create = () => {
-  const [nisitNameTh, setNisitNameTH] = useState<string>('');
-  const [nisitNameEn, setNisitNameENG] = useState<string>('');
-  const [nisitid, setNisitID] = useState<string>('');
-  const [nisitAcademicyear, setNisitAcademicyear] = useState<string>('');
-  const [age, setAge] = useState<number>();
-  const [dateofBirth, setDateofBirth] = useState<Date | null>(null);
-  const [awardDate, setAwardDate] = useState<Date | null>(null);
-  const [faculty, setFaculty] = useState<string>('');
-  const [department, setDepartment] = useState<string>('');
-  const [advisor, setAdvisor] = useState<string>('');
-  const [gpa, setGPA] = useState<number>();
-  const [phone, setPhone] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [address, setAddress] = useState<string>('');
-  const [behavior_Detail, setBehaviorDetail] = useState('');
-  const [isLastTerm, setLastterm] = useState('');
-  const [competitionName, setCompetitionName] = useState<string>('');
-  const [teamName, setTeamName] = useState<string>('');
-  const [innovationName, setInnovationName] = useState<string>('');
-  const [prizeName, setPrizeName] = useState<string>('');
-  const [numberOfTeam, setNumberOfTeam] = useState<number>();
-  const [competitiveLevel, setCompetitiveLevel] = useState<CompetitiveLevel>();
-  const [activityHour, setactivityHour] = useState<ActivityHour>();
+interface DynamicQuestionResponse {
+  id: number;
+  question: string;
+  type: QuestionType;
+  options: string[];
+  required: boolean;
+  answer: string;
+  selectedDate?: Date | null;
+}
+
+interface StaticData {
+  nisitNameTh: string;
+  nisitNameEn: string;
+  createdBy: string;
+  nisitAcademicyear: string;
+  nisitid: string;
+  faculty: string;
+  department: string;
+  advisor: string;
+  gpa: string;
+  dateofBirth: Date | null;
+  age: string;
+  phone: string;
+  email: string;
+  address: string;
+  isLastTerm: boolean;
+
+  universityPrice: number;
+  facultyPrice: number;
+  creditPrice: number;
+  sumPrice: number;
+
+  newuniversityPrice: number;
+  newfacultyPrice: number;
+  newcreditPrice: number;
+  newsumPrice: number;
+
+  academicYear: string;
+  term: string;
+
+  programType: string;
+  study: string;
+
+  awardDate: Date | null;
+  competitionName: string;
+  teamName: string;
+  innovationName: string;
+  prizeName: string;
+  organizer: string;
+  competitiveLevel: string;
+  numberOfTeam: string;
+  activityHour: string;
+  attachFile: string;
+}
+
+interface Termprice {
+  id: string;
+  faculty: string;
+  department: string;
+  academicYear: string;
+  term: string;
+  programType: string;
+  study: string;
+  price1: number;
+  price2: number;
+  price3: number;
+  sumPrice: number;
+}
+
+export default function ApplyScholarshipPage() {
+  const { data: session } = useSession();
+  // State สำหรับ static data ของฟอร์ม
+  const [staticData, setStaticData] = useState<StaticData>({
+    nisitNameTh: '',
+    nisitNameEn: '',
+    nisitAcademicyear: '',
+    createdBy: '',
+    nisitid: '',
+    faculty: '',
+    department: '',
+    advisor: '',
+    gpa: '',
+    dateofBirth: null,
+    age: '',
+    phone: '',
+    email: '',
+    address: '',
+
+    awardDate: null,
+    competitionName: '',
+    teamName: '',
+    innovationName: '',
+    prizeName: '',
+    organizer: '',
+    competitiveLevel: '',
+    numberOfTeam: '',
+    activityHour: '',
+    attachFile: '',
+
+    isLastTerm: false,
+    academicYear: '',
+    term: '',
+    programType: '',
+    study: '',
+    universityPrice: 0,
+    facultyPrice: 0,
+    creditPrice: 0,
+    sumPrice: 0,
+    newuniversityPrice: 0,
+    newfacultyPrice: 0,
+    newcreditPrice: 0,
+    newsumPrice: 0,
+  });
+
+  // Dynamic question responses state
+  const [dynamicResponses, setDynamicResponses] = useState<DynamicQuestionResponse[]>([]);
 
   const router = useRouter();
-  const { id, academiYear, term } = router?.query || {};
-  console.log('id', id);
-  const accept = '.pdf';
+  const params = useParams();
+  const searchParams = useSearchParams();
+
+  // สมมติว่า scholarship id อยู่ใน URL เช่น /apply/[id]
+  const scholarshipId = params.id; // id: string
+  // ดึง query parameters
+  const academicYearParam = searchParams.get('academiYear') || '';
+  const termParam = searchParams.get('term') || '';
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+  // State สำหรับข้อมูล termprice ที่ได้จาก API
+  const [data, setData] = useState<Termprice[]>([]);
+  // State สำหรับ selected termprice จากการ filter
+  const [selectedTermPrice, setSelectedTermPrice] = useState<Termprice | null>(null);
+
+  // State สำหรับ cascading dropdown options
+  const [programTypeOptions, setProgramTypeOptions] = useState<string[]>([]);
+  const [studyOptions, setStudyOptions] = useState<string[]>([]);
+  const [facultyOptions, setFacultyOptions] = useState<string[]>([]);
+  const [departmentOptions, setDepartmentOptions] = useState<string[]>([]);
+  const [pdf, setPdf] = useState<File | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [pdfMimeType, setPdfMimeType] = useState<string | null>(null);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setPdf(event.target.files[0]);
+      setPdfMimeType(event.target.files[0].type);
+    }
   };
 
-  const handleSubmit = async () => {
+  // ตัวอย่างการอัปโหลด PDF (ถ้าต้องการ)
+  const handleUploadPdf = async (): Promise<string | null> => {
+    if (!pdf) return null;
+
+    // แปลงเป็น Base64
+    const toBase64 = (file: File): Promise<string> =>
+      new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = (error) => reject(error);
+      });
+
     try {
-      const data = {
-        nisitNameTh,
-        nisitNameEn,
-        nisitid,
-        nisitAcademicyear,
-        age,
-        dateofBirth,
-        faculty,
-        department,
-        advisor,
-        gpa,
-        phone,
-        email,
-        address,
-        isLastTerm,
-        scholarshipId: id,
-        competitionName,
-        teamName,
-        innovationName,
-        prizeName,
+      const base64File = await toBase64(pdf);
+      const formData = new FormData();
+      formData.append('pdf', base64File);
+      formData.append('mimeType', pdfMimeType || '');
 
-        // Include the id in the data
-      };
+      const response = await fetch('/api/upload/pdf', {
+        method: 'POST',
+        body: formData,
+      });
 
-      console.log(data); // ตรวจสอบข้อมูลก่อนส่ง
+      if (response.ok) {
+        const { url } = await response.json();
+        setPdfUrl(url);
+        return url;
+      } else {
+        setPdfUrl(null);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      setPdfUrl(null);
+      return null;
+    }
+  };
 
-      // ส่งข้อมูลไปยัง API
-      await axios.post('/api/request', data);
+  // โหลด dynamic question template จาก Scholarship record (ถ้ามี)
+  useEffect(() => {
+    if (!scholarshipId) return;
+    fetch(`/api/scholarship/${scholarshipId}`)
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch scholarship');
+        return res.json();
+      })
+      .then((data) => {
+        if (data && data.dynamicQuestions) {
+          const loaded = data.dynamicQuestions.map((dq: any, index: number) => ({
+            id: Date.now() + index,
+            question: dq.question,
+            type: dq.type.toLowerCase(),
+            options: dq.options,
+            required: dq.required,
+            answer: '',
+            selectedDate: null,
+          }));
+          setDynamicResponses(loaded);
+        }
+      })
+      .catch((err) => console.error(err));
+  }, [scholarshipId]);
+
+  // จัดการ static field
+  const handleStaticChange = <K extends keyof StaticData>(field: K, value: StaticData[K]) => {
+    setStaticData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // ดึงข้อมูล termprice จาก API เมื่อ academicYearParam และ termParam เปลี่ยนแปลง
+  useEffect(() => {
+    if (!academicYearParam || !termParam) return;
+    const normalizedTerm =
+      termParam === '1' ? 'เทอมต้น' : termParam === '2' ? 'เทอมปลาย' : termParam;
+    const fetchTermPriceOptions = async () => {
+      try {
+        const response = await apiService.fetchData(academicYearParam.toString(), normalizedTerm);
+        const result = response as Termprice[];
+        setData(result);
+        // ตัวเลือกสำหรับหลักสูตร
+        const uniqueProgramTypes = Array.from(new Set(result.map((item) => item.programType)));
+        setProgramTypeOptions(uniqueProgramTypes);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchTermPriceOptions();
+  }, [academicYearParam, termParam]);
+
+  // เมื่อเลือกหลักสูตร ให้ filter หา studyOptions
+  useEffect(() => {
+    if (!staticData.programType) {
+      setStudyOptions([]);
+      return;
+    }
+    const filtered = data.filter((item) => item.programType === staticData.programType);
+    const uniqueStudies = Array.from(new Set(filtered.map((item) => item.study)));
+    setStudyOptions(uniqueStudies);
+    // Reset ค่าที่เกี่ยวข้อง
+    handleStaticChange('study', '');
+    handleStaticChange('faculty', '');
+    handleStaticChange('department', '');
+  }, [staticData.programType, data]);
+
+  // เมื่อเลือก study ให้ filter หา facultyOptions
+  useEffect(() => {
+    if (!staticData.study) {
+      setFacultyOptions([]);
+      return;
+    }
+    const filtered = data.filter(
+      (item) => item.programType === staticData.programType && item.study === staticData.study
+    );
+    const uniqueFaculties = Array.from(new Set(filtered.map((item) => item.faculty)));
+    setFacultyOptions(uniqueFaculties);
+    handleStaticChange('faculty', '');
+    handleStaticChange('department', '');
+  }, [staticData.study, staticData.programType, data]);
+
+  // เมื่อเลือก faculty ให้ filter หา departmentOptions
+  useEffect(() => {
+    if (!staticData.faculty) {
+      setDepartmentOptions([]);
+      return;
+    }
+    const filtered = data.filter(
+      (item) =>
+        item.programType === staticData.programType &&
+        item.study === staticData.study &&
+        item.faculty === staticData.faculty
+    );
+    const uniqueDepartments = Array.from(new Set(filtered.map((item) => item.department)));
+    setDepartmentOptions(uniqueDepartments);
+    handleStaticChange('department', '');
+  }, [staticData.faculty, staticData.study, staticData.programType, data]);
+
+  // เมื่อ staticData.programType, study, faculty, department เปลี่ยน ให้ filter หา selectedTermPrice
+  useEffect(() => {
+    if (
+      !staticData.programType ||
+      !staticData.study ||
+      !staticData.faculty ||
+      !staticData.department ||
+      data.length === 0
+    ) {
+      setSelectedTermPrice(null);
+      return;
+    }
+    const filtered = data.filter(
+      (item) =>
+        item.programType === staticData.programType &&
+        item.study === staticData.study &&
+        item.faculty === staticData.faculty &&
+        item.department === staticData.department
+    );
+    if (filtered.length > 0) {
+      setSelectedTermPrice(filtered[0]);
+    } else {
+      setSelectedTermPrice(null);
+    }
+  }, [staticData.programType, staticData.study, staticData.faculty, staticData.department, data]);
+
+  // console.log('user', session?.userProfile?.email);
+  // console.log('user', session?.userProfile?.id);
+  // จัดการ dynamic question response
+  const updateDynamicResponse = (id: number, field: keyof DynamicQuestionResponse, value: any) => {
+    setDynamicResponses((prev) =>
+      prev.map((resp) => (resp.id === id ? { ...resp, [field]: value } : resp))
+    );
+  };
+  const normalizedProgramType =
+    staticData.programType === 'ไทย'
+      ? 'THAI'
+      : staticData.programType === 'นานาชาติ'
+        ? 'INTERNATIONAL'
+        : staticData.programType;
+
+  // ส่งข้อมูล Form ไปยัง API (POST /api/request)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!scholarshipId) {
+      alert('Scholarship ID not found');
+      return;
+    }
+    let newuniversityPrice = 0;
+    let newfacultyPrice = 0;
+    let newcreditPrice = 0;
+    let newsumPrice = 0;
+
+    if (staticData.isLastTerm === false) {
+      newuniversityPrice = 0;
+      console.log('selectedTermPrice:', selectedTermPrice ? selectedTermPrice.price2 : 'N/A');
+      newfacultyPrice = selectedTermPrice ? selectedTermPrice.price2 : 0;
+      newcreditPrice = 0;
+      newsumPrice = selectedTermPrice ? selectedTermPrice.price2 : 0;
+
+      console.log('newuniversityPrice0:', newuniversityPrice);
+      console.log('newfacultyPrice0:', newfacultyPrice);
+      console.log('newcreditPrice0:', newcreditPrice);
+      console.log('newsumPrice0:', newsumPrice);
+    } else {
+      newuniversityPrice = 0;
+      newfacultyPrice = 0;
+      newcreditPrice = 0;
+      newsumPrice = 0;
+    }
+    staticData.programType = normalizedProgramType;
+    const createdBy = session?.userProfile?.id || '';
+    console.log('newuniversityPrice:', newuniversityPrice);
+    console.log('newfacultyPrice:', newfacultyPrice);
+    console.log('newcreditPrice:', newcreditPrice);
+    console.log('newsumPrice:', newsumPrice);
+    const payload = {
+      scholarshipID: scholarshipId,
+
+      ...staticData,
+      schType: 'INNOVATION',
+      dateofBirth: staticData.dateofBirth ? staticData.dateofBirth.toISOString() : null,
+      academicYear: academicYearParam,
+      term: termParam,
+      createdBy: session?.userProfile?.id,
+
+      attachfile: pdfUrl,
+
+      universityPrice: selectedTermPrice ? selectedTermPrice.price1 : 0,
+      facultyPrice: selectedTermPrice ? selectedTermPrice.price2 : 0,
+      creditPrice: selectedTermPrice ? selectedTermPrice.price3 : 0,
+      sumPrice: selectedTermPrice ? selectedTermPrice.sumPrice : 0,
+      newuniversityPrice: newuniversityPrice,
+      newfacultyPrice: newfacultyPrice,
+      newcreditPrice: newcreditPrice,
+      newsumPrice: newsumPrice,
+      dynamicQuestions: dynamicResponses.map((resp) => ({
+        question: resp.question,
+        type:
+          resp.type === 'text'
+            ? 'TEXT'
+            : resp.type === 'choice'
+              ? 'CHOICE'
+              : resp.type === 'checkbox'
+                ? 'CHECKBOX'
+                : 'DATE',
+        options: resp.options,
+        required: resp.required,
+        answer: resp.answer,
+        selectedDate: resp.selectedDate ? resp.selectedDate.toISOString() : undefined,
+      })),
+    };
+
+    try {
+      console.log('Sending payload:', payload);
+      const res = await fetch('/api/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        alert('ส่งฟอร์มสมัครทุนสำเร็จ!');
+        router.push('/pages/recentscholar'); // เปลี่ยน path ตามที่ต้องการ
+      } else {
+        alert('เกิดข้อผิดพลาดในการส่งฟอร์ม');
+      }
     } catch (error) {
       console.error(error);
+      alert('An error occurred while submitting the form.');
     }
   };
 
@@ -89,16 +439,16 @@ const Create = () => {
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Header Section */}
-      <Header toggleSidebar={toggleSidebar} />
+      <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
       {/* Main Section (Full Screen) */}
       <main className="mx-auto flex w-full flex-1 justify-center bg-gray-100">
         <div className="w-full max-w-5xl rounded-lg bg-white p-6 shadow-lg">
           <h2 className="mb-4 text-center text-xl font-bold text-gray-900">
-            แบบฟอร์มเสนอรายชื่อนิสิตดีเด่นมหาสิทยาลัยเกษรศาสตร์
+            กรอกฟอร์มสมัครทุนความคิดสร้างสรรค์และนวัตกรรม
           </h2>
-
-          <form>
+          <h2 className="mb-2 text-lg font-semibold">ข้อมูลนิสิต</h2>
+          <form onSubmit={handleSubmit}>
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
               <div className="sm:col-span-2">
                 <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
@@ -106,11 +456,10 @@ const Create = () => {
                 </label>
                 <input
                   type="text"
-                  id="schName"
+                  value={staticData.nisitNameTh}
+                  onChange={(e) => handleStaticChange('nisitNameTh', e.target.value)}
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="ชื่อผู้สมัคร (ภาษาไทย)"
-                  value={nisitNameTh}
-                  onChange={(e) => setNisitNameTH(e.target.value)}
                   required
                 />
               </div>
@@ -121,11 +470,10 @@ const Create = () => {
                 </label>
                 <input
                   type="text"
-                  id="schName"
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                  value={staticData.nisitNameEn}
+                  onChange={(e) => handleStaticChange('nisitNameEn', e.target.value)}
                   placeholder="ชื่อผู้สมัคร (ภาษาอังกฤษ)"
-                  value={nisitNameEn}
-                  onChange={(e) => setNisitNameENG(e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                   required
                 />
               </div>
@@ -137,11 +485,10 @@ const Create = () => {
                   </label>
                   <input
                     type="text"
-                    id="schName"
                     className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                     placeholder="นิสิตชั้นปีที่"
-                    value={nisitAcademicyear}
-                    onChange={(e) => setNisitAcademicyear(e.target.value)}
+                    value={staticData.nisitAcademicyear}
+                    onChange={(e) => handleStaticChange('nisitAcademicyear', e.target.value)}
                     required
                   />
                 </div>
@@ -151,11 +498,10 @@ const Create = () => {
                   </label>
                   <input
                     type="text"
-                    id="schName"
                     className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                     placeholder="รหัสนิสิต"
-                    value={nisitid}
-                    onChange={(e) => setNisitID(e.target.value)}
+                    value={staticData.nisitid}
+                    onChange={(e) => handleStaticChange('nisitid', e.target.value)}
                     required
                   />
                 </div>
@@ -166,8 +512,8 @@ const Create = () => {
                       เกิดวันที่
                     </label>
                     <DatePicker
-                      selected={dateofBirth}
-                      onChange={(date) => setDateofBirth(date)}
+                      selected={staticData.dateofBirth}
+                      onChange={(date) => handleStaticChange('dateofBirth', date)}
                       placeholderText="เกิดวันที่"
                       dateFormat="dd/MM/yyyy"
                       className="focus:ring-primary-600 focus:border-primary-600 w-full rounded-lg border border-gray-300 px-3 py-2"
@@ -181,56 +527,91 @@ const Create = () => {
                     </label>
                     <input
                       type="text"
-                      id="schName"
                       className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                       placeholder="อายุ (ปี)"
-                      value={age}
-                      onChange={(e) => setAge(Number(e.target.value))}
+                      value={staticData.age}
+                      onChange={(e) => handleStaticChange('age', e.target.value)}
                       required
                     />
                   </div>
                 </div>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium">หลักสูตรที่เปิดรับ</label>
+                <select
+                  value={staticData.programType}
+                  onChange={(e) => handleStaticChange('programType', e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                  required>
+                  <option value="">กรุณาเลือกหลักสูตร</option>
+                  {programTypeOptions.map((pt) => (
+                    <option key={pt} value={pt}>
+                      {pt}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {/* ภาค */}
+              <div>
+                <label className="block text-sm font-medium">ภาค</label>
+                <select
+                  value={staticData.study}
+                  onChange={(e) => handleStaticChange('study', e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                  required>
+                  <option value="">กรุณาเลือกภาค</option>
+                  {studyOptions.map((st) => (
+                    <option key={st} value={st}>
+                      {st}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {/* คณะ */}
+              <div>
+                <label className="block text-sm font-medium">คณะ</label>
+                <select
+                  value={staticData.faculty}
+                  onChange={(e) => handleStaticChange('faculty', e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                  required>
+                  <option value="">กรุณาเลือกคณะ</option>
+                  {facultyOptions.map((fac) => (
+                    <option key={fac} value={fac}>
+                      {fac}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {/* ภาควิชา/สาขาวิชา */}
+              <div>
+                <label className="block text-sm font-medium">ภาควิชา/สาขาวิชา</label>
+                <select
+                  value={staticData.department}
+                  onChange={(e) => handleStaticChange('department', e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                  required>
+                  <option value="">กรุณาเลือกภาควิชา</option>
+                  {departmentOptions.map((dept) => (
+                    <option key={dept} value={dept}>
+                      {dept}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div className="flex space-x-10 sm:col-span-2">
                 <div className="relative max-w-sm">
                   <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                    คณะ
+                    เกรดเฉลี่ย
                   </label>
                   <input
                     type="text"
-                    id="schName"
                     className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="คณะ"
-                    value={faculty}
-                    onChange={(e) => setFaculty(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="relative max-w-sm">
-                  <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                    ภาควิชา/สาขาวิชา
-                  </label>
-                  <input
-                    type="text"
-                    id="schName"
-                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="ภาควิชา/สาขาวิชา"
-                    value={department}
-                    onChange={(e) => setDepartment(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="relative max-w-sm">
-                  <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                    คะแนนเฉลี่ยสะสม
-                  </label>
-                  <input
-                    type="text"
-                    id="schName"
-                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="คะแนนเฉลี่ยสะสม"
-                    value={gpa}
-                    onChange={(e) => setGPA(Number(e.target.value))}
+                    placeholder="เกรดเฉลี่ย"
+                    value={staticData.gpa}
+                    onChange={(e) => handleStaticChange('gpa', e.target.value)}
                     required
                   />
                 </div>
@@ -240,10 +621,11 @@ const Create = () => {
                     className="mb-2 block text-sm font-medium text-gray-900">
                     ภาคการศึกษานี้เป็นภาคสุดท้ายก่อนจะจบ
                   </label>
+
                   <select
+                    value={staticData.isLastTerm ? 'true' : 'false'}
+                    onChange={(e) => handleStaticChange('isLastTerm', e.target.value === 'true')}
                     className="bg-white-50 block rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    value={isLastTerm}
-                    onChange={(e) => setLastterm(e.target.value)}
                     required>
                     <option value="">กรุณาเลือก</option>
                     <option value="true">ใช่</option>
@@ -259,11 +641,10 @@ const Create = () => {
                   </label>
                   <input
                     type="text"
-                    id="schName"
                     className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                     placeholder="โทรศัพท์"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    value={staticData.phone}
+                    onChange={(e) => handleStaticChange('phone', e.target.value)}
                     required
                   />
                 </div>
@@ -273,11 +654,10 @@ const Create = () => {
                   </label>
                   <input
                     type="text"
-                    id="schName"
                     className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                     placeholder="E-mail"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={staticData.email}
+                    onChange={(e) => handleStaticChange('email', e.target.value)}
                     required
                   />
                 </div>
@@ -285,15 +665,15 @@ const Create = () => {
 
               <div className="sm:col-span-2">
                 <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                  ชื่ออาจารยืที่ปรึกษา
+                  ชื่ออาจารย์ที่ปรึกษา
                 </label>
                 <input
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="ชื่ออาจารย์ที่ปรึกษา"
-                  value={advisor}
-                  onChange={(e) => setAdvisor(e.target.value)}
+                  value={staticData.advisor}
+                  onChange={(e) => handleStaticChange('advisor', e.target.value)}
                   required
                 />
               </div>
@@ -304,11 +684,10 @@ const Create = () => {
                 </label>
                 <input
                   type="text"
-                  id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="ที่อยู่ปัจจุบัน"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
+                  value={staticData.address}
+                  onChange={(e) => handleStaticChange('address', e.target.value)}
                   required
                 />
               </div>
@@ -319,6 +698,8 @@ const Create = () => {
                 </label>
                 <input
                   type="file"
+                  accept=".pdf"
+                  onChange={handleFileChange}
                   className="focus:ring-primary-600 focus:border-primary-600 w-full rounded-lg border border-gray-300 px-3 py-2"
                   required
                 />
@@ -330,8 +711,8 @@ const Create = () => {
                     วันที่ได้รับรางวัล
                   </label>
                   <DatePicker
-                    selected={awardDate}
-                    onChange={(date) => setAwardDate(date)}
+                    selected={staticData.awardDate}
+                    onChange={(date) => handleStaticChange('awardDate', date)}
                     placeholderText="วันที่ได้รับรางวัล"
                     dateFormat="dd/MM/yyyy"
                     className="focus:ring-primary-600 focus:border-primary-600 w-full rounded-lg border border-gray-300 px-3 py-2"
@@ -347,8 +728,8 @@ const Create = () => {
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="ชื่อโครงการที่แข่งขัน/เข้าร่วม"
-                  value={competitionName}
-                  onChange={(e) => setCompetitionName(e.target.value)}
+                  value={staticData.competitionName}
+                  onChange={(e) => handleStaticChange('competitionName', e.target.value)}
                   required
                 />
               </div>
@@ -361,8 +742,8 @@ const Create = () => {
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="ชื่อทีม"
-                  value={teamName}
-                  onChange={(e) => setTeamName(e.target.value)}
+                  value={staticData.teamName}
+                  onChange={(e) => handleStaticChange('teamName', e.target.value)}
                   required
                 />
               </div>
@@ -372,11 +753,10 @@ const Create = () => {
                 </label>
                 <input
                   type="text"
-                  id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="ชื่อผลงานที่ได้รับรางวัล"
-                  value={innovationName}
-                  onChange={(e) => setInnovationName(e.target.value)}
+                  value={staticData.innovationName}
+                  onChange={(e) => handleStaticChange('innovationName', e.target.value)}
                   required
                 />
               </div>
@@ -386,11 +766,10 @@ const Create = () => {
                 </label>
                 <input
                   type="text"
-                  id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="รางวัลที่ได้รับ"
-                  value={prizeName}
-                  onChange={(e) => setPrizeName(e.target.value)}
+                  value={staticData.prizeName}
+                  onChange={(e) => handleStaticChange('prizeName', e.target.value)}
                   required
                 />
               </div>
@@ -402,11 +781,10 @@ const Create = () => {
                   </label>
                   <input
                     type="text"
-                    id="schName"
                     className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                     placeholder="เช่น 5"
-                    value={numberOfTeam}
-                    onChange={(e) => setNumberOfTeam(Number(e.target.value))}
+                    value={staticData.numberOfTeam}
+                    onChange={(e) => handleStaticChange('numberOfTeam', e.target.value)}
                     required
                   />
                 </div>
@@ -416,8 +794,8 @@ const Create = () => {
                   </label>
                   <select
                     className="bg-white-50 block rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    value={competitiveLevel}
-                    onChange={(e) => setCompetitiveLevel(e.target.value as CompetitiveLevel)}
+                    value={staticData.competitiveLevel}
+                    onChange={(e) => handleStaticChange('competitiveLevel', e.target.value)}
                     required>
                     <option value="">กรุณาเลือก</option>
                     <option value="TERTIARY">ระดับอุดมศึกษา</option>
@@ -434,8 +812,8 @@ const Create = () => {
                   <select
                     className="bg-white-50 block rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                     id="programType"
-                    value={activityHour}
-                    onChange={(e) => setactivityHour(e.target.value as ActivityHour)}
+                    value={staticData.activityHour}
+                    onChange={(e) => handleStaticChange('activityHour', e.target.value)}
                     required>
                     <option value="">กรุณาเลือก</option>
                     <option value="OTHER">
@@ -449,11 +827,8 @@ const Create = () => {
                 </div>
               </div>
             </div>
-            <button
-              type="button"
-              //   onClick={handleSubmit}
-              className="mt-4 w-full rounded-lg bg-blue-500 px-4 py-2 text-white">
-              สมัคร
+            <button type="submit" className="mt-3 w-full rounded bg-blue-500 p-2 text-white">
+              ส่งฟอร์มสมัครทุน
             </button>
           </form>
         </div>
@@ -463,6 +838,4 @@ const Create = () => {
       <Footer />
     </div>
   );
-};
-
-export default Create;
+}

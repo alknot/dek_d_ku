@@ -4,6 +4,7 @@ import Footer from '@/components/footer';
 import Header from '@/components/header';
 import Sidebar from '@/components/sidebar';
 import axios from 'axios';
+import { useSession } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
 
 type Role =
@@ -20,7 +21,8 @@ type Role =
 
 interface User {
   id: string;
-  name: string;
+  firstnameTh: string;
+  lastnameTh: string;
   email: string;
   role: Role;
 }
@@ -30,29 +32,34 @@ const AdminPage = () => {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+  const { data: session } = useSession();
+
   const [users, setUsers] = useState<User[]>([]);
-  const [selectedUser, setSelectedUser] = useState<string>('');
+  const [selectedUser, setSelectedUser] = useState<string | null>('');
   const [selectedRole, setSelectedRole] = useState<Role>('NOT_ASSIGNED');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    // ดึงข้อมูลผู้ใช้งานจาก API
-    const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get('/api/users'); // แก้ endpoint ให้ตรงกับ backend
-        // setUsers(response.data);
-      } catch (err) {
-        setError('Failed to fetch users');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get<{ users: User[] }>('/api/user');
+      console.log('API response:', response.data);
+      // สมมติ API ส่งกลับมาเป็น { users: [...] }
+      setUsers(response.data.users ?? []);
+    } catch (err) {
+      setError('Failed to fetch users');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // ดึงข้อมูลผู้ใช้งานจาก API
+  useEffect(() => {
     fetchUsers();
   }, []);
 
+  // ฟังก์ชัน Assign Role
   const handleAssignRole = async () => {
     if (!selectedUser || !selectedRole) {
       setError('Please select a user and a role.');
@@ -62,14 +69,17 @@ const AdminPage = () => {
     try {
       setError(null);
       setLoading(true);
-      await axios.post('/api/assign-role', {
-        userId: selectedUser,
+      console.log('Assigning role:', selectedRole);
+      console.log('Selected user:', selectedUser);
+      await axios.put(`/api/user/${selectedUser}`, {
         role: selectedRole,
-      }); // แก้ endpoint ให้ตรงกับ backend
+      });
+      if (session && session.userProfile) {
+        session.userProfile.role = selectedRole;
+      }
       alert('Role assigned successfully!');
-      // Refresh user list
-      const response = await axios.get('/api/users');
-      // setUsers(response.data);
+
+      fetchUsers();
     } catch (err) {
       setError('Failed to assign role.');
     } finally {
@@ -83,9 +93,9 @@ const AdminPage = () => {
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Header Section */}
-      <Header toggleSidebar={toggleSidebar} />
+      <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
-      {/* Main Section (Full Screen) */}
+      {/* Main Section */}
       <main className="mx-auto flex w-full flex-1 justify-center bg-gray-100">
         <div className="w-full max-w-5xl rounded-lg bg-white p-6 shadow-lg">
           <h1 className="mb-6 text-center text-2xl font-bold">Admin Role Assignment</h1>
@@ -95,21 +105,26 @@ const AdminPage = () => {
 
           <div className="mx-auto max-w-4xl rounded-lg bg-white p-6 shadow-lg">
             <h2 className="mb-4 text-lg font-bold">Users</h2>
+
+            {/* ส่วนแสดงรายชื่อผู้ใช้ในระบบ */}
             <div className="space-y-4">
-              {users.map((user) => (
-                <div key={user.id} className="flex items-center justify-between border-b pb-2">
+              {users?.map((user) => (
+                <div key={user.id} className="flex items-center justify-between rounded border p-3">
                   <div>
-                    <p className="text-sm font-medium">
-                      {user.name} ({user.email})
+                    <p className="font-semibold">
+                      {user.firstnameTh} {user.firstnameTh}
                     </p>
-                    <p className="text-sm text-gray-500">Role: {user.role}</p>
+                    <p className="text-sm text-gray-500">{user.email}</p>
+                    <p className="text-sm text-gray-500">
+                      Current Role: <span className="font-medium">{user.role}</span>
+                    </p>
                   </div>
                   <button
-                    onClick={() => setSelectedUser(user.id)}
-                    className={`rounded px-4 py-2 text-sm ${
-                      selectedUser === user.id ? 'bg-blue-500 text-white' : 'bg-gray-300'
+                    onClick={() => setSelectedUser(selectedUser === user.id ? '' : user.id)}
+                    className={`rounded px-4 py-2 text-white ${
+                      selectedUser === user.id ? 'bg-red-600' : 'bg-blue-400 hover:bg-blue-500'
                     }`}>
-                    {selectedUser === user.id ? 'Selected' : 'Select'}
+                    {selectedUser === user.id ? 'ยกเลิก' : 'เลือก'}
                   </button>
                 </div>
               ))}
@@ -122,11 +137,16 @@ const AdminPage = () => {
                 onChange={(e) => setSelectedRole(e.target.value as Role)}
                 className="mb-4 w-full rounded-lg border px-4 py-2">
                 <option value="NOT_ASSIGNED">Select Role</option>
-                <option value="STUDENT">Student</option>
-                <option value="FACULTY_STAFF">Faculty Staff</option>
-                <option value="DEAN">Dean</option>
+                <option value="STUDENT">นิสิต</option>
+                <option value="DEPARTMENT_HEAD">หัวหน้าภาควิชา</option>
+                <option value="FACULTY_STAFF">เจ้าหน้าที่คณะ</option>
+                <option value="DEPUTY_DEAN">รองคณบดี</option>
+                <option value="DEAN">คณบดี</option>
                 <option value="SA_STAFF">SA Staff</option>
-                <option value="DEPARTMENT_HEAD">Department Head</option>
+
+                <option value="COMMITTEE">คณะกรรมการ</option>
+                <option value="CHAIRMAN">ประธานกรรมกาาร</option>
+                <option value="FINANCIAL">พนักงานการเงิน</option>
               </select>
 
               <button

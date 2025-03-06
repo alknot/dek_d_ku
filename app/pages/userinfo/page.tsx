@@ -29,7 +29,7 @@ export default function Home() {
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Header Section */}
-      <Header toggleSidebar={toggleSidebar} />
+      <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
       {/* Main Section (User Info Section) */}
       <main className="flex flex-1 items-center justify-center bg-gray-100">

@@ -123,7 +123,7 @@ const Create = () => {
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Header Section */}
-      <Header toggleSidebar={toggleSidebar} />
+      <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
       {/* Main Section (Full Screen) */}
       <main className="mx-auto flex w-full flex-1 justify-center bg-gray-100">
@@ -135,15 +135,13 @@ const Create = () => {
           <form>
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
               <div>
-                <label
-                  htmlFor="schName"
-                  className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
                   ชื่อโครงการ
                 </label>
                 <input
                   type="text"
                   id="schName"
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="ชื่อโครงการ"
                   value={schName}
                   onChange={(e) => setschName(e.target.value)}
@@ -230,7 +228,7 @@ const Create = () => {
                 <div className="relative max-w-sm">
                   <label className="mb-2 block text-sm font-medium text-gray-900">ปีการศึกษา</label>
                   <input
-                    className="bg-white-50 block rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                    className="bg-white-50 block rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                     type="number"
                     value={academiYear}
                     onChange={(e) => setacademicYear(e.target.value)}
@@ -243,7 +241,7 @@ const Create = () => {
                     ภาคการศึกษา
                   </label>
                   <select
-                    className="bg-white-50 block rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                    className="bg-white-50 block rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                     id="term"
                     value={term}
                     onChange={(e) => setterm(e.target.value)}
@@ -260,7 +258,7 @@ const Create = () => {
                     สำหรับหลักสูตร
                   </label>
                   <select
-                    className="bg-white-50 block rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                    className="bg-white-50 block rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                     id="programType"
                     value={programType}
                     onChange={(e) => setprogramType(e.target.value)}

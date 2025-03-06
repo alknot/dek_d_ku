@@ -133,7 +133,7 @@ const CreateWellBehavior = () => {
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Header Section */}
-      <Header toggleSidebar={toggleSidebar} />
+      <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
       {/* Main Section (Full Screen) */}
       <main className="mx-auto flex w-full flex-1 justify-center bg-gray-100">

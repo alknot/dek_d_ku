@@ -3,346 +3,243 @@
 import Footer from '@/components/footer';
 import Header from '@/components/header';
 import Sidebar from '@/components/sidebar';
-import { SchType } from '@prisma/client';
-import { programType } from '@prisma/client';
-import axios from 'axios';
-import { useRouter } from 'next/compat/router';
-import React, { ChangeEvent, useEffect, useState } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
-// import router from "next/dist/shared/lib/router/router";
+// ประเภทคำถาม (template)
+type QuestionType = 'text' | 'choice' | 'checkbox' | 'date';
 
-const Create = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+type Question = {
+  id: number;
+  question: string;
+  type: QuestionType;
+  options: string[];
+  required: boolean;
+};
+
+export default function DynamicQuestionPage() {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const router = useRouter();
+  const params = useParams(); // กรณีเส้นทาง /scholarship/[id]
+  const searchParams = useSearchParams(); // ถ้าต้องการอ่าน query param เช่น ?pageScholarshipId=xxx
 
-  // const handleRewardChange = (reward: string) => {
-  //     setrewards(prevRewards =>
-  //         prevRewards.includes(reward)
-  //         ? prevRewards.filter(r => r !== reward)
-  //         : [...prevRewards, reward]
-  //     );
-  // };
+  // สมมติอ่านค่า scholarshipId จาก params หรือ query param
+  const scholarshipId = params.id || searchParams.get('pageScholarshipId');
+
+  useEffect(() => {
+    if (!scholarshipId) return;
+
+    // เรียก API GET เพื่อนำข้อมูล Scholarship + dynamicQuestions
+    const fetchData = async () => {
+      try {
+        const res = await fetch(`/api/scholarship/${scholarshipId}`);
+        if (!res.ok) {
+          // ถ้า status code != 2xx จะโยน Error ออกไป
+          throw new Error(`Failed to fetch scholarship. status=${res.status}`);
+        }
+        const data = await res.json();
+
+        // ตรวจสอบว่ามี dynamicQuestions หรือไม่
+        if (data && data.dynamicQuestions) {
+          // map ให้ตรงกับ state Question
+          const loadedQuestions = data.dynamicQuestions.map((q: any, idx: number) => ({
+            id: Date.now() + idx,
+            question: q.question,
+            // แปลง type ใน DB ("TEXT", "CHOICE", "CHECKBOX", "DATE") เป็น TypeScript union
+            type: q.type?.toLowerCase() || 'text',
+            options: q.options || [],
+            required: q.required || false,
+          }));
+          setQuestions(loadedQuestions);
+        }
+      } catch (error) {
+        console.error('Error fetching scholarship:', error);
+        // อาจจะ alert หรือทำ redirect ก็ได้
+      }
+    };
+
+    fetchData();
+  }, [scholarshipId]);
+
+  // เพิ่มคำถามใหม่
+  const addQuestion = () => {
+    setQuestions((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        question: '',
+        type: 'text',
+        options: [],
+        required: false,
+      },
+    ]);
+  };
+
+  // ลบคำถาม
+  const deleteQuestion = (id: number) => {
+    setQuestions((prev) => prev.filter((q) => q.id !== id));
+  };
+
+  // อัปเดตฟิลด์ของคำถาม
+  const updateQuestion = (id: number, field: keyof Question, value: any) => {
+    setQuestions((prev) => prev.map((q) => (q.id === id ? { ...q, [field]: value } : q)));
+  };
+
+  // ส่งข้อมูล (PATCH) เพื่อบันทึก dynamicQuestions กลับไปยัง /api/scholarship/[id]
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!scholarshipId) {
+      alert('Scholarship ID not found.');
+      return;
+    }
+    // แปลงค่า type ใน State ให้เป็น enum ของ Prisma ("TEXT", "CHOICE", ...)
+    const dynamicQuestions = questions.map((q) => ({
+      question: q.question,
+      type:
+        q.type === 'text'
+          ? 'TEXT'
+          : q.type === 'choice'
+            ? 'CHOICE'
+            : q.type === 'checkbox'
+              ? 'CHECKBOX'
+              : 'DATE',
+      options: q.options,
+      required: q.required,
+    }));
+
+    try {
+      const res = await fetch(`/api/scholarship/${scholarshipId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dynamicQuestions }),
+      });
+      if (!res.ok) {
+        throw new Error(`Update failed. status=${res.status}`);
+      }
+      alert('บันทึก Dynamic Questions สำเร็จ!');
+      // redirect หรือทำอย่างอื่น
+      router.push('/pages/newscholar');
+    } catch (error) {
+      console.error('Error updating dynamicQuestions:', error);
+      alert('Error updating dynamicQuestions');
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Sidebar */}
+      {/* Sidebar / Header ตามต้องการ */}
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+      <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
-      {/* Header Section */}
-      <Header toggleSidebar={toggleSidebar} />
-
-      {/* Main Section (Full Screen) */}
       <main className="mx-auto flex w-full flex-1 justify-center bg-gray-100">
         <div className="w-full max-w-5xl rounded-lg bg-white p-6 shadow-lg">
-          <h2 className="mb-4 text-center text-xl font-bold text-gray-900">ตัวอย่างคำถาม</h2>
+          <h2 className="mb-4 text-center text-xl font-bold text-gray-900">
+            เพิ่มคำถาม ให้ Scholarship
+          </h2>
 
-          <form>
-            <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
-              <div className="sm:col-span-2">
-                <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                  ชื่อผู้สมัคร (ภาษาไทย)
-                </label>
-                <input
-                  type="text"
-                  id="schName"
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="ชื่อผู้สมัคร (ภาษาไทย)"
-                />
-              </div>
-
-              <div className="sm:col-span-2">
-                <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                  ชื่อผู้สมัคร (ภาษาอังกฤษ)
-                </label>
-                <input
-                  type="text"
-                  id="schName"
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="ชื่อผู้สมัคร (ภาษาอังกฤษ)"
-                />
-              </div>
-
-              <div className="flex space-x-10 sm:col-span-2">
-                <div className="relative max-w-sm">
-                  <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                    นิสิตชั้นปีที่
+          {/* ใช้ form เดียวเท่านั้น, onSubmit={handleFormSubmit} */}
+          <form onSubmit={handleSubmit}>
+            {questions.map((q, index) => (
+              <div key={q.id} className="mb-4 space-y-2 border-b pb-4">
+                <div className="flex items-center justify-between">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Question {index + 1}
                   </label>
-                  <input
-                    type="text"
-                    id="schName"
-                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="นิสิตชั้นปีที่"
-                  />
-                </div>
-                <div className="relative max-w-sm">
-                  <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                    รหัสนิสิต
-                  </label>
-                  <input
-                    type="text"
-                    id="schName"
-                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="รหัสนิสิต"
-                  />
+                  <button
+                    type="button"
+                    onClick={() => deleteQuestion(q.id)}
+                    className="text-sm text-red-500">
+                    Delete
+                  </button>
                 </div>
 
-                <div className="flex space-x-10 sm:col-span-2">
-                  <div className="relative max-w-sm">
-                    <label className="mb-2 block text-sm font-medium text-gray-900">
-                      เกิดวันที่
-                    </label>
-                    <DatePicker
-                      // selected={startDate}
-                      // onChange={(date) => setstartDate(date)}
-                      placeholderText="เกิดวันที่"
-                      dateFormat="dd/MM/yyyy"
-                      className="focus:ring-primary-600 focus:border-primary-600 w-full rounded-lg border border-gray-300 px-3 py-2"
-                    />
+                <input
+                  type="text"
+                  placeholder="Enter your question"
+                  value={q.question}
+                  onChange={(e) => updateQuestion(q.id, 'question', e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+
+                <select
+                  value={q.type}
+                  onChange={(e) => updateQuestion(q.id, 'type', e.target.value as QuestionType)}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="text">Text</option>
+                  <option value="choice">Multiple Choice</option>
+                  <option value="checkbox">Checkbox</option>
+                  <option value="date">Date Picker</option>
+                </select>
+
+                {(q.type === 'choice' || q.type === 'checkbox') && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Options</label>
+                    {q.options.map((option, idx) => (
+                      <div key={idx} className="mb-1 flex items-center space-x-2">
+                        <input
+                          type="text"
+                          placeholder={`Option ${idx + 1}`}
+                          value={option}
+                          onChange={(e) => {
+                            const newOpts = [...q.options];
+                            newOpts[idx] = e.target.value;
+                            updateQuestion(q.id, 'options', newOpts);
+                          }}
+                          className="w-full rounded-lg border border-gray-300 px-3 py-1"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newOpts = q.options.filter((_, i) => i !== idx);
+                            updateQuestion(q.id, 'options', newOpts);
+                          }}
+                          className="text-sm text-red-500">
+                          Del
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => updateQuestion(q.id, 'options', [...q.options, ''])}
+                      className="mt-2 rounded-lg bg-blue-500 px-4 py-1 text-white">
+                      Add Option
+                    </button>
                   </div>
-                  <div className="relative max-w-sm">
-                    <label
-                      htmlFor="schName"
-                      className="mb-2 block text-sm font-medium text-gray-900">
-                      อายุ
-                    </label>
-                    <input
-                      type="text"
-                      id="schName"
-                      className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                      placeholder="อายุ (ปี)"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="flex space-x-10 sm:col-span-2">
-                <div className="relative max-w-sm">
-                  <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                    คณะ
-                  </label>
+                )}
+
+                <div className="flex items-center space-x-3">
                   <input
-                    type="text"
-                    id="schName"
-                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="คณะ"
+                    type="checkbox"
+                    checked={q.required}
+                    onChange={(e) => updateQuestion(q.id, 'required', e.target.checked)}
                   />
-                </div>
-                <div className="relative max-w-sm">
-                  <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                    ภาควิชา/สาขาวิชา
-                  </label>
-                  <input
-                    type="text"
-                    id="schName"
-                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="ภาควิชา/สาขาวิชา"
-                  />
-                </div>
-                <div className="relative max-w-sm">
-                  <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                    คะแนนเฉลี่ยสะสม
-                  </label>
-                  <input
-                    type="text"
-                    id="schName"
-                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="คะแนนเฉลี่ยสะสม"
-                  />
-                </div>
-                <div className="relative max-w-sm">
-                  <label
-                    htmlFor="programType"
-                    className="mb-2 block text-sm font-medium text-gray-900">
-                    ภาคการศึกษานี้เป็นภาคสุดท้ายก่อนจะจบ
-                  </label>
-                  <select
-                    className="bg-white-50 block rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    id="programType"
-                    // value={programType}
-                    // onChange={(e) => setprogramType(e.target.value)}
-                    required>
-                    <option value="">กรุณาเลือก</option>
-                    <option value="">ใช่</option>
-                    <option value="">ไม่ใช่</option>
-                  </select>
+                  <label className="text-sm text-gray-700">Required</label>
                 </div>
               </div>
+            ))}
 
-              <div className="flex space-x-10 sm:col-span-2">
-                <div className="relative max-w-sm">
-                  <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                    โทรศัพท์
-                  </label>
-                  <input
-                    type="text"
-                    id="schName"
-                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="โทรศัพท์"
-                  />
-                </div>
-                <div className="relative max-w-sm">
-                  <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                    E-mail
-                  </label>
-                  <input
-                    type="text"
-                    id="schName"
-                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="E-mail"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                  ชื่ออาจารย์ที่ปรึกษา
-                </label>
-                <input
-                  type="text"
-                  id="schName"
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="ชื่ออาจารยืที่ปรึกษา"
-                />
-              </div>
-
-              <div className="sm:col-span-2">
-                <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                  ที่อยู่ปัจจุบัน
-                </label>
-                <input
-                  type="text"
-                  id="schName"
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="ที่อยู่ปัจจุบัน"
-                />
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="mb-2 block text-sm font-medium text-gray-900">
-                  แนบผลงาน(ใบประกาศ) หรือเอกสารอ้างอิงที่บ่งบอกถึงการได้รับรางวัล
-                </label>
-                <input
-                  type="file"
-                  className="focus:ring-primary-600 focus:border-primary-600 w-full rounded-lg border border-gray-300 px-3 py-2"
-                  required
-                />
-              </div>
-
-              <div className="flex space-x-10 sm:col-span-2">
-                <div className="relative max-w-sm">
-                  <label className="mb-2 block text-sm font-medium text-gray-900">
-                    วันที่ได้รับรางวัล
-                  </label>
-                  <DatePicker
-                    // selected={startDate}
-                    // onChange={(date) => setstartDate(date)}
-                    placeholderText="วันที่ได้รับรางวัล"
-                    dateFormat="dd/MM/yyyy"
-                    className="focus:ring-primary-600 focus:border-primary-600 w-full rounded-lg border border-gray-300 px-3 py-2"
-                  />
-                </div>
-              </div>
-              <div className="sm:grid-cols-1">
-                <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                  ชื่อโครงการที่แข่งขัน/เข้าร่วม
-                </label>
-                <input
-                  type="text"
-                  id="schName"
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="ชื่อโครงการที่แข่งขัน/เข้าร่วม"
-                />
-              </div>
-              <div className="sm:grid-cols-1">
-                <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                  ชื่อทีม
-                </label>
-                <input
-                  type="text"
-                  id="schName"
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="ชื่อทีม"
-                />
-              </div>
-              <div className="sm:grid-cols-1">
-                <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                  ชื่อผลงานที่ได้รับรางวัล
-                </label>
-                <input
-                  type="text"
-                  id="schName"
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="ชื่อผลงานที่ได้รับรางวัล"
-                />
-              </div>
-              <div className="sm:grid-cols-1">
-                <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                  รางวัลที่ได้รับ
-                </label>
-                <input
-                  type="text"
-                  id="schName"
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="รางวัลที่ได้รับ"
-                />
-              </div>
-
-              <div className="flex space-x-10 sm:col-span-2">
-                <div className="relative max-w-sm">
-                  <label htmlFor="term" className="mb-2 block text-sm font-medium text-gray-900">
-                    ระดับการประกวดการแข่งขัน/การเข้าร่วม
-                  </label>
-                  <select
-                    className="bg-white-50 block rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    id="term"
-                    // value={term}
-                    // onChange={(e) => setterm(e.target.value)}
-                    required>
-                    <option value="">กรุณาเลือก</option>
-                    <option value="">ระดับอุดมศึกษา</option>
-                    <option value="เทอมต้น">ระดับชาติ</option>
-                    <option value="เทอมปลาย">ระดับนานาติ</option>
-                  </select>
-                </div>
-                <div>
-                  <label
-                    htmlFor="programType"
-                    className="mb-2 block text-sm font-medium text-gray-900">
-                    ประเภทกิจกรรม
-                  </label>
-                  <select
-                    className="bg-white-50 block rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    id="programType"
-                    // value={programType}
-                    // onChange={(e) => setprogramType(e.target.value)}
-                    required>
-                    <option value="">กรุณาเลือก</option>
-                    <option value="">ส่งเสริมคุณลักษณะบัณฑิตที่พึงประสงค์ที่กำหนดโดยสถาบัน</option>
-                    <option value="">กีฬาหรือส่งเสริมสุขภาพ</option>
-                    <option value="">บำเพ็ญประโยชน์หรือรักษาสิ่งแวดล้อม</option>
-                    <option value="">เสริมสร้างคุณธรรมและจริยธรรม</option>
-                    <option value="">ส่งเสริมศิลปและวัฒนธรรม</option>
-                  </select>
-                </div>
-              </div>
+            <div className="mt-4 flex justify-center">
+              <button
+                type="button"
+                onClick={addQuestion}
+                className="rounded-lg bg-green-500 px-4 py-2 text-white">
+                Add Question
+              </button>
             </div>
+
             <button
-              type="button"
-              //   onClick={handleSubmit}
+              type="submit"
               className="mt-4 w-full rounded-lg bg-blue-500 px-4 py-2 text-white">
-              ยืนยันและไปหน้าถัดไป
+              บันทึก Dynamic Questions
             </button>
           </form>
         </div>
       </main>
-
-      {/* Footer Section */}
       <Footer />
     </div>
   );
-};
-
-export default Create;
+}

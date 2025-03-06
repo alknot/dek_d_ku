@@ -56,8 +56,18 @@ interface FormType {
 
   certificate?: string | null;
   activityImageUrl?: string | null;
-  wellBehavior?: {
-    beahavior_detail: string;
+  innovation: {
+    innovationType: string | null;
+    awardDate: Date | null;
+    competitionName: string | null;
+    teamName: string | null;
+    innovationName: string | null;
+    prizeName: string | null;
+    organizer: string | null;
+    competitiveLevel: string | null;
+    numberOfTeam: number | null;
+    activityHour: number | null;
+    attachfile: string | null;
   } | null;
 
   // Dynamic Questions
@@ -356,17 +366,17 @@ export default function ShowRequestFormPage() {
                   readOnly
                 />
               </div>
-              <div className="sm:col-span-2">
+              {/* <div className="sm:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-gray-900">
                   บรรยายความประพฤติดี
                 </label>
                 <textarea
                   rows={6}
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={formDetail.wellBehavior?.beahavior_detail || 'ไม่มีข้อมูล'}
+                  placeholder={formDetail.innovation?.beahavior_detail || 'ไม่มีข้อมูล'}
                   readOnly
                 />
-              </div>
+              </div> */}
             </div>
 
             {/* Dynamic Questions Section */}

@@ -4,7 +4,6 @@ import Footer from '@/components/footer';
 import Header from '@/components/header';
 import Sidebar from '@/components/sidebar';
 import { ActivityHour, CompetitiveLevel, SchType } from '@prisma/client';
-import { programType } from '@prisma/client';
 import axios from 'axios';
 import { useRouter } from 'next/compat/router';
 import React, { ChangeEvent, useEffect, useState } from 'react';
@@ -89,7 +88,7 @@ const Create = () => {
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Header Section */}
-      <Header toggleSidebar={toggleSidebar} />
+      <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
       {/* Main Section (Full Screen) */}
       <main className="mx-auto flex w-full flex-1 justify-center bg-gray-100">

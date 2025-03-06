@@ -4,7 +4,8 @@ import { apiService } from '@/common/apiService';
 import Footer from '@/components/footer';
 import Header from '@/components/header';
 import Sidebar from '@/components/sidebar';
-import { create } from 'axios';
+import axios from 'axios';
+import { log } from 'console';
 import { useSession } from 'next-auth/react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -26,7 +27,7 @@ interface DynamicQuestionResponse {
 interface StaticData {
   nisitNameTh: string;
   nisitNameEn: string;
-  createdby: string;
+  createdBy: string;
   nisitAcademicyear: string;
   nisitid: string;
   faculty: string;
@@ -40,6 +41,16 @@ interface StaticData {
   address: string;
   isLastTerm: boolean;
   beahavior_detail: string;
+
+  universityPrice: number;
+  facultyPrice: number;
+  creditPrice: number;
+  sumPrice: number;
+
+  newuniversityPrice: number;
+  newfacultyPrice: number;
+  newcreditPrice: number;
+  newsumPrice: number;
 
   academicYear: string;
   term: string;
@@ -64,12 +75,12 @@ interface Termprice {
 
 export default function ApplyScholarshipPage() {
   const { data: session } = useSession();
-  // Static fields state
+  // State สำหรับ static data ของฟอร์ม
   const [staticData, setStaticData] = useState<StaticData>({
     nisitNameTh: '',
     nisitNameEn: '',
     nisitAcademicyear: '',
-    createdby: '',
+    createdBy: '',
     nisitid: '',
     faculty: '',
     department: '',
@@ -84,8 +95,16 @@ export default function ApplyScholarshipPage() {
     isLastTerm: false,
     academicYear: '',
     term: '',
-    programType: '', // สมมติว่ามี field นี้ในฟอร์ม
-    study: '', // สมมติว่ามี field นี้ในฟอร์ม
+    programType: '',
+    study: '',
+    universityPrice: 0,
+    facultyPrice: 0,
+    creditPrice: 0,
+    sumPrice: 0,
+    newuniversityPrice: 0,
+    newfacultyPrice: 0,
+    newcreditPrice: 0,
+    newsumPrice: 0,
   });
 
   // Dynamic question responses state
@@ -97,17 +116,23 @@ export default function ApplyScholarshipPage() {
 
   // สมมติว่า scholarship id อยู่ใน URL เช่น /apply/[id]
   const scholarshipId = params.id; // id: string
-  // นอกจากนี้ อาจมี query params สำหรับ academicYear และ term
-  const academicYearParam = searchParams.get('academicYear') || '';
+  // ดึง query parameters
+  const academicYearParam = searchParams.get('academiYear') || '';
   const termParam = searchParams.get('term') || '';
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
+  // State สำหรับข้อมูล termprice ที่ได้จาก API
+  const [data, setData] = useState<Termprice[]>([]);
+  // State สำหรับ selected termprice จากการ filter
+  const [selectedTermPrice, setSelectedTermPrice] = useState<Termprice | null>(null);
+
+  // State สำหรับ cascading dropdown options
+  const [programTypeOptions, setProgramTypeOptions] = useState<string[]>([]);
+  const [studyOptions, setStudyOptions] = useState<string[]>([]);
   const [facultyOptions, setFacultyOptions] = useState<string[]>([]);
   const [departmentOptions, setDepartmentOptions] = useState<string[]>([]);
-
-  const [data, setData] = useState<Termprice[]>([]);
 
   // โหลด dynamic question template จาก Scholarship record (ถ้ามี)
   useEffect(() => {
@@ -119,11 +144,10 @@ export default function ApplyScholarshipPage() {
       })
       .then((data) => {
         if (data && data.dynamicQuestions) {
-          // map dynamicQuestions template ให้เป็น dynamicResponses state
           const loaded = data.dynamicQuestions.map((dq: any, index: number) => ({
             id: Date.now() + index,
             question: dq.question,
-            type: dq.type.toLowerCase(), // สมมติใน DB เป็น "TEXT", "CHOICE", ฯลฯ
+            type: dq.type.toLowerCase(),
             options: dq.options,
             required: dq.required,
             answer: '',
@@ -140,31 +164,19 @@ export default function ApplyScholarshipPage() {
     setStaticData((prev) => ({ ...prev, [field]: value }));
   };
 
+  // ดึงข้อมูล termprice จาก API เมื่อ academicYearParam และ termParam เปลี่ยนแปลง
   useEffect(() => {
     if (!academicYearParam || !termParam) return;
-
     const normalizedTerm =
       termParam === '1' ? 'เทอมต้น' : termParam === '2' ? 'เทอมปลาย' : termParam;
-
     const fetchTermPriceOptions = async () => {
       try {
-        // เรียก API ผ่าน service
         const response = await apiService.fetchData(academicYearParam.toString(), normalizedTerm);
-        console.log('Fetching termprice options from:', response);
-
-        // ได้ผลลัพธ์เป็น data
-        const result: Termprice[] = response as Termprice[];
-        console.log('data0', result);
-
-        // เก็บลง state data (อันนี้สำคัญ!)
+        const result = response as Termprice[];
         setData(result);
-
-        // สร้างตัวเลือกที่ไม่ซ้ำกันสำหรับคณะ
-        const faculties = Array.from(new Set(result.map((item) => item.faculty)));
-        // และภาควิชา
-        const departments = Array.from(new Set(result.map((item) => item.department)));
-        setFacultyOptions(faculties);
-        setDepartmentOptions(departments);
+        // ตัวเลือกสำหรับหลักสูตร
+        const uniqueProgramTypes = Array.from(new Set(result.map((item) => item.programType)));
+        setProgramTypeOptions(uniqueProgramTypes);
       } catch (err) {
         console.error(err);
       }
@@ -172,46 +184,147 @@ export default function ApplyScholarshipPage() {
     fetchTermPriceOptions();
   }, [academicYearParam, termParam]);
 
+  // เมื่อเลือกหลักสูตร ให้ filter หา studyOptions
   useEffect(() => {
-    // console.log("working1");
-    // console.log("data", data);
+    if (!staticData.programType) {
+      setStudyOptions([]);
+      return;
+    }
+    const filtered = data.filter((item) => item.programType === staticData.programType);
+    const uniqueStudies = Array.from(new Set(filtered.map((item) => item.study)));
+    setStudyOptions(uniqueStudies);
+    // Reset ค่าที่เกี่ยวข้อง
+    handleStaticChange('study', '');
+    handleStaticChange('faculty', '');
+    handleStaticChange('department', '');
+  }, [staticData.programType, data]);
 
-    const filteredDepartments = Array.from(
-      new Set(
-        data.filter((item) => item.faculty === staticData.faculty).map((item) => item.department)
-      )
+  // เมื่อเลือก study ให้ filter หา facultyOptions
+  useEffect(() => {
+    if (!staticData.study) {
+      setFacultyOptions([]);
+      return;
+    }
+    const filtered = data.filter(
+      (item) => item.programType === staticData.programType && item.study === staticData.study
     );
+    const uniqueFaculties = Array.from(new Set(filtered.map((item) => item.faculty)));
+    setFacultyOptions(uniqueFaculties);
+    handleStaticChange('faculty', '');
+    handleStaticChange('department', '');
+  }, [staticData.study, staticData.programType, data]);
 
-    // console.log("item.faculty", data.filter((item) => item.faculty === staticData.faculty));
-    // console.log("staticData.faculty", staticData.faculty);
-    // console.log("filteredDepartments", filteredDepartments);
-    setDepartmentOptions(filteredDepartments);
-  }, [staticData.faculty, data]);
+  // เมื่อเลือก faculty ให้ filter หา departmentOptions
+  useEffect(() => {
+    if (!staticData.faculty) {
+      setDepartmentOptions([]);
+      return;
+    }
+    const filtered = data.filter(
+      (item) =>
+        item.programType === staticData.programType &&
+        item.study === staticData.study &&
+        item.faculty === staticData.faculty
+    );
+    const uniqueDepartments = Array.from(new Set(filtered.map((item) => item.department)));
+    setDepartmentOptions(uniqueDepartments);
+    handleStaticChange('department', '');
+  }, [staticData.faculty, staticData.study, staticData.programType, data]);
 
+  // เมื่อ staticData.programType, study, faculty, department เปลี่ยน ให้ filter หา selectedTermPrice
+  useEffect(() => {
+    if (
+      !staticData.programType ||
+      !staticData.study ||
+      !staticData.faculty ||
+      !staticData.department ||
+      data.length === 0
+    ) {
+      setSelectedTermPrice(null);
+      return;
+    }
+    const filtered = data.filter(
+      (item) =>
+        item.programType === staticData.programType &&
+        item.study === staticData.study &&
+        item.faculty === staticData.faculty &&
+        item.department === staticData.department
+    );
+    if (filtered.length > 0) {
+      setSelectedTermPrice(filtered[0]);
+    } else {
+      setSelectedTermPrice(null);
+    }
+  }, [staticData.programType, staticData.study, staticData.faculty, staticData.department, data]);
+
+  // console.log('user', session?.userProfile?.email);
+  // console.log('user', session?.userProfile?.id);
   // จัดการ dynamic question response
   const updateDynamicResponse = (id: number, field: keyof DynamicQuestionResponse, value: any) => {
     setDynamicResponses((prev) =>
       prev.map((resp) => (resp.id === id ? { ...resp, [field]: value } : resp))
     );
   };
+  const normalizedProgramType =
+    staticData.programType === 'ไทย'
+      ? 'THAI'
+      : staticData.programType === 'นานาชาติ'
+        ? 'INTERNATIONAL'
+        : staticData.programType;
 
-  // ส่งข้อมูล Form ไปยัง API (POST /api/form)
+  // ส่งข้อมูล Form ไปยัง API (POST /api/request)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!scholarshipId) {
       alert('Scholarship ID not found');
       return;
     }
-    // Prepare payload (แปลงวันที่ให้เป็น ISO string)
+    let newuniversityPrice = 0;
+    let newfacultyPrice = 0;
+    let newcreditPrice = 0;
+    let newsumPrice = 0;
+
+    if (staticData.isLastTerm === false) {
+      newuniversityPrice = 0;
+      console.log('selectedTermPrice:', selectedTermPrice ? selectedTermPrice.price2 : 'N/A');
+      newfacultyPrice = selectedTermPrice ? selectedTermPrice.price2 : 0;
+      newcreditPrice = 0;
+      newsumPrice = selectedTermPrice ? selectedTermPrice.price2 : 0;
+
+      console.log('newuniversityPrice0:', newuniversityPrice);
+      console.log('newfacultyPrice0:', newfacultyPrice);
+      console.log('newcreditPrice0:', newcreditPrice);
+      console.log('newsumPrice0:', newsumPrice);
+    } else {
+      newuniversityPrice = 0;
+      newfacultyPrice = 0;
+      newcreditPrice = 0;
+      newsumPrice = 0;
+    }
+    staticData.programType = normalizedProgramType;
+    const createdBy = session?.userProfile?.id || '';
+    console.log('newuniversityPrice:', newuniversityPrice);
+    console.log('newfacultyPrice:', newfacultyPrice);
+    console.log('newcreditPrice:', newcreditPrice);
+    console.log('newsumPrice:', newsumPrice);
     const payload = {
       scholarshipID: scholarshipId,
+
       ...staticData,
       schType: 'WELL_BEHAVIOR',
       dateofBirth: staticData.dateofBirth ? staticData.dateofBirth.toISOString() : null,
       academicYear: academicYearParam,
       term: termParam,
-      createdby: session?.userProfile?.id,
+      createdBy: session?.userProfile?.id,
 
+      universityPrice: selectedTermPrice ? selectedTermPrice.price1 : 0,
+      facultyPrice: selectedTermPrice ? selectedTermPrice.price2 : 0,
+      creditPrice: selectedTermPrice ? selectedTermPrice.price3 : 0,
+      sumPrice: selectedTermPrice ? selectedTermPrice.sumPrice : 0,
+      newuniversityPrice: newuniversityPrice,
+      newfacultyPrice: newfacultyPrice,
+      newcreditPrice: newcreditPrice,
+      newsumPrice: newsumPrice,
       dynamicQuestions: dynamicResponses.map((resp) => ({
         question: resp.question,
         type:
@@ -251,7 +364,7 @@ export default function ApplyScholarshipPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-      <Header toggleSidebar={toggleSidebar} />
+      <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <main className="mx-auto flex w-full flex-1 justify-center bg-gray-100">
         <div className="w-full max-w-5xl rounded-lg bg-white p-6 shadow-lg">
           <h1 className="mb-4 text-center text-xl font-bold">กรอกฟอร์มสมัครทุนประพฤติดี</h1>
@@ -300,41 +413,39 @@ export default function ApplyScholarshipPage() {
                     required
                   />
                 </div>
+                {/* หลักสูตร */}
                 <div>
-                  <label className="block text-sm font-medium">หลักสูตร</label>
+                  <label className="block text-sm font-medium">หลักสูตรที่เปิดรับ</label>
                   <select
                     value={staticData.programType}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      handleStaticChange('programType', value);
-                      // ถ้าเลือกนานาชาติให้รีเซ็ต study เป็นค่าว่าง (หรือ null)
-                      if (value === 'INTERNATIONAL') {
-                        handleStaticChange('study', '');
-                      }
-                    }}
+                    onChange={(e) => handleStaticChange('programType', e.target.value)}
                     className="w-full border p-2"
                     required>
                     <option value="">กรุณาเลือกหลักสูตร</option>
-                    <option value="THAI">ไทย</option>
-                    <option value="INTERNATIONAL">นานาชาติ</option>
+                    {programTypeOptions.map((pt) => (
+                      <option key={pt} value={pt}>
+                        {pt}
+                      </option>
+                    ))}
                   </select>
                 </div>
-
-                {staticData.programType === 'THAI' && (
-                  <div>
-                    <label className="block text-sm font-medium">ภาค</label>
-                    <select
-                      value={staticData.study}
-                      onChange={(e) => handleStaticChange('study', e.target.value)}
-                      className="w-full border p-2"
-                      required>
-                      <option value="">กรุณาเลือกภาค</option>
-                      <option value="ปกติ">ปกติ</option>
-                      <option value="พิเศษ">พิเศษ</option>
-                    </select>
-                  </div>
-                )}
-
+                {/* ภาค */}
+                <div>
+                  <label className="block text-sm font-medium">ภาค</label>
+                  <select
+                    value={staticData.study}
+                    onChange={(e) => handleStaticChange('study', e.target.value)}
+                    className="w-full border p-2"
+                    required>
+                    <option value="">กรุณาเลือกภาค</option>
+                    {studyOptions.map((st) => (
+                      <option key={st} value={st}>
+                        {st}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {/* คณะ */}
                 <div>
                   <label className="block text-sm font-medium">คณะ</label>
                   <select
@@ -350,7 +461,7 @@ export default function ApplyScholarshipPage() {
                     ))}
                   </select>
                 </div>
-                {/* เปลี่ยน input ของ department เป็น select จาก termprice */}
+                {/* ภาควิชา/สาขาวิชา */}
                 <div>
                   <label className="block text-sm font-medium">ภาควิชา/สาขาวิชา</label>
                   <select
@@ -366,6 +477,7 @@ export default function ApplyScholarshipPage() {
                     ))}
                   </select>
                 </div>
+                {/* อาจารย์ที่ปรึกษา */}
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium">อาจารย์ที่ปรึกษา</label>
                   <input
@@ -376,6 +488,7 @@ export default function ApplyScholarshipPage() {
                     required
                   />
                 </div>
+                {/* เกรดเฉลี่ย, วันเกิด, อายุ */}
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium">เกรดเฉลี่ย</label>
@@ -407,6 +520,7 @@ export default function ApplyScholarshipPage() {
                     />
                   </div>
                 </div>
+                {/* โทรศัพท์ */}
                 <div>
                   <label className="block text-sm font-medium">โทรศัพท์</label>
                   <input
@@ -417,6 +531,7 @@ export default function ApplyScholarshipPage() {
                     required
                   />
                 </div>
+                {/* E-mail */}
                 <div>
                   <label className="block text-sm font-medium">E-mail</label>
                   <input
@@ -427,6 +542,7 @@ export default function ApplyScholarshipPage() {
                     required
                   />
                 </div>
+                {/* ที่อยู่ */}
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium">ที่อยู่</label>
                   <input
@@ -437,6 +553,7 @@ export default function ApplyScholarshipPage() {
                     required
                   />
                 </div>
+                {/* ภาคการศึกษานี้เป็นภาคสุดท้ายก่อนจบ */}
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium">
                     ภาคการศึกษานี้เป็นภาคสุดท้ายก่อนจบ
@@ -451,6 +568,7 @@ export default function ApplyScholarshipPage() {
                     <option value="false">ไม่ใช่</option>
                   </select>
                 </div>
+                {/* บรรยายความประพฤติดี */}
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium">บรรยายความประพฤติดี</label>
                   <textarea
@@ -463,6 +581,51 @@ export default function ApplyScholarshipPage() {
                 </div>
               </div>
             </section>
+
+            {/* แสดงข้อมูล termprice ที่ได้จากการ filter */}
+            {selectedTermPrice && (
+              <section className="mb-8">
+                <h2 className="mb-2 text-lg font-semibold">ข้อมูลค่าใช้จ่าย</h2>
+                <div className="flex space-x-4">
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium">ค่าบำรุงมหาลัย</label>
+                    <input
+                      type="text"
+                      readOnly
+                      value={selectedTermPrice.price1.toString()}
+                      className="w-full border p-2"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium">ค่าบำรุงคณะ</label>
+                    <input
+                      type="text"
+                      readOnly
+                      value={selectedTermPrice.price2.toString()}
+                      className="w-full border p-2"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium">ค่าหน่วยกิต</label>
+                    <input
+                      type="text"
+                      readOnly
+                      value={selectedTermPrice.price3.toString()}
+                      className="w-full border p-2"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium">รวม</label>
+                    <input
+                      type="text"
+                      readOnly
+                      value={selectedTermPrice.sumPrice.toString()}
+                      className="w-full border p-2"
+                    />
+                  </div>
+                </div>
+              </section>
+            )}
 
             {/* Dynamic Questions Section */}
             <section className="mb-8">
@@ -531,28 +694,6 @@ export default function ApplyScholarshipPage() {
                   )}
                 </div>
               ))}
-              {/* <div className="flex justify-center mt-4">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setDynamicResponses((prev) => [
-                      ...prev,
-                      {
-                        id: Date.now(),
-                        question: "",
-                        type: "text",
-                        options: [],
-                        required: false,
-                        answer: "",
-                        selectedDate: null,
-                      },
-                    ])
-                  }
-                  className="px-4 py-2 bg-green-500 text-white rounded"
-                >
-                  เพิ่มคำถาม
-                </button>
-              </div> */}
             </section>
 
             <button type="submit" className="w-full rounded bg-blue-500 p-2 text-white">

@@ -27,7 +27,7 @@ enum Role {
 }
 
 enum RequestStatus {
-  PENDING_DEPARTMENT_HEAD
+
   PENDING_DEPUTY_DEAN
   PENDING_DEAN
   PENDING_JUDGING
@@ -94,14 +94,13 @@ enum QuestionType {
 
 model User {
   id                String  @id @default(cuid()) @map("_id") // รหัสนิสิต หรือ รหัสเจ้าหน้าที่
-  userprincipalname String  @unique
   prenameTh         String? // คำนำหน้าชื่อ
   firstnameTh       String // ชื่อจริง ภาษาไทย
   lastnameTh        String // นามสกุล ภาษาไทย
   prenameEn         String?
   firstnameEn       String // ชื่อจริง ภาษาอังกฤษ
   lastnameEn        String // นามสกุล ภาษาอังกฤษ
-  role              Role[]
+  role              Role
   major             String? // คณะ (เฉพาะนิสิต)
   faculty           String? // สังกัด, คณะ
 
@@ -133,6 +132,7 @@ model Form {
   scholarshipID String
   schType       SchType
   approveStatus RequestStatus
+  currentStage Boolean
 
   nisitNameTh       String
   nisitNameEn       String
@@ -155,7 +155,15 @@ model Form {
   academicYear String
   term         String
 
+  universityPrice  Float?
+  facultyPrice     Float?
+  creditPrice      Float?
+  sumPrice         Float?
 
+  newUniversityPrice  Float?
+  newFacultyPrice     Float?
+  newCreditPrice      Float?
+  newSumPrice         Float?
   // Depend on scholarship type (innovation, extracurricular)
   certificate       String?
   activityImageUrl  String?
@@ -237,7 +245,7 @@ model File {
 model Termprice {
   id           String @id @default(cuid()) @map("_id")
   faculty      String
-  department   String
+  department   String?
   academicYear String
   term         String
   programType  String // ไทย,นานาชาติ

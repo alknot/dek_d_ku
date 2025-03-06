@@ -52,15 +52,24 @@ export default function Home() {
 
   const fetchScholarships = async () => {
     try {
-      const response = await axios.get('/api/scholarship', {
-        params: {
+      const response = await fetch('/api/scholarship', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           academiYear: academiYear,
           term: term,
           programType: programType,
           schType: schType,
-        },
+        }),
       });
-      const data = response.data as { scholarships: Scholarship[] };
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch scholarships');
+      }
+
+      const data: { scholarships: Scholarship[] } = await response.json();
       setScholarships(data.scholarships);
     } catch (error) {
       console.error('Failed to fetch scholarships:', error);
@@ -91,7 +100,7 @@ export default function Home() {
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Header Section */}
-      <Header toggleSidebar={toggleSidebar} />
+      <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
       {/* Main Section (Full Screen) */}
       <main className="mx-auto flex w-full flex-1 justify-center bg-gray-100">

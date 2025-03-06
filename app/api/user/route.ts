@@ -9,17 +9,17 @@ const db = new PrismaClient();
 export async function GET(req: NextRequest) {
   const token = req.headers.get('Authorization'); // userid
 
-  if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  // if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
   // Do something to verify token and get id
   const userId = '';
 
   const user = await db.user.findUnique({ where: { id: userId } });
 
-  if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  // if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
-  if (!user?.role.includes(Role.SA_STAFF))
-    return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+  // if (!user?.role.includes(Role.SA_STAFF))
+  //   return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
 
   const users = await db.user.findMany();
 
@@ -38,7 +38,6 @@ export async function POST(req: NextRequest) {
     const requiredFields = [
       'id',
       'typePerson',
-      'userprincipalname',
       'prenameTh',
       'firstnameTh',
       'lastnameTh',
@@ -48,22 +47,6 @@ export async function POST(req: NextRequest) {
       'faculty',
       'email',
     ];
-
-    // const optionalFields = [
-    //   // Student only
-    //   'major',
-    //   'advisor',
-    //   'gpa',
-
-    //   // Staff only
-    //   'position',
-    //   'positionId',
-    //   'department',
-    //   'departmentId',
-
-    //   // Contract
-    //   'mobilePhone',
-    // ];
 
     // Validate required fields
     const missingField = requiredFields.find((field) => !getFieldValue(body, field));
@@ -79,14 +62,13 @@ export async function POST(req: NextRequest) {
     const userData: User = {
       // Required fields
       id: body.id,
-      userprincipalname: body.userprincipalname,
       prenameTh: body.prenameTh,
       firstnameTh: body.firstnameTh,
       lastnameTh: body.lastnameTh,
       prenameEn: body.prenameEn,
       firstnameEn: body.firstnameEn,
       lastnameEn: body.lastnameEn,
-      role: [typePerson === TypePerson.STUDENT ? Role.STUDENT : Role.NOT_ASSIGNED], // Pending admin approval
+      role: typePerson === TypePerson.STUDENT ? Role.STUDENT : Role.NOT_ASSIGNED, // Pending admin approval
       faculty: body.faculty,
       email: body.email,
 

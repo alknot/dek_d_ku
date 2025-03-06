@@ -1,5 +1,6 @@
 'use client';
 
+import apiClient from '@/common/apiClient';
 import Modal from '@/components/Modal';
 import Footer from '@/components/footer';
 import Header from '@/components/header';
@@ -38,7 +39,7 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10; // แสดง 10 แถวต่อหน้า
 
-  // หา totalPages = เพดาน(จำนวนรายการ / 10)
+  // หา totalPages = เพดาน(จำนวนรายการ / pageSize)
   const totalPages = Math.ceil(scholarships.length / pageSize);
 
   // ตัด array scholarships ให้เหลือเฉพาะข้อมูลของหน้านั้น
@@ -56,7 +57,7 @@ export default function Home() {
   // ดึงข้อมูลทุน (Scholarship) จาก /api/scholarship
   const fetchScholarships = async () => {
     try {
-      const response = await axios.get('/api/scholarship', {
+      const response = await apiClient.get('/scholarship', {
         params: {
           academiYear,
           term,
@@ -75,26 +76,13 @@ export default function Home() {
 
   // โหลดข้อมูลครั้งแรก
   useEffect(() => {
+    console.log('Fetching scholarships...');
     fetchScholarships();
   }, []);
 
   // ฟังก์ชันค้นหา
   const handleSearch = () => {
     fetchScholarships();
-  };
-
-  // ตัวอย่างฟังก์ชันสำหรับไปหน้าถัดไป
-  const nextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  // ตัวอย่างฟังก์ชันสำหรับไปหน้าก่อนหน้า
-  const prevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
   };
 
   // Modal เกี่ยวกับ Scholarship (ถ้าใช้งาน)
@@ -112,52 +100,57 @@ export default function Home() {
 
   // ตัวอย่างฟังก์ชันเมื่อกด "สมัครโครงการนี้"
   const navigateToForm = (scholarship: Scholarship) => {
-    // Here you can either set state or use routing to navigate
-    // For example, using React Router:
     if (!scholarship) {
       console.error('No scholarship selected');
       return;
     }
-
     setIsModalOpen(false); // Close the modal first
 
-    // Navigate based on the scholarship type
     switch (scholarship.schType) {
       case 'WELL_BEHAVIOR':
         if (scholarship.term === 'เทอมต้น') {
           const term = 1;
-          const url = `../../../../../../../../../../../../pages/recentscholar/applyform/wellbehavior/${scholarship.id}?academiYear=${encodeURIComponent(scholarship.academiYear)}&term=${encodeURIComponent(term)}`;
+          const url = `../../../../../../../../../../../../pages/recentscholar/applyform/wellbehavior/${scholarship.id}?academiYear=${encodeURIComponent(
+            scholarship.academiYear
+          )}&term=${encodeURIComponent(term)}`;
           router.push(url);
         } else if (scholarship.term === 'เทอมปลาย') {
           const term = 2;
-          const url = `../../../../../../../../../../../../pages/recentscholar/applyform/wellbehavior/${scholarship.id}?term=${encodeURIComponent(term)}&academicYear=${encodeURIComponent(scholarship.academiYear)}`;
+          const url = `../../../../../../../../../../../../pages/recentscholar/applyform/wellbehavior/${scholarship.id}?term=${encodeURIComponent(
+            term
+          )}&academicYear=${encodeURIComponent(scholarship.academiYear)}`;
           router.push(url);
         }
-
         break;
       case 'EXTRACURRICULAR':
         if (scholarship.term === 'เทอมต้น') {
           const term = 1;
-          const url = `../../../../../../../../../../../../pages/recentscholar/applyform/extracurricular/${scholarship.id}?academiYear=${encodeURIComponent(scholarship.academiYear)}&term=${encodeURIComponent(term)}`;
+          const url = `../../../../../../../../../../../../pages/recentscholar/applyform/extracurricular/${scholarship.id}?academiYear=${encodeURIComponent(
+            scholarship.academiYear
+          )}&term=${encodeURIComponent(term)}`;
           router.push(url);
         } else if (scholarship.term === 'เทอมปลาย') {
           const term = 2;
-          const url = `../../../../../../../../../../../../pages/recentscholar/applyform/extracurricular/${scholarship.id}?term=${encodeURIComponent(term)}&academicYear=${encodeURIComponent(scholarship.academiYear)}`;
+          const url = `../../../../../../../../../../../../pages/recentscholar/applyform/extracurricular/${scholarship.id}?term=${encodeURIComponent(
+            term
+          )}&academicYear=${encodeURIComponent(scholarship.academiYear)}`;
           router.push(url);
         }
-
         break;
       case 'INNOVATION':
         if (scholarship.term === 'เทอมต้น') {
           const term = 1;
-          const url = `../../../../../../../../../../../../pages/recentscholar/applyform/innovation/${scholarship.id}?academiYear=${encodeURIComponent(scholarship.academiYear)}&term=${encodeURIComponent(term)}`;
+          const url = `../../../../../../../../../../../../pages/recentscholar/applyform/innovation/${scholarship.id}?academiYear=${encodeURIComponent(
+            scholarship.academiYear
+          )}&term=${encodeURIComponent(term)}`;
           router.push(url);
         } else if (scholarship.term === 'เทอมปลาย') {
           const term = 2;
-          const url = `../../../../../../../../../../../../pages/recentscholar/applyform/innovation/${scholarship.id}?term=${encodeURIComponent(term)}&academicYear=${encodeURIComponent(scholarship.academiYear)}`;
+          const url = `../../../../../../../../../../../../pages/recentscholar/applyform/innovation/${scholarship.id}?term=${encodeURIComponent(
+            term
+          )}&academicYear=${encodeURIComponent(scholarship.academiYear)}`;
           router.push(url);
         }
-
         break;
       default:
         console.error('Unsupported scholarship type:', scholarship.schType);
@@ -170,7 +163,7 @@ export default function Home() {
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Header */}
-      <Header toggleSidebar={toggleSidebar} />
+      <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
       {/* Main */}
       <main className="mx-auto flex w-full flex-1 justify-center bg-gray-100">
@@ -256,17 +249,24 @@ export default function Home() {
                     buttonColor = 'bg-red-600';
                   }
 
+                  // ลำดับที่ = (currentPage - 1) * pageSize + index + 1
+                  const itemNumber = (currentPage - 1) * pageSize + (index + 1);
+
                   return (
                     <tr key={scholarship.id}>
-                      <td className="w-12 border px-4 py-2 text-center">
-                        {(currentPage - 1) * pageSize + index + 1}
-                      </td>
+                      <td className="w-12 border px-4 py-2 text-center">{itemNumber}</td>
                       <td className="w-28 border px-4 py-2 text-center">
                         {scholarship.academiYear}
                       </td>
                       <td className="w-28 border px-4 py-2 text-center">{scholarship.term}</td>
-                      <td className="w-28 border px-4 py-2 text-center">
-                        {scholarship.programType}
+                      <td className="w-40 border px-4 py-2 text-center">
+                        {scholarship.programType === 'THAI'
+                          ? 'หลักสูตรไทย'
+                          : scholarship.programType === 'INTERNATIONAL'
+                            ? 'หลักสูตรนานาชาติ'
+                            : scholarship.programType === 'BOTHTHAIANDINTERNATIONAL'
+                              ? 'หลักสูตรไทย,นานาชาติ'
+                              : scholarship.programType}
                       </td>
                       <td className="border px-4 py-2">{scholarship.schName}</td>
                       <td className="w-80 border px-4 py-2 text-center">
@@ -274,7 +274,7 @@ export default function Home() {
                         {format(new Date(scholarship.endDate), 'dd MMMM yyyy', { locale: th })}
                         <br />
                         {daysLeft >= 0 ? (
-                          <button className={`rounded-lg px-2 py-1 ${buttonColor}`}>
+                          <button className={`rounded-lg px-2 py-1 text-white ${buttonColor}`}>
                             คงเหลือ {daysLeft} วัน
                           </button>
                         ) : (
@@ -297,30 +297,25 @@ export default function Home() {
             </table>
           </div>
 
-          {/* แถบ Pagination */}
-          {scholarships.length > pageSize && (
-            <div className="mt-4 flex items-center justify-center space-x-4">
-              <button
-                onClick={() => prevPage()}
-                disabled={currentPage === 1}
-                className="rounded bg-gray-300 px-3 py-1 text-gray-700 disabled:bg-gray-200">
-                ก่อนหน้า
-              </button>
-              <span>
-                หน้าที่ {currentPage} / {totalPages}
-              </span>
-              <button
-                onClick={() => nextPage()}
-                disabled={currentPage === totalPages}
-                className="rounded bg-gray-300 px-3 py-1 text-gray-700 disabled:bg-gray-200">
-                ถัดไป
-              </button>
+          {/* แถบ Pagination เป็นปุ่มเลขหน้า */}
+          {totalPages > 1 && (
+            <div className="mt-4 flex justify-center space-x-2">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`rounded-lg px-3 py-1 ${
+                    page === currentPage ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+                  }`}>
+                  {page}
+                </button>
+              ))}
             </div>
           )}
         </div>
       </main>
 
-      {/* Modal */}
+      {/* Modal แสดงรายละเอียดทุน */}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         {selectedScholarship && (
           <div>
@@ -342,7 +337,14 @@ export default function Home() {
               <strong>เทอม:</strong> {selectedScholarship.term}
             </p>
             <p>
-              <strong>หลักสูตรที่เปิดรับ:</strong> {selectedScholarship.programType}
+              <strong>หลักสูตรที่เปิดรับ:</strong>{' '}
+              {selectedScholarship.programType === 'THAI'
+                ? 'หลักสูตรไทย'
+                : selectedScholarship.programType === 'INTERNATIONAL'
+                  ? 'หลักสูตรนานาชาติ'
+                  : selectedScholarship.programType === 'BOTHTHAIANDINTERNATIONAL'
+                    ? 'หลักสูตรไทย,นานาชาติ'
+                    : selectedScholarship.programType}
             </p>
             <p>
               <strong>รายละเอียดโครงการ:</strong> {selectedScholarship.description}

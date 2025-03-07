@@ -1,4 +1,3 @@
-import { handleError } from '@/app/libs/utils';
 import { PrismaClient, Role } from '@prisma/client';
 import NextAuth, { NextAuthOptions, Profile, Session } from 'next-auth';
 import KeycloakProvider from 'next-auth/providers/keycloak';
@@ -42,7 +41,7 @@ declare module 'next-auth' {
 
 async function createUserThroughAPI(userId: string, tokenData: any) {
   console.log('--------------CREATE USER VIA API---------------');
-  // console.log({ userId, tokenData });
+  console.log({ userId, tokenData });
 
   console.log({
     resultBody: {
@@ -108,81 +107,61 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, account, profile }) {
       console.log({ token, account, profile });
-
       try {
         if (account) {
-          console.log('--------------ACCESS TOKEN---------------');
-
-          if (!account.access_token) {
-            throw new Error('Access token is missing in account object');
+          console.log('--------------ACCESS TOKEN ---------------');
+          const decodedToken = decodeToken(account.access_token as any);
+          if (token == null) {
+            throw new Error('Unable to decode token');
           }
-
-          const decodedToken: any = decodeToken(account.access_token as any);
-          if (!decodedToken) {
-            throw new Error('Failed to decode access token');
-          }
-
-          console.log('Decoded Token:', decodedToken);
-
-          console.log('decodedToken', decodedToken);
-          const userId = decodedToken?.sub as string;
-          if (!userId) {
-            throw new Error('User ID (sub) is missing from the decoded token');
-          }
-
+          // console.log(decodedToken);
+          const userId = token.sub as string;
+          // console.log("--------------USER ID---------------");
+          // console.log(userId);
+          // console.log("--------------ROLES---------------");
           profile = decodedToken as Profile;
           token.account = account;
+        }
+        if (profile) {
+          // console.log("--------------PROFILE---------------");
+          // console.log(profile);
           token.profile = profile;
-          token.client_roles = profile?.realm_access?.roles || [];
+          const clientRoles = profile.realm_access.roles;
+          token.client_roles = clientRoles;
+        }
+        if (profile && account) {
+          const userId = token.sub as string;
+          const tokenData = profile;
 
-          console.log('User ID:', userId);
-          console.log('Client Roles:', token.client_roles);
-
-          // Check if the user exists in the database
-          let user;
-          try {
-            user = await db.user.findUnique({ where: { id: userId } });
-            console.log('User found in DB:', user);
-          } catch (prismaError) {
-            handleError(prismaError);
-            throw new Error('Database error while fetching user');
-          }
-
-          // If user does not exist, create one
+          // console.log("--------------USER ID---------------");
+          // console.log({userId});
+          console.log('working');
+          const user = await db.user.findUnique({ where: { id: userId } });
+          // console.log({user});
           if (!user) {
-            console.log('User not found, creating user via API');
-            try {
-              const newUser = await createUserThroughAPI(userId, profile);
-              if (!newUser) {
-                throw new Error('Failed to create user via API');
-              }
-              token.userProfile = newUser;
-              console.log('newUser', newUser);
-              console.log('User created successfully:', newUser);
-            } catch (apiError) {
-              console.error('Error creating user via API:', apiError);
-              throw new Error('API user creation failed');
-            }
+            // user does not exist, create user
+            console.log('User not found, creating user');
+            const newUser = await createUserThroughAPI(userId, tokenData);
+            token.userProfile = newUser;
           } else {
-            console.log(user);
             token.userProfile = user;
           }
+
+          // user exists
         }
       } catch (error) {
-        console.error('JWT Callback Error:', error);
+        console.log(error);
       }
 
       return token;
     },
-
     async session({ session, token }) {
       console.log('async session accessed');
 
-      session.account = token.account || null;
-      session.profile = token.profile || null;
-      session.roles = token.client_roles || [];
+      session.account = token.account;
+      session.profile = token.profile;
+      session.roles = token.client_roles;
       session.userProfile = token.userProfile as any;
-
       return session;
     },
   },

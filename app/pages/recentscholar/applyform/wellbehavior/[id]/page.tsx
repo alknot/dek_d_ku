@@ -40,7 +40,9 @@ interface StaticData {
   email: string;
   address: string;
   isLastTerm: boolean;
-  beahavior_detail: string;
+  wellBehavior: {
+    beahavior_detail: string;
+  };
 
   universityPrice: number;
   facultyPrice: number;
@@ -91,7 +93,9 @@ export default function ApplyScholarshipPage() {
     phone: '',
     email: '',
     address: '',
-    beahavior_detail: '',
+    wellBehavior: {
+      beahavior_detail: '',
+    },
     isLastTerm: false,
     academicYear: '',
     term: '',
@@ -317,10 +321,11 @@ export default function ApplyScholarshipPage() {
       term: termParam,
       createdBy: session?.userProfile?.id,
 
-      universityPrice: selectedTermPrice ? selectedTermPrice.price1 : 0,
-      facultyPrice: selectedTermPrice ? selectedTermPrice.price2 : 0,
-      creditPrice: selectedTermPrice ? selectedTermPrice.price3 : 0,
-      sumPrice: selectedTermPrice ? selectedTermPrice.sumPrice : 0,
+      universityPrice: staticData.isLastTerm ? 0 : selectedTermPrice ? selectedTermPrice.price1 : 0,
+      facultyPrice: staticData.isLastTerm ? 0 : selectedTermPrice ? selectedTermPrice.price2 : 0,
+      creditPrice: staticData.isLastTerm ? 0 : selectedTermPrice ? selectedTermPrice.price3 : 0,
+      sumPrice: staticData.isLastTerm ? 0 : selectedTermPrice ? selectedTermPrice.sumPrice : 0,
+
       newuniversityPrice: newuniversityPrice,
       newfacultyPrice: newfacultyPrice,
       newcreditPrice: newcreditPrice,
@@ -573,8 +578,16 @@ export default function ApplyScholarshipPage() {
                   <label className="block text-sm font-medium">บรรยายความประพฤติดี</label>
                   <textarea
                     rows={6}
-                    value={staticData.beahavior_detail}
-                    onChange={(e) => handleStaticChange('beahavior_detail', e.target.value)}
+                    value={staticData.wellBehavior.beahavior_detail}
+                    onChange={(e) =>
+                      setStaticData((prev) => ({
+                        ...prev,
+                        wellBehavior: {
+                          ...prev.wellBehavior,
+                          beahavior_detail: e.target.value,
+                        },
+                      }))
+                    }
                     className="w-full border p-2"
                     required
                   />
@@ -583,7 +596,7 @@ export default function ApplyScholarshipPage() {
             </section>
 
             {/* แสดงข้อมูล termprice ที่ได้จากการ filter */}
-            {selectedTermPrice && (
+            {/* {selectedTermPrice && (
               <section className="mb-8">
                 <h2 className="mb-2 text-lg font-semibold">ข้อมูลค่าใช้จ่าย</h2>
                 <div className="flex space-x-4">
@@ -625,7 +638,7 @@ export default function ApplyScholarshipPage() {
                   </div>
                 </div>
               </section>
-            )}
+            )} */}
 
             {/* Dynamic Questions Section */}
             <section className="mb-8">

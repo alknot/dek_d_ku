@@ -43,6 +43,11 @@ interface FormType {
   address: string;
   isLastTerm: boolean;
 
+  universityPrice: number;
+  facultyPrice: number;
+  creditPrice: number;
+  sumPrice: number;
+
   newUniversityPrice: number;
   newFacultyPrice: number;
   newCreditPrice: number;
@@ -80,6 +85,7 @@ export default function ShowRequestFormPage() {
 
   const [formDetail, setFormDetail] = useState<FormType | null>(null);
   const [termPriceData, setTermPriceData] = useState<TermPriceData | null>(null);
+  const isLastTerm = formDetail?.isLastTerm || false;
   console.log('termpricedata', termPriceData);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
@@ -402,6 +408,11 @@ export default function ShowRequestFormPage() {
             )}
 
             <p className="mb-2 mt-6 font-bold text-gray-900">จำนวนเงินเต็มที่ควรเก็บได้</p>
+            {formDetail.isLastTerm && (
+              <label htmlFor="schName" className="mb-2 block text-sm font-medium text-red-500">
+                เทอมนี้เป็นเทอมสุดท้าย
+              </label>
+            )}
             <div className="mb-4 flex space-x-10 sm:col-span-2">
               <div className="sm:grid-cols-1">
                 <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
@@ -411,7 +422,7 @@ export default function ShowRequestFormPage() {
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={termPriceData?.price1?.toString() || ''}
+                  placeholder={formDetail.universityPrice.toString()}
                   readOnly
                 />
               </div>
@@ -423,7 +434,7 @@ export default function ShowRequestFormPage() {
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={termPriceData?.price2?.toString() || ''}
+                  placeholder={formDetail.facultyPrice.toString()}
                   readOnly
                 />
               </div>
@@ -435,7 +446,7 @@ export default function ShowRequestFormPage() {
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={termPriceData?.price3?.toString() || ''}
+                  placeholder={formDetail.creditPrice.toString()}
                   readOnly
                 />
               </div>
@@ -447,7 +458,7 @@ export default function ShowRequestFormPage() {
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={termPriceData?.sumPrice?.toString() || ''}
+                  placeholder={formDetail.sumPrice.toString()}
                   readOnly
                 />
               </div>

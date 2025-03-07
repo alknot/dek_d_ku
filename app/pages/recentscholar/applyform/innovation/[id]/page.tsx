@@ -57,16 +57,18 @@ interface StaticData {
   programType: string;
   study: string;
 
-  awardDate: Date | null;
-  competitionName: string;
-  teamName: string;
-  innovationName: string;
-  prizeName: string;
-  organizer: string;
-  competitiveLevel: string;
-  numberOfTeam: string;
-  activityHour: string;
-  attachFile: string;
+  innovation: {
+    awardDate: Date | null;
+    competitionName: string;
+    teamName: string;
+    innovationName: string;
+    prizeName: string;
+    organizer: string;
+    competitiveLevel: string;
+    numberOfTeam: string;
+    activityHour: string;
+    attachFile: string;
+  };
 }
 
 interface Termprice {
@@ -102,16 +104,18 @@ export default function ApplyScholarshipPage() {
     email: '',
     address: '',
 
-    awardDate: null,
-    competitionName: '',
-    teamName: '',
-    innovationName: '',
-    prizeName: '',
-    organizer: '',
-    competitiveLevel: '',
-    numberOfTeam: '',
-    activityHour: '',
-    attachFile: '',
+    innovation: {
+      awardDate: null,
+      competitionName: '',
+      teamName: '',
+      innovationName: '',
+      prizeName: '',
+      organizer: '',
+      competitiveLevel: '',
+      numberOfTeam: '',
+      activityHour: '',
+      attachFile: '',
+    },
 
     isLastTerm: false,
     academicYear: '',
@@ -230,8 +234,14 @@ export default function ApplyScholarshipPage() {
   }, [scholarshipId]);
 
   // จัดการ static field
-  const handleStaticChange = <K extends keyof StaticData>(field: K, value: StaticData[K]) => {
-    setStaticData((prev) => ({ ...prev, [field]: value }));
+  const handleStaticChange = (field: string, value: any) => {
+    setStaticData((prev) => {
+      const fields = field.split('.');
+      if (fields.length === 2 && fields[0] === 'innovation') {
+        return { ...prev, innovation: { ...prev.innovation, [fields[1]]: value } };
+      }
+      return { ...prev, [field]: value };
+    });
   };
 
   // ดึงข้อมูล termprice จาก API เมื่อ academicYearParam และ termParam เปลี่ยนแปลง
@@ -349,17 +359,46 @@ export default function ApplyScholarshipPage() {
       alert('Scholarship ID not found');
       return;
     }
+
     let newuniversityPrice = 0;
     let newfacultyPrice = 0;
     let newcreditPrice = 0;
     let newsumPrice = 0;
 
-    if (staticData.isLastTerm === false) {
+    if (staticData.isLastTerm === false && staticData.innovation.competitiveLevel == 'TERTIARY') {
+      newuniversityPrice = selectedTermPrice ? selectedTermPrice.price1 : 0;
+      console.log('selectedTermPrice:', selectedTermPrice ? selectedTermPrice.price2 : 'N/A');
+      newfacultyPrice = selectedTermPrice ? selectedTermPrice.price2 : 0;
+      newcreditPrice = 0;
+      newsumPrice = newuniversityPrice + newfacultyPrice;
+
+      console.log('newuniversityPrice0:', newuniversityPrice);
+      console.log('newfacultyPrice0:', newfacultyPrice);
+      console.log('newcreditPrice0:', newcreditPrice);
+      console.log('newsumPrice0:', newsumPrice);
+    } else if (
+      staticData.isLastTerm === false &&
+      staticData.innovation.competitiveLevel == 'NATIONAL'
+    ) {
       newuniversityPrice = 0;
       console.log('selectedTermPrice:', selectedTermPrice ? selectedTermPrice.price2 : 'N/A');
       newfacultyPrice = selectedTermPrice ? selectedTermPrice.price2 : 0;
       newcreditPrice = 0;
-      newsumPrice = selectedTermPrice ? selectedTermPrice.price2 : 0;
+      newsumPrice = newfacultyPrice;
+
+      console.log('newuniversityPrice0:', newuniversityPrice);
+      console.log('newfacultyPrice0:', newfacultyPrice);
+      console.log('newcreditPrice0:', newcreditPrice);
+      console.log('newsumPrice0:', newsumPrice);
+    } else if (
+      staticData.isLastTerm === false &&
+      staticData.innovation.competitiveLevel == 'NATIONAL'
+    ) {
+      newuniversityPrice = 0;
+      console.log('selectedTermPrice:', selectedTermPrice ? selectedTermPrice.price2 : 'N/A');
+      newfacultyPrice = selectedTermPrice ? selectedTermPrice.price2 : 0;
+      newcreditPrice = 0;
+      newsumPrice = newfacultyPrice;
 
       console.log('newuniversityPrice0:', newuniversityPrice);
       console.log('newfacultyPrice0:', newfacultyPrice);
@@ -377,22 +416,20 @@ export default function ApplyScholarshipPage() {
     console.log('newfacultyPrice:', newfacultyPrice);
     console.log('newcreditPrice:', newcreditPrice);
     console.log('newsumPrice:', newsumPrice);
+    staticData.innovation.attachFile = pdfUrl || '';
+
     const payload = {
       scholarshipID: scholarshipId,
-
       ...staticData,
       schType: 'INNOVATION',
       dateofBirth: staticData.dateofBirth ? staticData.dateofBirth.toISOString() : null,
       academicYear: academicYearParam,
       term: termParam,
       createdBy: session?.userProfile?.id,
-
-      attachfile: pdfUrl,
-
-      universityPrice: selectedTermPrice ? selectedTermPrice.price1 : 0,
-      facultyPrice: selectedTermPrice ? selectedTermPrice.price2 : 0,
-      creditPrice: selectedTermPrice ? selectedTermPrice.price3 : 0,
-      sumPrice: selectedTermPrice ? selectedTermPrice.sumPrice : 0,
+      universityPrice: staticData.isLastTerm ? 0 : selectedTermPrice ? selectedTermPrice.price1 : 0,
+      facultyPrice: staticData.isLastTerm ? 0 : selectedTermPrice ? selectedTermPrice.price2 : 0,
+      creditPrice: staticData.isLastTerm ? 0 : selectedTermPrice ? selectedTermPrice.price3 : 0,
+      sumPrice: staticData.isLastTerm ? 0 : selectedTermPrice ? selectedTermPrice.sumPrice : 0,
       newuniversityPrice: newuniversityPrice,
       newfacultyPrice: newfacultyPrice,
       newcreditPrice: newcreditPrice,
@@ -711,8 +748,8 @@ export default function ApplyScholarshipPage() {
                     วันที่ได้รับรางวัล
                   </label>
                   <DatePicker
-                    selected={staticData.awardDate}
-                    onChange={(date) => handleStaticChange('awardDate', date)}
+                    selected={staticData.innovation.awardDate}
+                    onChange={(date) => handleStaticChange('innovation.awardDate', date)}
                     placeholderText="วันที่ได้รับรางวัล"
                     dateFormat="dd/MM/yyyy"
                     className="focus:ring-primary-600 focus:border-primary-600 w-full rounded-lg border border-gray-300 px-3 py-2"
@@ -725,11 +762,10 @@ export default function ApplyScholarshipPage() {
                 </label>
                 <input
                   type="text"
-                  id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="ชื่อโครงการที่แข่งขัน/เข้าร่วม"
-                  value={staticData.competitionName}
-                  onChange={(e) => handleStaticChange('competitionName', e.target.value)}
+                  value={staticData.innovation.competitionName}
+                  onChange={(e) => handleStaticChange('innovation.competitionName', e.target.value)}
                   required
                 />
               </div>
@@ -739,11 +775,10 @@ export default function ApplyScholarshipPage() {
                 </label>
                 <input
                   type="text"
-                  id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="ชื่อทีม"
-                  value={staticData.teamName}
-                  onChange={(e) => handleStaticChange('teamName', e.target.value)}
+                  value={staticData.innovation.teamName}
+                  onChange={(e) => handleStaticChange('innovation.teamName', e.target.value)}
                   required
                 />
               </div>
@@ -755,8 +790,8 @@ export default function ApplyScholarshipPage() {
                   type="text"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="ชื่อผลงานที่ได้รับรางวัล"
-                  value={staticData.innovationName}
-                  onChange={(e) => handleStaticChange('innovationName', e.target.value)}
+                  value={staticData.innovation.innovationName}
+                  onChange={(e) => handleStaticChange('innovation.innovationName', e.target.value)}
                   required
                 />
               </div>
@@ -768,8 +803,8 @@ export default function ApplyScholarshipPage() {
                   type="text"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="รางวัลที่ได้รับ"
-                  value={staticData.prizeName}
-                  onChange={(e) => handleStaticChange('prizeName', e.target.value)}
+                  value={staticData.innovation.prizeName}
+                  onChange={(e) => handleStaticChange('innovation.prizeName', e.target.value)}
                   required
                 />
               </div>
@@ -783,8 +818,8 @@ export default function ApplyScholarshipPage() {
                     type="text"
                     className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                     placeholder="เช่น 5"
-                    value={staticData.numberOfTeam}
-                    onChange={(e) => handleStaticChange('numberOfTeam', e.target.value)}
+                    value={staticData.innovation.numberOfTeam}
+                    onChange={(e) => handleStaticChange('innovation.numberOfTeam', e.target.value)}
                     required
                   />
                 </div>
@@ -794,8 +829,10 @@ export default function ApplyScholarshipPage() {
                   </label>
                   <select
                     className="bg-white-50 block rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    value={staticData.competitiveLevel}
-                    onChange={(e) => handleStaticChange('competitiveLevel', e.target.value)}
+                    value={staticData.innovation.competitiveLevel}
+                    onChange={(e) =>
+                      handleStaticChange('innovation.competitiveLevel', e.target.value)
+                    }
                     required>
                     <option value="">กรุณาเลือก</option>
                     <option value="TERTIARY">ระดับอุดมศึกษา</option>
@@ -812,8 +849,8 @@ export default function ApplyScholarshipPage() {
                   <select
                     className="bg-white-50 block rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                     id="programType"
-                    value={staticData.activityHour}
-                    onChange={(e) => handleStaticChange('activityHour', e.target.value)}
+                    value={staticData.innovation.activityHour}
+                    onChange={(e) => handleStaticChange('innovation.activityHour', e.target.value)}
                     required>
                     <option value="">กรุณาเลือก</option>
                     <option value="OTHER">

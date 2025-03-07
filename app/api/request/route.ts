@@ -192,8 +192,8 @@ export async function POST(req: NextRequest) {
       innovation:
         body.schType === SchType.INNOVATION
           ? {
-              innovationType: body.innovationType || null, // ควรเป็นค่าที่ตรงกับ enum ExtracurricularType
-              awardDate: body.awardDate ? new Date(body.awardDate) : new Date(), // ถ้าเป็นวันที่
+              innovationType: body.innovationType || null,
+              awardDate: body.awardDate ? new Date(body.awardDate) : new Date(),
               competitionName: body.competitionName || null,
               teamName: body.teamName || null,
               innovationName: body.innovationName || null,

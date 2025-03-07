@@ -89,7 +89,7 @@ export default function Home() {
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Header Section */}
-      <Header toggleSidebar={toggleSidebar} />
+      <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
       {/* Main Section (Full Screen) */}
       <main className="mx-auto flex w-full flex-1 justify-center bg-gray-100">
@@ -160,12 +160,16 @@ export default function Home() {
               <thead className="bg-blue-800 text-white">
                 <tr>
                   <th className="px-4 py-2 text-left text-center">ที่</th>
-                  <th className="w-28 px-2 py-2 text-left text-center">ปีการศึกษา</th>
-                  <th className="px-4 py-2 text-left text-center">เทอม</th>
-                  <th className="px-4 py-2 text-left text-center">หลักสูตรที่เปิดรับ</th>
-                  <th className="px-4 py-2 text-left text-center">โครงการ</th>
-                  <th className="px-9 py-2 text-left text-center">กำหนดการ</th>
-                  <th className="px-9 py-2 text-left text-center">ดูผลการพิจารณา</th>
+                  <th className="w-36 px-2 py-2 text-left text-center">รหัสนิสิต</th>
+                  <th className="px-4 py-2 text-left text-center">ชื่อ - สกุล</th>
+                  <th className="px-4 py-2 text-left text-center">คณะ</th>
+                  <th className="px-4 py-2 text-left text-center">ดูใบสมัคร</th>
+                  <th className="px-9 py-2 text-left text-center">รองคณบดี</th>
+                  <th className="px-9 py-2 text-left text-center">คณบดี</th>
+                  <th className="px-9 py-2 text-left text-center">กองพัฒนานิสิต</th>
+                  <th className="px-9 py-2 text-left text-center">คณะกรรมการ</th>
+                  <th className="px-9 py-2 text-left text-center">ประธานกรรมการ</th>
+                  <th className="px-9 py-2 text-left text-center">comment</th>
                 </tr>
               </thead>
               <tbody>
@@ -180,7 +184,7 @@ export default function Home() {
 
                   return (
                     <tr key={scholarship.id}>
-                      <td className="w-12 border px-4 py-2">{index + 1}</td>
+                      {/* <td className="w-12 border px-4 py-2">{index + 1}</td>
                       <td className="w-28 border px-2 py-2 text-center">
                         {scholarship.academiYear}
                       </td>
@@ -205,7 +209,7 @@ export default function Home() {
                           onClick={() => handleOpenModal(scholarship)}>
                           ดูผลการพิจารณา
                         </button>
-                      </td>
+                      </td> */}
                     </tr>
                   );
                 })}

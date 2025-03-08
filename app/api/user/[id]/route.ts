@@ -21,7 +21,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   const id = (await params).id;
   try {
     const data = await req.json();
+    console.log('data', data);
     const role = data.role;
+    const faculty = data.faculty;
+    const department = data.department;
     console.log('data: ' + JSON.stringify(data));
     if (!role) {
       console.log('Invalid or missing role', role);
@@ -32,7 +35,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     // Update the user role in the database
     const updatedUser = await db.user.update({
       where: { id: String(id) },
-      data: { role: role as Role },
+      data: {
+        role: role as Role,
+        faculty: faculty,
+        department: department,
+
+        // faculty:
+      },
     });
     return NextResponse.json(
       { message: `User ${updatedUser.id} updated with role ${updatedUser.role}` },

@@ -4,6 +4,7 @@ import Footer from '@/components/footer';
 import Header from '@/components/header';
 import Sidebar from '@/components/sidebar';
 import axios from 'axios';
+import { useSession } from 'next-auth/react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
@@ -41,6 +42,11 @@ interface FormType {
 }
 
 export default function CommitteeViewPage() {
+  const { data: session } = useSession();
+
+  const token = session?.account.access_token as string | undefined;
+  console.log('token:', token);
+
   // State สำหรับฟอร์มทั้งหมด
   const [forms, setForms] = useState<FormType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,6 +59,8 @@ export default function CommitteeViewPage() {
   const [nisitNameTH, setNisitNameTH] = useState('');
   const [programType, setProgramType] = useState('');
   const [schType, setSchType] = useState('');
+  const [formType, setFormType] = useState('PENDING');
+  const [faculty, setFacultyType] = useState('');
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -91,24 +99,44 @@ export default function CommitteeViewPage() {
       .catch((err) => console.error(err));
   }, [scholarshipID]);
   // ฟังก์ชันดึงข้อมูลฟอร์มจาก API
+
   const fetchForms = async () => {
     try {
       setLoading(true);
       const academicYearParam = searchParams.get('academicYear');
       // ตัวอย่างแปลง termParam
       const termParam = searchParams.get('term');
+
       const normalizedTerm =
         termParam === '1' ? 'เทอมต้น' : termParam === '2' ? 'เทอมปลาย' : termParam;
-
+      console.log('tokenBF', token);
       const response = await axios.get('/api/request', {
+        headers: { Authorization: token },
         params: {
           scholarshipID: scholarshipID,
           academicYear: academiYear,
           term: normalizedTerm,
+          studentId: studentId,
+          nisitNameTH: nisitNameTH,
+          faculty: faculty,
+
           // ...อาจส่ง param อื่น ๆ เช่น studentId, programType, schType
         },
       });
-      setForms(response.data as FormType[]);
+      console.log('response', response.data);
+      if (formType == 'PENDING') {
+        const data = response.data as { getByStatus: FormType[] };
+        setForms(data.getByStatus);
+      } else if (formType == 'NOT_PASS') {
+        const data = response.data as { getRejected: FormType[] };
+        setForms(data.getRejected);
+      } else if (formType == 'PASS') {
+        const data = response.data as { getPass: FormType[] };
+        setForms(data.getPass);
+      } else if (formType == 'ALL') {
+        const data = response.data as { getByFaculty: FormType[] };
+        setForms(data.getByFaculty);
+      }
     } catch (err: any) {
       setError(err.message || 'An error occurred');
     } finally {
@@ -118,10 +146,13 @@ export default function CommitteeViewPage() {
 
   // ดึงข้อมูลเมื่อ mount หรือเมื่อ param ต่าง ๆ เปลี่ยน
   useEffect(() => {
+    if (!token) {
+      return;
+    }
     fetchForms();
     // รีเซ็ต currentPage เป็น 1 เมื่อเงื่อนไขค้นหาเปลี่ยน
     setCurrentPage(1);
-  }, [academiYear, term, programType, schType, studentId]);
+  }, [academiYear, term, programType, schType, studentId, token]);
 
   // handleSearch สำหรับกดปุ่ม "ค้นหา"
   const handleSearch = () => {
@@ -204,19 +235,28 @@ export default function CommitteeViewPage() {
                     <option value="ระดับชาติ">ระดับชาติ</option>
                     <option value="ระดับนานาชาติ">ระดับนานาชาติ</option>
                   </select>
-
-                  <select
-                    value={schType}
-                    onChange={(e) => setSchType(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 p-2">
-                    <option value="">สถานะการตัดสิน</option>
-                    <option value="PENDING">รอการพิจารณา</option>
-                    <option value="PASS">ผ่านการพิจารณา</option>
-                    <option value="NOT_PASS">ไม่ผ่านการพิจารณา</option>
-                  </select>
                 </>
               )}
+              <select
+                value={faculty}
+                onChange={(e) => setFacultyType(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 p-2">
+                <option value="PENDING">รอการพิจารณา</option>
+                <option value="PASS">ผ่านการพิจารณา</option>
+                <option value="NOT_PASS">ไม่ผ่านการพิจารณา</option>
+                <option value="ALL">ทั้งหมด</option>
+              </select>
+              <select
+                value={formType}
+                onChange={(e) => setFormType(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 p-2">
+                <option value="PENDING">รอการพิจารณา</option>
+                <option value="PASS">ผ่านการพิจารณา</option>
+                <option value="NOT_PASS">ไม่ผ่านการพิจารณา</option>
+                <option value="ALL">ทั้งหมด</option>
+              </select>
             </div>
+
             <div className="text-center">
               <button
                 onClick={handleSearch}

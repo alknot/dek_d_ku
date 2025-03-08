@@ -411,7 +411,7 @@ export default function ApplyScholarshipPage() {
         newuniversityPrice: newuniversityPrice,
         newfacultyPrice: newfacultyPrice,
         newcreditPrice: newcreditPrice,
-        newsumPrice: newcreditPrice,
+        newsumPrice: newsumPrice,
         dynamicQuestions: dynamicResponses.map((resp) => ({
           question: resp.question,
           type:
@@ -894,6 +894,75 @@ export default function ApplyScholarshipPage() {
                 </div>
               </div>
             </div>
+
+            <section className="mb-8">
+              <h2 className="mb-2 text-lg font-semibold">คำถามเพิ่มเติม </h2>
+              {dynamicResponses.map((dr, idx) => (
+                <div key={dr.id} className="mb-4 rounded border p-4">
+                  <p className="font-bold">
+                    Q{idx + 1}: {dr.question}
+                  </p>
+                  {dr.type === 'text' && (
+                    <input
+                      type="text"
+                      value={dr.answer}
+                      onChange={(e) => updateDynamicResponse(dr.id, 'answer', e.target.value)}
+                      className="w-full border p-2"
+                      placeholder="กรอกคำตอบ"
+                      required={dr.required}
+                    />
+                  )}
+                  {dr.type === 'choice' && (
+                    <div>
+                      {dr.options.map((opt, i) => (
+                        <div key={i} className="flex items-center space-x-2">
+                          <input
+                            type="radio"
+                            name={`choice_${dr.id}`}
+                            value={opt}
+                            checked={dr.answer === opt}
+                            onChange={() => updateDynamicResponse(dr.id, 'answer', opt)}
+                          />
+                          <label>{opt}</label>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {dr.type === 'checkbox' && (
+                    <div>
+                      {dr.options.map((opt, i) => {
+                        const selectedValues = dr.answer ? dr.answer.split(',') : [];
+                        const isChecked = selectedValues.includes(opt);
+                        const toggleCheckbox = () => {
+                          let newArr = [...selectedValues];
+                          if (isChecked) {
+                            newArr = newArr.filter((v) => v !== opt);
+                          } else {
+                            newArr.push(opt);
+                          }
+                          updateDynamicResponse(dr.id, 'answer', newArr.join(','));
+                        };
+                        return (
+                          <div key={i} className="flex items-center space-x-2">
+                            <input type="checkbox" checked={isChecked} onChange={toggleCheckbox} />
+                            <label>{opt}</label>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                  {dr.type === 'date' && (
+                    <DatePicker
+                      selected={dr.selectedDate || null}
+                      onChange={(date) => updateDynamicResponse(dr.id, 'selectedDate', date)}
+                      className="w-full border p-2"
+                      dateFormat="dd/MM/yyyy"
+                    />
+                  )}
+                </div>
+              ))}
+            </section>
+
             <button type="submit" className="mt-3 w-full rounded bg-blue-500 p-2 text-white">
               ส่งฟอร์มสมัครทุน
             </button>

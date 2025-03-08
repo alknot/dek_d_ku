@@ -94,10 +94,13 @@ export default function Home() {
       console.error('No scholarship selected');
       return;
     }
+
+    const termToSend =
+      scholarship.term === 'เทอมต้น' ? '1' : scholarship.term === 'เทอมปลาย' ? '2' : term;
     setIsModalOpen(false);
     const url = `../../../../pages/consideration/showReq/${scholarship.id}?academiYear=${encodeURIComponent(
       scholarship.academiYear
-    )}&term=${encodeURIComponent(term)}`;
+    )}&term=${encodeURIComponent(termToSend)}`;
     router.push(url);
     // Navigate based on the scholarship type
   };

@@ -43,6 +43,11 @@ interface FormType {
   address: string;
   isLastTerm: boolean;
 
+  universityPrice: number;
+  facultyPrice: number;
+  creditPrice: number;
+  sumPrice: number;
+
   newUniversityPrice: number;
   newFacultyPrice: number;
   newCreditPrice: number;
@@ -56,8 +61,8 @@ interface FormType {
 
   certificate?: string | null;
   activityImageUrl?: string | null;
-  innovation: {
-    // innovationType: string | null;
+  extracurricular: {
+    extracurricularType: string | null;
     awardDate: Date | null;
     competitionName: string | null;
     teamName: string | null;
@@ -89,6 +94,7 @@ export default function ShowRequestFormPage() {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   const [formDetail, setFormDetail] = useState<FormType | null>(null);
+  console.log('extype', formDetail?.extracurricular?.extracurricularType);
   const [termPriceData, setTermPriceData] = useState<TermPriceData | null>(null);
   console.log('termpricedata', termPriceData);
   const [loading, setLoading] = useState<boolean>(true);
@@ -178,8 +184,8 @@ export default function ShowRequestFormPage() {
     ? format(parseISO(formDetail.dateofBirth), 'dd/MM/yyyy', { locale: th })
     : 'ไม่ระบุวันเกิด';
 
-  const formattedAwardDate = formDetail?.innovation?.awardDate
-    ? format(formDetail.innovation.awardDate, 'dd/MM/yyyy', { locale: th })
+  const formattedAwardDate = formDetail?.extracurricular?.awardDate
+    ? format(formDetail.extracurricular.awardDate, 'dd/MM/yyyy', { locale: th })
     : 'ไม่มีข้อมูล';
 
   // ฟังก์ชันอัปเดตสถานะฟอร์ม
@@ -384,109 +390,122 @@ export default function ShowRequestFormPage() {
                 />
               </div>
             </div>
-            {formDetail.innovation && (
-              <div className="mt-8">
-                <h2 className="mb-2 text-lg font-bold">รายละเอียดรางวัล</h2>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="block text-sm font-medium">วันที่ได้รับรางวัล</label>
-                    <input value={formattedAwardDate} className="w-full border p-2" readOnly />
+            {formDetail.extracurricular?.extracurricularType !== 'POSITION' &&
+              formDetail.extracurricular?.extracurricularType !== 'SOCIAL' && (
+                <div className="mt-8">
+                  <h2 className="mb-2 text-lg font-bold">รายละเอียดรางวัล</h2>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="block text-sm font-medium">วันที่ได้รับรางวัล</label>
+                      <input value={formattedAwardDate} className="w-full border p-2" readOnly />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium">หน่วยงานที่จัดการแข่งขัน</label>
+                      <input
+                        type="text"
+                        className="w-full border p-2"
+                        value={formDetail.extracurricular?.organizer || 'ไม่มีข้อมูล'}
+                        readOnly
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium">
+                        ชื่อโครงการที่แข่งขัน/เข้าร่วม
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border p-2"
+                        value={formDetail.extracurricular?.competitionName || 'ไม่มีข้อมูล'}
+                        readOnly
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium">ชื่อทีม</label>
+                      <input
+                        type="text"
+                        className="w-full border p-2"
+                        value={formDetail.extracurricular?.teamName || 'ไม่มีข้อมูล'}
+                        readOnly
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium">ชื่อผลงานที่ได้รับรางวัล</label>
+                      <input
+                        type="text"
+                        className="w-full border p-2"
+                        value={formDetail.extracurricular?.innovationName || 'ไม่มีข้อมูล'}
+                        readOnly
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium">รางวัลที่ได้รับ</label>
+                      <input
+                        type="text"
+                        className="w-full border p-2"
+                        value={formDetail.extracurricular?.prizeName || 'ไม่มีข้อมูล'}
+                        readOnly
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium">
+                        จำนวนทีมที่เข้าร่วมในโครงการ/การแข่งขัน
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border p-2"
+                        value={
+                          formDetail.extracurricular?.numberOfTeam !== null
+                            ? formDetail.extracurricular?.numberOfTeam
+                            : 'ไม่มีข้อมูล'
+                        }
+                        readOnly
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium">
+                        ระดับการประกวดการแข่งขัน/การเข้าร่วม
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border p-2"
+                        value={
+                          formDetail.extracurricular && formDetail.extracurricular.competitiveLevel
+                            ? competitiveLevelMapping[
+                                formDetail.extracurricular.competitiveLevel
+                              ] || formDetail.extracurricular.competitiveLevel
+                            : 'ไม่มีข้อมูล'
+                        }
+                        readOnly
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium">ประเภทกิจกรรม</label>
+                      <input
+                        type="text"
+                        className="w-full border p-2"
+                        value={
+                          formDetail.extracurricular && formDetail.extracurricular.activityHour
+                            ? activityMapping[formDetail.extracurricular.activityHour] ||
+                              formDetail.extracurricular.activityHour
+                            : 'ไม่มีข้อมูล'
+                        }
+                        readOnly
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium">หน่วยงานที่จัดการแข่งขัน</label>
-                    <input
-                      type="text"
-                      className="w-full border p-2"
-                      value={formDetail.innovation.organizer || 'ไม่มีข้อมูล'}
-                      readOnly
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium">
-                      ชื่อโครงการที่แข่งขัน/เข้าร่วม
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full border p-2"
-                      value={formDetail.innovation.competitionName || 'ไม่มีข้อมูล'}
-                      readOnly
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium">ชื่อทีม</label>
-                    <input
-                      type="text"
-                      className="w-full border p-2"
-                      value={formDetail.innovation.teamName || 'ไม่มีข้อมูล'}
-                      readOnly
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium">ชื่อผลงานที่ได้รับรางวัล</label>
-                    <input
-                      type="text"
-                      className="w-full border p-2"
-                      value={formDetail.innovation.innovationName || 'ไม่มีข้อมูล'}
-                      readOnly
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium">รางวัลที่ได้รับ</label>
-                    <input
-                      type="text"
-                      className="w-full border p-2"
-                      value={formDetail.innovation.prizeName || 'ไม่มีข้อมูล'}
-                      readOnly
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium">
-                      จำนวนทีมที่เข้าร่วมในโครงการ/การแข่งขัน
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full border p-2"
-                      value={
-                        formDetail.innovation.numberOfTeam !== null
-                          ? formDetail.innovation.numberOfTeam
-                          : 'ไม่มีข้อมูล'
-                      }
-                      readOnly
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium">
-                      ระดับการประกวดการแข่งขัน/การเข้าร่วม
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full border p-2"
-                      value={
-                        formDetail.innovation && formDetail.innovation.competitiveLevel
-                          ? competitiveLevelMapping[formDetail.innovation.competitiveLevel] ||
-                            formDetail.innovation.competitiveLevel
-                          : 'ไม่มีข้อมูล'
-                      }
-                      readOnly
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium">ประเภทกิจกรรม</label>
-                    <input
-                      type="text"
-                      className="w-full border p-2"
-                      value={
-                        formDetail.innovation && formDetail.innovation.activityHour
-                          ? activityMapping[formDetail.innovation.activityHour] ||
-                            formDetail.innovation.activityHour
-                          : 'ไม่มีข้อมูล'
-                      }
-                      readOnly
-                    />
-                  </div>
+                  {formDetail.extracurricular?.attachfile && (
+                    <div className="mt-4">
+                      <object
+                        data={formDetail.extracurricular.attachfile}
+                        type="application/pdf"
+                        width="100%"
+                        height="600px">
+                        <p>ไม่สามารถแสดง PDF ได้ กรุณาดาวน์โหลดเพื่อดู</p>
+                      </object>
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              )}
             {/* Dynamic Questions Section */}
             {formDetail.dynamicQuestions && formDetail.dynamicQuestions.length > 0 && (
               <div className="mt-8">
@@ -518,33 +537,34 @@ export default function ShowRequestFormPage() {
                 ))}
               </div>
             )}
-            {formDetail.innovation?.attachfile && (
-              <div className="mt-4">
-                <object
-                  data={formDetail.innovation.attachfile}
-                  type="application/pdf"
-                  width="100%"
-                  height="600px">
-                  <p>ไม่สามารถแสดง PDF ได้ กรุณาดาวน์โหลดเพื่อดู</p>
-                </object>
-              </div>
-            )}
+
             <p className="mb-2 mt-6 font-bold text-gray-900">จำนวนเงินเต็มที่ควรเก็บได้</p>
             {formDetail.isLastTerm && (
-              <label htmlFor="schName" className="mb-2 block text-sm font-medium text-red-500">
+              <label className="mb-2 block text-sm font-medium text-red-500">
                 เทอมนี้เป็นเทอมสุดท้าย
               </label>
             )}
+            {formDetail.extracurricular?.extracurricularType == 'POSITION' && (
+              <label className="mb-2 block text-sm font-medium text-red-500">
+                ได้รับโล่หรือประกาศเกียรติคุณแทนการลดค่าเทอม
+              </label>
+            )}
+            {formDetail.extracurricular?.extracurricularType == 'SOCIAL' && (
+              <label className="mb-2 block text-sm font-medium text-red-500">
+                ได้รับโล่หรือประกาศเกียรติคุณแทนการลดค่าเทอม
+              </label>
+            )}
+
             <div className="mb-4 flex space-x-10 sm:col-span-2">
               <div className="sm:grid-cols-1">
-                <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
+                <label className="mb-2 block text-sm font-medium text-gray-900">
                   ค่าบำรุงมหาลัย
                 </label>
                 <input
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={termPriceData?.price1?.toString() || ''}
+                  placeholder={formDetail.universityPrice.toString() || ''}
                   readOnly
                 />
               </div>
@@ -556,7 +576,7 @@ export default function ShowRequestFormPage() {
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={termPriceData?.price2?.toString() || ''}
+                  placeholder={formDetail.facultyPrice.toString() || ''}
                   readOnly
                 />
               </div>
@@ -568,7 +588,7 @@ export default function ShowRequestFormPage() {
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={termPriceData?.price3?.toString() || ''}
+                  placeholder={formDetail.creditPrice.toString() || ''}
                   readOnly
                 />
               </div>
@@ -580,7 +600,7 @@ export default function ShowRequestFormPage() {
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={termPriceData?.sumPrice?.toString() || ''}
+                  placeholder={formDetail.sumPrice.toString() || ''}
                   readOnly
                 />
               </div>

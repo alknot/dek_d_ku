@@ -21,7 +21,7 @@ export default function Home() {
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Header Section */}
-      <Header toggleSidebar={toggleSidebar} />
+      <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
       {/* Main Section (Full Screen) */}
       <main className="items-top flex flex-1 justify-center bg-gray-100">
@@ -41,7 +41,7 @@ export default function Home() {
             <Link href="../../../../pages/newscholar/innovation">
               <button className={styles.button}>โครงการความคิดสร้างสรรค์และนวัตกรรม</button>
             </Link>
-            <button className={styles.button}>โครงการอื่นๆ</button>
+            {/* <button className={styles.button}>โครงการอื่นๆ</button> */}
           </div>
         </div>
       </main>

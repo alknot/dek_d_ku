@@ -595,51 +595,6 @@ export default function ApplyScholarshipPage() {
               </div>
             </section>
 
-            {/* แสดงข้อมูล termprice ที่ได้จากการ filter */}
-            {/* {selectedTermPrice && (
-              <section className="mb-8">
-                <h2 className="mb-2 text-lg font-semibold">ข้อมูลค่าใช้จ่าย</h2>
-                <div className="flex space-x-4">
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium">ค่าบำรุงมหาลัย</label>
-                    <input
-                      type="text"
-                      readOnly
-                      value={selectedTermPrice.price1.toString()}
-                      className="w-full border p-2"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium">ค่าบำรุงคณะ</label>
-                    <input
-                      type="text"
-                      readOnly
-                      value={selectedTermPrice.price2.toString()}
-                      className="w-full border p-2"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium">ค่าหน่วยกิต</label>
-                    <input
-                      type="text"
-                      readOnly
-                      value={selectedTermPrice.price3.toString()}
-                      className="w-full border p-2"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium">รวม</label>
-                    <input
-                      type="text"
-                      readOnly
-                      value={selectedTermPrice.sumPrice.toString()}
-                      className="w-full border p-2"
-                    />
-                  </div>
-                </div>
-              </section>
-            )} */}
-
             {/* Dynamic Questions Section */}
             <section className="mb-8">
               <h2 className="mb-2 text-lg font-semibold">คำถามเพิ่มเติม </h2>

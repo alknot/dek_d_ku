@@ -4,9 +4,9 @@ import { NextRequest, NextResponse } from 'next/server';
 const db = new PrismaClient();
 
 // GET scholarship by ID
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const scholarship = await db.scholarship.findUnique({
       where: { id },
     });

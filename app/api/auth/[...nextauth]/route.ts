@@ -1,3 +1,4 @@
+import { handleError } from '@/app/libs/utils';
 import { PrismaClient, Role } from '@prisma/client';
 import NextAuth, { NextAuthOptions, Profile, Session } from 'next-auth';
 import KeycloakProvider from 'next-auth/providers/keycloak';
@@ -40,24 +41,24 @@ declare module 'next-auth' {
 }
 
 async function createUserThroughAPI(userId: string, tokenData: any) {
-  console.log('--------------CREATE USER VIA API---------------');
-  console.log({ userId, tokenData });
+  // console.log('--------------CREATE USER VIA API---------------');
+  // console.log({ userId, tokenData });
 
-  console.log({
-    resultBody: {
-      id: userId,
-      prenameTh: tokenData.thaiprename || '',
-      firstnameTh: tokenData['first-name'] || '',
-      lastnameTh: tokenData['last-name'] || '',
-      prenameEn: tokenData.prenameEn || '',
-      firstnameEn: tokenData.given_name || '',
-      lastnameEn: tokenData.family_name || '',
-      role: 'NOT_ASSIGNED',
-      faculty: tokenData.faculty,
-      email: tokenData['google-mail'],
-      typePerson: tokenData['type-person'],
-    },
-  });
+  // console.log({
+  //   resultBody: {
+  //     id: userId,
+  //     prenameTh: tokenData.thaiprename || '',
+  //     firstnameTh: tokenData['first-name'] || '',
+  //     lastnameTh: tokenData['last-name'] || '',
+  //     prenameEn: tokenData.prenameEn || '',
+  //     firstnameEn: tokenData.given_name || '',
+  //     lastnameEn: tokenData.family_name || '',
+  //     role: 'NOT_ASSIGNED',
+  //     faculty: tokenData.faculty,
+  //     email: tokenData['google-mail'],
+  //     typePerson: tokenData['type-person'],
+  //   },
+  // });
 
   const API_BASE_URL = process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
@@ -106,20 +107,22 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, account, profile }) {
-      console.log({ token, account, profile });
+      console.log('acc,profile', { account, profile });
       try {
+        // console.log('acc', account);
         if (account) {
-          console.log('--------------ACCESS TOKEN ---------------');
+          // console.log('--------------ACCESS TOKEN ---------------');
           const decodedToken = decodeToken(account.access_token as any);
           if (token == null) {
             throw new Error('Unable to decode token');
           }
           // console.log(decodedToken);
           const userId = token.sub as string;
-          // console.log("--------------USER ID---------------");
+          // console.log('--------------USER ID---------------');
           // console.log(userId);
           // console.log("--------------ROLES---------------");
           profile = decodedToken as Profile;
+          // console.log('profile', profile);
           token.account = account;
         }
         if (profile) {
@@ -133,11 +136,11 @@ export const authOptions: NextAuthOptions = {
           const userId = token.sub as string;
           const tokenData = profile;
 
-          // console.log("--------------USER ID---------------");
-          // console.log({userId});
+          console.log('--------------USER ID---------------');
+          console.log({ userId });
           console.log('working');
           const user = await db.user.findUnique({ where: { id: userId } });
-          // console.log({user});
+          // console.log({ user });
           if (!user) {
             // user does not exist, create user
             console.log('User not found, creating user');
@@ -150,7 +153,7 @@ export const authOptions: NextAuthOptions = {
           // user exists
         }
       } catch (error) {
-        console.log(error);
+        handleError(error);
       }
 
       return token;

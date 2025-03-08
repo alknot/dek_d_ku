@@ -30,9 +30,19 @@ enum RequestStatus {
 
   PENDING_DEPUTY_DEAN
   PENDING_DEAN
-  PENDING_JUDGING
-  PENDING_EDIT
+  PENDING_SA
+  PENDING_BOARD
+  PENDING_CHAIRMAN
   APPROVED
+  REJECTED
+}
+
+enum CheckReject {
+  NOT_REJECTED
+  REJECTED_DEPUTY_DEAN
+  REJECTED_DEAN
+  REJECTED_SA
+  REJECTED_BOARD
   REJECTED
 }
 
@@ -132,7 +142,7 @@ model Form {
   scholarshipID String
   schType       SchType
   approveStatus RequestStatus
-  currentStage Boolean
+  checkReject CheckReject
 
   nisitNameTh       String
   nisitNameEn       String
@@ -177,6 +187,7 @@ model Form {
 
   comment     String?
   commentedBy String?
+  
 
   // Relationships
   commentedUser   User? @relation("CommentedUserForm", fields: [commentedBy], references: [id])
@@ -268,7 +279,6 @@ type Question {
 }
 
 type InnovationQuestion {
-  innovationType InnovationType
 
   awardDate        DateTime
   competitionName  String
@@ -293,7 +303,7 @@ type ExtracurricularQuestion {
   competitionName  String?
   teamName         String?
   innovationName   String?
-  priceName        String?
+  prizeName        String?
   organizer        String?
   competitiveLevel CompetitiveLevel?
   numberOfTeam     Int?

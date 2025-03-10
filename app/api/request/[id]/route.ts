@@ -11,13 +11,18 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     // if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
     // Do something to verify token and get id
-    const userid = '';
-    const user = await db.user.findUnique({ where: { id: userid } });
+    // const userid = '';
+    // const user = await db.user.findUnique({ where: { id: userid } });
     // if (!user) {
     //   return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     // }
 
-    const request = await db.form.findUnique({ where: { id } });
+    const request = await db.form.findMany({
+      where: {
+        scholarshipID: id,
+        approveStatus: 'APPROVED',
+      },
+    });
 
     if (!request) {
       return NextResponse.json({ message: 'Request not found' }, { status: 404 });

@@ -37,7 +37,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="space-x-10 space-y-10">
+          <div className="mt-10 space-x-10 space-y-10 text-left">
             <Link href="../../../../pages/newscholar/innovation">
               <button className={styles.button}>โครงการความคิดสร้างสรรค์และนวัตกรรม</button>
             </Link>

@@ -6,9 +6,10 @@ import { comment } from 'postcss';
 import { decodeToken } from 'react-jwt';
 
 const db = new PrismaClient();
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const token = req.headers.get('Authorization');
+    const { searchParams } = new URL(req.url);
 
     if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
@@ -28,7 +29,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const formId = (await params).id;
     const body = await req.json();
+    console.log(
+      '---------------------------------------------------body------------------------------------------'
+    );
+    console.log('body', body);
+    console.log('body.approveStatus', body.approveStatus);
+    console.log('body.comment', body.comment);
+    console.log(
+      '---------------------------------------------------body------------------------------------------'
+    );
 
+    // const approveStatus = searchParams.get('approveStatus');
+    // const comment = searchParams.get('comment');
+    // console.log('approveStatus', approveStatus);
+    // console.log('body.approveStatus', body.isApproved);
+    // console.log('comment', comment);
+    // console.log('body.comment', body.comment);
     // Validate the request body
     if (!body || typeof body !== 'object') {
       return NextResponse.json({ message: 'Invalid or missing request body' }, { status: 400 });
@@ -41,32 +57,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     // if (missingField) {
     //   return NextResponse.json({ message: `${missingField} is missing` }, { status: 400 });
     // }
-
-    switch (user.role) {
-      // case Role.DEPARTMENT_HEAD:
-      //   const deptForm = await db.form.findUnique({ where: { id: formId } });
-      //   if (!deptForm) return NextResponse.json({ message: 'Request not found' }, { status: 404 });
-      //   if (deptForm.approveStatus !== 'PENDING_DEPARTMENT_HEAD')
-      //     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
-
-      //   const deptHeadRequests = await db.form.update({
-      //     where: { id: formId },
-      //     data: { approveStatus: body.isApproved ? 'PENDING_FACULTY' : 'REJECTED' },
-      //   });
-      //   if (!deptHeadRequests)
-      //     return NextResponse.json({ message: 'Request not found' }, { status: 404 });
-      //   return NextResponse.json(
-      //     { message: body.isApproved ? 'Approve success' : 'Reject success' },
-      //     { status: 200 }
-      //   );
+    switch (accessUser.role) {
       case Role.DEPUTY_DEAN || Role.FACULTY_STAFF:
         const duputyRequest = await db.form.update({
           where: { id: formId },
           data: {
-            approveStatus: body.isApproved ? 'PENDING_DEAN' : 'REJECTED',
-            checkReject: body.isApproved ? 'NOT_REJECTED' : 'REJECTED_DEPUTY_DEAN',
-            comment: body.isApproved ? '' : body.comment,
-            commentedBy: body.isApproved ? '' : accessUser.email,
+            approveStatus: body.approveStatus ? 'PENDING_DEAN' : 'REJECTED',
+            checkReject: body.approveStatus ? 'NOT_REJECTED' : 'REJECTED_DEPUTY_DEAN',
+            comment: body.approveStatus ? body.comment : body.comment,
+            commentedBy: body.approveStatus ? accessUser.email : accessUser.email,
           },
         });
         if (!duputyRequest)
@@ -80,16 +79,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         const deanRequest = await db.form.update({
           where: { id: formId },
           data: {
-            approveStatus: body.isApproved ? 'PENDING_SA' : 'REJECTED',
-            checkReject: body.isApproved ? 'NOT_REJECTED' : 'REJECTED_DEPUTY_DEAN',
-            comment: body.isApproved ? '' : body.comment,
-            commentedBy: body.isApproved ? '' : accessUser.email,
+            approveStatus: body.approveStatus ? 'PENDING_SA' : 'REJECTED',
+            checkReject: body.approveStatus ? 'NOT_REJECTED' : 'REJECTED_DEAN',
+            comment: body.approveStatus ? body.comment : body.comment,
+            commentedBy: body.approveStatus ? accessUser.email : accessUser.email,
           },
         });
         if (!deanRequest)
           return NextResponse.json({ message: 'Request not found' }, { status: 404 });
         return NextResponse.json(
-          { message: body.isApproved ? 'Approve success' : 'Reject success' },
+          { message: body.approveStatus ? 'Approve success' : 'Reject success' },
           { status: 200 }
         );
 
@@ -97,49 +96,50 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         const saRequest = await db.form.update({
           where: { id: formId },
           data: {
-            approveStatus: body.isApproved ? 'PENDING_BOARD' : 'REJECTED',
-            checkReject: body.isApproved ? 'NOT_REJECTED' : 'REJECTED_SA',
-            comment: body.isApproved ? '' : body.comment,
-            commentedBy: body.isApproved ? '' : accessUser.email,
+            approveStatus: body.approveStatus ? 'PENDING_BOARD' : 'REJECTED',
+            checkReject: body.approveStatus ? 'NOT_REJECTED' : 'REJECTED_SA',
+            comment: body.approveStatus ? body.comment : body.comment,
+            commentedBy: body.approveStatus ? accessUser.email : accessUser.email,
           },
         });
         if (!saRequest) return NextResponse.json({ message: 'Request not found' }, { status: 404 });
         return NextResponse.json(
-          { message: body.isApproved ? 'Approve success' : 'Reject success' },
+          { message: body.approveStatus ? 'Approve success' : 'Reject success' },
           { status: 200 }
         );
       case Role.COMMITTEE:
         const committeeRequest = await db.form.update({
           where: { id: formId },
           data: {
-            approveStatus: body.isApproved ? 'PENDING_CHAIRMAN' : 'REJECTED',
-            checkReject: body.isApproved ? 'NOT_REJECTED' : 'REJECTED_BOARD',
-            comment: body.isApproved ? '' : body.comment,
-            commentedBy: body.isApproved ? '' : accessUser.email,
+            approveStatus: body.approveStatus ? 'PENDING_CHAIRMAN' : 'REJECTED',
+            checkReject: body.approveStatus ? 'NOT_REJECTED' : 'REJECTED_BOARD',
+            comment: body.approveStatus ? body.comment : body.comment,
+            commentedBy: body.approveStatus ? accessUser.email : accessUser.email,
           },
         });
         if (!committeeRequest)
           return NextResponse.json({ message: 'Request not found' }, { status: 404 });
         return NextResponse.json(
-          { message: body.isApproved ? 'Approve success' : 'Reject success' },
+          { message: body.approveStatus ? 'Approve success' : 'Reject success' },
           { status: 200 }
         );
       case Role.CHAIRMAN:
         const chaimanRequest = await db.form.update({
           where: { id: formId },
           data: {
-            approveStatus: body.isApproved ? 'APPROVED' : 'REJECTED',
-            checkReject: body.isApproved ? 'NOT_REJECTED' : 'REJECTED',
-            comment: body.isApproved ? '' : body.comment,
-            commentedBy: body.isApproved ? '' : accessUser.email,
+            approveStatus: body.approveStatus ? 'APPROVED' : 'REJECTED',
+            checkReject: body.approveStatus ? 'NOT_REJECTED' : 'REJECTED',
+            comment: body.approveStatus ? body.comment : body.comment,
+            commentedBy: body.approveStatus ? accessUser.email : accessUser.email,
           },
         });
         if (!chaimanRequest)
           return NextResponse.json({ message: 'Request not found' }, { status: 404 });
         return NextResponse.json(
-          { message: body.isApproved ? 'Approve success' : 'Reject success' },
+          { message: body.approveStatus ? 'Approve success' : 'Reject success' },
           { status: 200 }
         );
+
       default:
         return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }

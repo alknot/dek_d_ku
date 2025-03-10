@@ -98,6 +98,38 @@ export default function Home() {
     setSelectedScholarship(null);
   };
 
+  const navigateToPrint = (scholarship: Scholarship) => {
+    if (!scholarship) {
+      console.error('No scholarship selected');
+      return;
+    }
+    // Close the modal first
+
+    switch (scholarship.schType) {
+      case 'WELL_BEHAVIOR':
+        {
+          const url = `../../../../../../../../../../../../pages/print/well_behavior/${scholarship.id}`;
+          router.push(url);
+        }
+        break;
+      case 'EXTRACURRICULAR':
+        {
+          const url = `../../../../../../../../../../../../pages/print/extracurricular/${scholarship.id}`;
+          router.push(url);
+        }
+        break;
+      case 'INNOVATION':
+        {
+          const url = `../../../../../../../../../../../../pages/print/innovation/${scholarship.id}`;
+          router.push(url);
+        }
+        break;
+
+      default:
+        console.error('Unsupported scholarship type:', scholarship.schType);
+    }
+  };
+
   // ตัวอย่างฟังก์ชันเมื่อกด "สมัครโครงการนี้"
   const navigateToForm = (scholarship: Scholarship) => {
     if (!scholarship) {
@@ -227,18 +259,20 @@ export default function Home() {
 
           {/* ตารางแสดงผล (Pagination) */}
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-gray-200">
+            <table className="table-flex w-full border-collapse border border-gray-200">
               <thead className="bg-blue-800 text-white">
                 <tr>
-                  <th className="px-4 py-2 text-left text-center">ที่</th>
-                  <th className="w-28 px-2 py-2 text-left text-center">ปีการศึกษา</th>
-                  <th className="px-4 py-2 text-left text-center">เทอม</th>
-                  <th className="px-4 py-2 text-left text-center">หลักสูตรที่เปิดรับ</th>
-                  <th className="px-4 py-2 text-left text-center">โครงการ</th>
-                  <th className="px-9 py-2 text-left text-center">กำหนดการ</th>
-                  <th className="px-9 py-2 text-left text-center">รายละเอียด</th>
+                  <th className="w-15 px-4 py-2 text-center">ที่</th>
+                  <th className="w-30 px-2 py-2 text-center">ปีการศึกษา</th>
+                  <th className="px-4 py-2 text-center">เทอม</th>
+                  <th className="px-4 py-2 text-center">หลักสูตรที่เปิดรับ</th>
+                  <th className="w-96 px-4 py-2 text-center">โครงการ</th>
+                  <th className="w-80 px-2 py-2 text-center">กำหนดการ</th>
+                  <th className="w-40 px-2 py-2 text-center">รายละเอียด</th>
+                  <th className="px-2 py-2 text-center">พิมพ์ประกาศ</th>
                 </tr>
               </thead>
+
               <tbody>
                 {displayedScholarships.map((scholarship, index) => {
                   const daysLeft = differenceInDays(new Date(scholarship.endDate), new Date());
@@ -254,12 +288,10 @@ export default function Home() {
 
                   return (
                     <tr key={scholarship.id}>
-                      <td className="w-12 border px-4 py-2 text-center">{itemNumber}</td>
-                      <td className="w-28 border px-4 py-2 text-center">
-                        {scholarship.academiYear}
-                      </td>
-                      <td className="w-28 border px-4 py-2 text-center">{scholarship.term}</td>
-                      <td className="w-40 border px-4 py-2 text-center">
+                      <td className="border px-4 py-2 text-center">{itemNumber}</td>
+                      <td className="border px-4 py-2 text-center">{scholarship.academiYear}</td>
+                      <td className="border px-4 py-2 text-center">{scholarship.term}</td>
+                      <td className="border px-4 py-2 text-center">
                         {scholarship.programType === 'THAI'
                           ? 'หลักสูตรไทย'
                           : scholarship.programType === 'INTERNATIONAL'
@@ -269,7 +301,8 @@ export default function Home() {
                               : scholarship.programType}
                       </td>
                       <td className="border px-4 py-2">{scholarship.schName}</td>
-                      <td className="w-80 border px-4 py-2 text-center">
+
+                      <td className="border px-4 py-2 text-center">
                         {format(new Date(scholarship.startDate), 'dd MMMM yyyy', { locale: th })} -{' '}
                         {format(new Date(scholarship.endDate), 'dd MMMM yyyy', { locale: th })}
                         <br />
@@ -281,7 +314,7 @@ export default function Home() {
                           <span className="text-red-600">หมดเขต</span>
                         )}
                       </td>
-                      <td className="w-40 border px-4 py-2 text-center">
+                      <td className="border px-4 py-2 text-center">
                         {daysLeft >= 0 && (
                           <button
                             className="rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-400"
@@ -289,6 +322,13 @@ export default function Home() {
                             รายละเอียด
                           </button>
                         )}
+                      </td>
+                      <td className="border px-4 py-2 text-center">
+                        <button
+                          className="rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-400"
+                          onClick={() => navigateToPrint(scholarship)}>
+                          พิมพ์
+                        </button>
                       </td>
                     </tr>
                   );

@@ -237,7 +237,7 @@ export default function CommitteeViewPage() {
                   </select>
                 </>
               )}
-              <select
+              {/* <select
                 value={faculty}
                 onChange={(e) => setFacultyType(e.target.value)}
                 className="w-full rounded-lg border border-gray-300 p-2">
@@ -245,7 +245,7 @@ export default function CommitteeViewPage() {
                 <option value="PASS">ผ่านการพิจารณา</option>
                 <option value="NOT_PASS">ไม่ผ่านการพิจารณา</option>
                 <option value="ALL">ทั้งหมด</option>
-              </select>
+              </select> */}
               <select
                 value={formType}
                 onChange={(e) => setFormType(e.target.value)}

@@ -29,6 +29,7 @@
     "react-datepicker": "^7.6.0",
     "react-dom": "^19.0.0",
     "react-jwt": "^1.2.2",
+    "react-to-print": "^3.0.5",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {

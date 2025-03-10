@@ -73,3 +73,7 @@ export const handleError = (e: unknown) => {
   console.error(`Unknown Error: ${JSON.stringify(e)}`);
   return NextResponse.json({ message: 'An unexpected error occurred.' }, { status: 500 });
 };
+
+export function cn(...classes: (string | undefined | false)[]) {
+  return classes.filter(Boolean).join(' ');
+}

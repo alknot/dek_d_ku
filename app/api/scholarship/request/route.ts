@@ -94,8 +94,8 @@ export async function POST(req: NextRequest) {
       id: generateCuid(),
       scholarshipID: body.forScholarship,
       schType: body.schType,
-      approveStatus: RequestStatus.PENDING_DEPARTMENT_HEAD,
-
+      approveStatus: RequestStatus.PENDING_DEAN,
+      checkReject: c
       nisitNameTh: body.nisitNameTh,
       nisitNameEn: body.nisitNameEn,
       nisitAcademicyear: body.nisitAcademicyear,

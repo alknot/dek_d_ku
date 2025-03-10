@@ -90,7 +90,7 @@ export async function GET(req: NextRequest) {
           where: {
             approveStatus: 'REJECTED',
             checkReject: 'REJECTED_DEPUTY_DEAN',
-            nisitid: studentId ?? undefined,
+            // nisitid: studentId ?? undefined,
             // nisitNameTh: nisitNameTH ?? undefined,
             // faculty: accessUser.faculty ?? undefined,
           },
@@ -99,7 +99,7 @@ export async function GET(req: NextRequest) {
         const pass = await db.form.findMany({
           where: {
             approveStatus: 'PENDING_DEAN',
-            nisitid: studentId ?? undefined,
+            // nisitid: studentId ?? undefined,
             // nisitNameTh: nisitNameTH ?? undefined,
             // faculty: accessUser.faculty ?? undefined,
           },
@@ -126,10 +126,10 @@ export async function GET(req: NextRequest) {
       case Role.DEAN: {
         const deanRequests = await db.form.findMany({
           where: {
-            approveStatus: 'PENDING_DEPUTY_DEAN',
+            approveStatus: 'PENDING_DEAN',
             faculty: accessUser.faculty ?? undefined,
-            nisitid: studentId ?? undefined,
-            nisitNameTh: nisitNameTH ?? undefined,
+            // nisitid: studentId ?? undefined,
+            // nisitNameTh: nisitNameTH ?? undefined,
           },
         });
 
@@ -137,8 +137,8 @@ export async function GET(req: NextRequest) {
           where: {
             approveStatus: 'REJECTED',
             checkReject: 'REJECTED_DEAN',
-            nisitid: studentId ?? undefined,
-            nisitNameTh: nisitNameTH ?? undefined,
+            // nisitid: studentId ?? undefined,
+            // nisitNameTh: nisitNameTH ?? undefined,
             faculty: accessUser.faculty ?? undefined,
           },
         });
@@ -146,8 +146,8 @@ export async function GET(req: NextRequest) {
         const pass = await db.form.findMany({
           where: {
             approveStatus: 'PENDING_SA',
-            nisitid: studentId ?? undefined,
-            nisitNameTh: nisitNameTH ?? undefined,
+            // nisitid: studentId ?? undefined,
+            // nisitNameTh: nisitNameTH ?? undefined,
             faculty: accessUser.faculty ?? undefined,
           },
         });
@@ -155,8 +155,8 @@ export async function GET(req: NextRequest) {
         const allFaculty = await db.form.findMany({
           where: {
             faculty: accessUser.faculty ?? undefined,
-            nisitid: studentId ?? undefined,
-            nisitNameTh: nisitNameTH ?? undefined,
+            // nisitid: studentId ?? undefined,
+            // nisitNameTh: nisitNameTH ?? undefined,
           },
         });
         return NextResponse.json(
@@ -174,36 +174,36 @@ export async function GET(req: NextRequest) {
         const saRequests = await db.form.findMany({
           where: {
             approveStatus: 'PENDING_SA',
-            faculty: accessUser.faculty ?? undefined,
-            nisitid: studentId ?? undefined,
-            nisitNameTh: nisitNameTH ?? undefined,
+            // faculty: accessUser.faculty ?? undefined,
+            // nisitid: studentId ?? undefined,
+            // nisitNameTh: nisitNameTH ?? undefined,
           },
         });
 
         const notPass = await db.form.findMany({
           where: {
             approveStatus: 'REJECTED',
-            faculty: accessUser.faculty ?? undefined,
+            // faculty: accessUser.faculty ?? undefined,
             checkReject: 'REJECTED_SA',
-            nisitid: studentId ?? undefined,
-            nisitNameTh: nisitNameTH ?? undefined,
+            // nisitid: studentId ?? undefined,
+            // nisitNameTh: nisitNameTH ?? undefined,
           },
         });
 
         const pass = await db.form.findMany({
           where: {
             approveStatus: 'PENDING_BOARD',
-            nisitid: studentId ?? undefined,
-            nisitNameTh: nisitNameTH ?? undefined,
-            faculty: accessUser.faculty ?? undefined,
+            // nisitid: studentId ?? undefined,
+            // nisitNameTh: nisitNameTH ?? undefined,
+            // faculty: accessUser.faculty ?? undefined,
           },
         });
 
         const allFaculty = await db.form.findMany({
           where: {
-            nisitid: studentId ?? undefined,
-            nisitNameTh: nisitNameTH ?? undefined,
-            faculty: accessUser.faculty ?? undefined,
+            // nisitid: studentId ?? undefined,
+            // nisitNameTh: nisitNameTH ?? undefined,
+            // faculty: accessUser.faculty ?? undefined,
           },
         });
         return NextResponse.json(
@@ -221,9 +221,9 @@ export async function GET(req: NextRequest) {
         const committeeRequest = await db.form.findMany({
           where: {
             approveStatus: 'PENDING_BOARD',
-            faculty: accessUser.faculty ?? undefined,
-            nisitid: studentId ?? undefined,
-            nisitNameTh: nisitNameTH ?? undefined,
+            // faculty: accessUser.faculty ?? undefined,
+            // nisitid: studentId ?? undefined,
+            // nisitNameTh: nisitNameTH ?? undefined,
           },
         });
 
@@ -231,26 +231,26 @@ export async function GET(req: NextRequest) {
           where: {
             approveStatus: 'REJECTED',
             checkReject: 'REJECTED_BOARD',
-            nisitid: studentId ?? undefined,
-            nisitNameTh: nisitNameTH ?? undefined,
-            faculty: accessUser.faculty ?? undefined,
+            // nisitid: studentId ?? undefined,
+            // nisitNameTh: nisitNameTH ?? undefined,
+            // faculty: accessUser.faculty ?? undefined,
           },
         });
 
         const pass = await db.form.findMany({
           where: {
             approveStatus: 'PENDING_CHAIRMAN',
-            nisitid: studentId ?? undefined,
-            nisitNameTh: nisitNameTH ?? undefined,
-            faculty: accessUser.faculty ?? undefined,
+            // nisitid: studentId ?? undefined,
+            // nisitNameTh: nisitNameTH ?? undefined,
+            // faculty: accessUser.faculty ?? undefined,
           },
         });
 
         const allFaculty = await db.form.findMany({
           where: {
-            faculty: accessUser.faculty ?? undefined,
-            nisitid: studentId ?? undefined,
-            nisitNameTh: nisitNameTH ?? undefined,
+            // faculty: accessUser.faculty ?? undefined,
+            // nisitid: studentId ?? undefined,
+            // nisitNameTh: nisitNameTH ?? undefined,
           },
         });
         return NextResponse.json(
@@ -268,9 +268,9 @@ export async function GET(req: NextRequest) {
         const chaimanRequest = await db.form.findMany({
           where: {
             OR: [{ approveStatus: 'PENDING_CHAIRMAN' }, { checkReject: 'REJECTED_BOARD' }],
-            faculty: accessUser.faculty ?? undefined,
-            nisitid: studentId ?? undefined,
-            nisitNameTh: nisitNameTH ?? undefined,
+            // faculty: accessUser.faculty ?? undefined,
+            // nisitid: studentId ?? undefined,
+            // nisitNameTh: nisitNameTH ?? undefined,
           },
         });
 
@@ -278,26 +278,26 @@ export async function GET(req: NextRequest) {
           where: {
             approveStatus: 'REJECTED',
             checkReject: 'REJECTED',
-            nisitid: studentId ?? undefined,
-            nisitNameTh: nisitNameTH ?? undefined,
-            faculty: accessUser.faculty ?? undefined,
+            // nisitid: studentId ?? undefined,
+            // nisitNameTh: nisitNameTH ?? undefined,
+            // faculty: accessUser.faculty ?? undefined,
           },
         });
 
         const pass = await db.form.findMany({
           where: {
             approveStatus: 'APPROVED',
-            nisitid: studentId ?? undefined,
-            nisitNameTh: nisitNameTH ?? undefined,
-            faculty: accessUser.faculty ?? undefined,
+            // nisitid: studentId ?? undefined,
+            // nisitNameTh: nisitNameTH ?? undefined,
+            // faculty: accessUser.faculty ?? undefined,
           },
         });
 
         const allFaculty = await db.form.findMany({
           where: {
-            faculty: accessUser.faculty ?? undefined,
-            nisitid: studentId ?? undefined,
-            nisitNameTh: nisitNameTH ?? undefined,
+            // faculty: accessUser.faculty ?? undefined,
+            // nisitid: studentId ?? undefined,
+            // nisitNameTh: nisitNameTH ?? undefined,
           },
         });
         return NextResponse.json(

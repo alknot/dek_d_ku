@@ -804,9 +804,7 @@ export default function ApplyScholarshipPage() {
                     <input
                       type="file"
                       accept=".pdf"
-                      onChange={(e) => {
-                        // handle file change
-                      }}
+                      onChange={handleFileChange}
                       className="focus:ring-primary-600 focus:border-primary-600 w-full rounded-lg border border-gray-300 px-3 py-2"
                       required
                     />

@@ -43,6 +43,11 @@ interface FormType {
   address: string;
   isLastTerm: boolean;
 
+  universityPrice: number;
+  facultyPrice: number;
+  creditPrice: number;
+  sumPrice: number;
+
   newUniversityPrice: number;
   newFacultyPrice: number;
   newCreditPrice: number;
@@ -112,7 +117,7 @@ export default function ShowRequestFormPage() {
     if (!id) return;
     const fetchFormDetail = async () => {
       try {
-        const res = await fetch(`/api/request/${id}`);
+        const res = await fetch(`/api/request/justshow/${id}`);
         if (!res.ok) {
           throw new Error(`Failed to fetch form, status: ${res.status}`);
         }
@@ -203,6 +208,17 @@ export default function ShowRequestFormPage() {
       alert('เกิดข้อผิดพลาดในการอัปเดตสถานะ');
     }
   };
+
+  const gpa = formDetail?.gpa || 0;
+  const universityPrice = formDetail?.universityPrice || 0;
+  const facultyPrice = formDetail?.facultyPrice || 0;
+  const creditPrice = formDetail?.creditPrice || 0;
+  const sumPrice = formDetail?.sumPrice || 0;
+
+  const newUniversityPrice = formDetail?.newUniversityPrice || 0;
+  const newFacultyPrice = formDetail?.newFacultyPrice || 0;
+  const newCreditPrice = formDetail?.newCreditPrice || 0;
+  const newSumPrice = formDetail?.newSumPrice || 0;
 
   if (loading) {
     return (
@@ -336,7 +352,7 @@ export default function ShowRequestFormPage() {
                   <input
                     type="text"
                     className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder={formDetail.gpa.toString()}
+                    placeholder={gpa.toString()}
                     readOnly
                   />
                 </div>
@@ -531,56 +547,47 @@ export default function ShowRequestFormPage() {
             )}
             <p className="mb-2 mt-6 font-bold text-gray-900">จำนวนเงินเต็มที่ควรเก็บได้</p>
             {formDetail.isLastTerm && (
-              <label htmlFor="schName" className="mb-2 block text-sm font-medium text-red-500">
+              <label className="mb-2 block text-sm font-medium text-red-500">
                 เทอมนี้เป็นเทอมสุดท้าย
               </label>
             )}
             <div className="mb-4 flex space-x-10 sm:col-span-2">
               <div className="sm:grid-cols-1">
-                <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
+                <label className="mb-2 block text-sm font-medium text-gray-900">
                   ค่าบำรุงมหาลัย
                 </label>
                 <input
                   type="text"
-                  id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={termPriceData?.price1?.toString() || ''}
+                  placeholder={universityPrice.toString()}
                   readOnly
                 />
               </div>
               <div className="sm:grid-cols-1">
-                <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                  ค่าบำรุงคณะ
-                </label>
+                <label className="mb-2 block text-sm font-medium text-gray-900">ค่าบำรุงคณะ</label>
                 <input
                   type="text"
-                  id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={termPriceData?.price2?.toString() || ''}
+                  placeholder={facultyPrice.toString()}
                   readOnly
                 />
               </div>
               <div className="sm:grid-cols-1">
-                <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                  ค่าหน่วยกิต
-                </label>
+                <label className="mb-2 block text-sm font-medium text-gray-900">ค่าหน่วยกิต</label>
                 <input
                   type="text"
-                  id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={termPriceData?.price3?.toString() || ''}
+                  placeholder={creditPrice.toString()}
                   readOnly
                 />
               </div>
               <div className="sm:grid-cols-1">
-                <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                  รวม
-                </label>
+                <label className="mb-2 block text-sm font-medium text-gray-900">รวม</label>
                 <input
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={termPriceData?.sumPrice?.toString() || ''}
+                  placeholder={sumPrice.toString()}
                   readOnly
                 />
               </div>
@@ -589,45 +596,39 @@ export default function ShowRequestFormPage() {
             <p className="mb-2 font-bold text-gray-900">จำนวนเงินที่ควรเก็บได้จริง</p>
             <div className="flex space-x-10 sm:col-span-2">
               <div className="sm:grid-cols-1">
-                <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
+                <label className="mb-2 block text-sm font-medium text-gray-900">
                   ค่าบำรุงมหาลัย
                 </label>
                 <input
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={formDetail.newUniversityPrice.toString()}
+                  placeholder={newUniversityPrice.toString()}
                   readOnly
                 />
               </div>
               <div className="sm:grid-cols-1">
-                <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                  ค่าบำรุงคณะ
-                </label>
+                <label className="mb-2 block text-sm font-medium text-gray-900">ค่าบำรุงคณะ</label>
                 <input
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={formDetail.newFacultyPrice.toString()}
+                  placeholder={newFacultyPrice.toString()}
                   readOnly
                 />
               </div>
               <div className="sm:grid-cols-1">
-                <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                  ค่าหน่วยกิต
-                </label>
+                <label className="mb-2 block text-sm font-medium text-gray-900">ค่าหน่วยกิต</label>
                 <input
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={formDetail.newCreditPrice.toString()}
+                  placeholder={newCreditPrice.toString()}
                   readOnly
                 />
               </div>
               <div className="sm:grid-cols-1">
-                <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                  รวม
-                </label>
+                <label className="mb-2 block text-sm font-medium text-gray-900">รวม</label>
                 <input
                   type="text"
                   id="schName"

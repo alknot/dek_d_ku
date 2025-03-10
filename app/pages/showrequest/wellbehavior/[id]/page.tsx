@@ -77,6 +77,9 @@ interface TermPriceData {
 }
 
 export default function ShowRequestFormPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isApproved, setIsApproved] = useState<boolean | null>(null);
+  const [comment, setComment] = useState<string>('');
   const router = useRouter();
   const params = useParams();
   const id = params.id; // รับ id จาก URL
@@ -95,11 +98,12 @@ export default function ShowRequestFormPage() {
     if (!id) return;
     const fetchFormDetail = async () => {
       try {
-        const res = await fetch(`/api/request/${id}`);
+        const res = await fetch(`/api/request/justshow/${id}`);
         if (!res.ok) {
           throw new Error(`Failed to fetch form, status: ${res.status}`);
         }
         const data: FormType = await res.json();
+
         setFormDetail(data);
       } catch (err: any) {
         setError(err.message || 'An error occurred');
@@ -110,6 +114,7 @@ export default function ShowRequestFormPage() {
 
     fetchFormDetail();
   }, [id]);
+  console.log('formDetail', formDetail);
   ///////////////////////////////////////////////
   useEffect(() => {
     if (!formDetail) return;
@@ -181,6 +186,28 @@ export default function ShowRequestFormPage() {
       console.error(error);
       alert('เกิดข้อผิดพลาดในการอัปเดตสถานะ');
     }
+  };
+
+  const gpa = formDetail?.gpa || 0;
+  const universityPrice = formDetail?.universityPrice || 0;
+  const facultyPrice = formDetail?.facultyPrice || 0;
+  const creditPrice = formDetail?.creditPrice || 0;
+  const sumPrice = formDetail?.sumPrice || 0;
+
+  const newUniversityPrice = formDetail?.newUniversityPrice || 0;
+  const newFacultyPrice = formDetail?.newFacultyPrice || 0;
+  const newCreditPrice = formDetail?.newCreditPrice || 0;
+  const newSumPrice = formDetail?.newSumPrice || 0;
+
+  const handleReject = () => {
+    setIsApproved(false);
+    setIsModalOpen(true);
+  };
+
+  // ฟังก์ชันเมื่อกดปุ่ม ผ่านการตัดสิน
+  const handleApprove = () => {
+    setIsApproved(true);
+    setIsModalOpen(true);
   };
 
   if (loading) {
@@ -315,7 +342,7 @@ export default function ShowRequestFormPage() {
                   <input
                     type="text"
                     className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder={formDetail.gpa.toString()}
+                    placeholder={gpa.toString()}
                     readOnly
                   />
                 </div>
@@ -422,7 +449,7 @@ export default function ShowRequestFormPage() {
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={formDetail.universityPrice.toString()}
+                  placeholder={universityPrice.toString()}
                   readOnly
                 />
               </div>
@@ -434,7 +461,7 @@ export default function ShowRequestFormPage() {
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={formDetail.facultyPrice.toString()}
+                  placeholder={facultyPrice.toString()}
                   readOnly
                 />
               </div>
@@ -446,7 +473,7 @@ export default function ShowRequestFormPage() {
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={formDetail.creditPrice.toString()}
+                  placeholder={creditPrice.toString()}
                   readOnly
                 />
               </div>
@@ -458,7 +485,7 @@ export default function ShowRequestFormPage() {
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={formDetail.sumPrice.toString()}
+                  placeholder={sumPrice.toString()}
                   readOnly
                 />
               </div>
@@ -474,7 +501,7 @@ export default function ShowRequestFormPage() {
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={formDetail.newUniversityPrice.toString()}
+                  placeholder={newUniversityPrice.toString()}
                   readOnly
                 />
               </div>
@@ -486,7 +513,7 @@ export default function ShowRequestFormPage() {
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={formDetail.newFacultyPrice.toString()}
+                  placeholder={newFacultyPrice.toString()}
                   readOnly
                 />
               </div>
@@ -498,7 +525,7 @@ export default function ShowRequestFormPage() {
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={formDetail.newCreditPrice.toString()}
+                  placeholder={newCreditPrice.toString()}
                   readOnly
                 />
               </div>
@@ -510,7 +537,7 @@ export default function ShowRequestFormPage() {
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={formDetail.newSumPrice.toString()}
+                  placeholder={newSumPrice.toString()}
                   readOnly
                 />
               </div>
@@ -525,19 +552,22 @@ export default function ShowRequestFormPage() {
                 ย้อนกลับ
               </button>
               <div className="flex space-x-3">
-                <button type="button" className="rounded-lg bg-blue-500 px-4 py-2 text-white">
+                {/* <button
+                  type="button"
+                  className="rounded-lg bg-blue-500 px-4 py-2 text-white"
+                  onClick={() => alert('comment feature not implemented')}>
                   comment
-                </button>
+                </button> */}
                 <button
                   type="button"
                   className="rounded-lg bg-red-500 px-4 py-2 text-white"
-                  onClick={() => updateFormStatus('REJECTED')}>
+                  onClick={handleReject}>
                   ไม่ผ่านการตัดสิน
                 </button>
                 <button
                   type="button"
                   className="rounded-lg bg-green-500 px-4 py-2 text-white"
-                  onClick={() => updateFormStatus('PENDING_DEAN')}>
+                  onClick={handleApprove}>
                   ผ่านการตัดสิน
                 </button>
               </div>
@@ -545,7 +575,45 @@ export default function ShowRequestFormPage() {
           </form>
         </div>
       </main>
-
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        {isApproved === false && (
+          <div>
+            <h2 className="mb-4 text-lg font-bold">Comment สำหรับ ไม่ผ่านการตัดสิน</h2>
+            <textarea
+              required
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="กรอก comment ของคุณที่นี่"
+              className="w-full rounded-lg border p-2"
+            />
+            <div className="mt-4 flex justify-end">
+              <button
+                className="rounded-lg bg-red-500 px-4 py-2 text-black"
+                onClick={() => updateApvStatus(false, comment)}>
+                ส่ง
+              </button>
+            </div>
+          </div>
+        )}
+        {isApproved === true && (
+          <div>
+            <h2 className="mb-4 text-lg font-bold">Comment สำหรับ ผ่านการตัดสิน</h2>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="กรอก comment ของคุณที่นี่"
+              className="w-full rounded-lg border p-2"
+            />
+            <div className="mt-4 flex justify-end">
+              <button
+                className="rounded-lg bg-green-500 px-4 py-2 text-black"
+                onClick={() => updateApvStatus(true, comment)}>
+                ส่ง
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
       {/* Footer Section */}
       <Footer />
     </div>

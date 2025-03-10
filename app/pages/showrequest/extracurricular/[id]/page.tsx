@@ -169,7 +169,7 @@ export default function ShowRequestFormPage() {
     if (!id) return;
     const fetchFormDetail = async () => {
       try {
-        const res = await fetch(`/api/request/${id}`);
+        const res = await fetch(`/api/request/justshow/${id}`);
         if (!res.ok) {
           throw new Error(`Failed to fetch form, status: ${res.status}`);
         }
@@ -251,7 +251,37 @@ export default function ShowRequestFormPage() {
   const newCreditPrice = formDetail?.newCreditPrice || 0;
   const newSumPrice = formDetail?.newSumPrice || 0;
   // ฟังก์ชันอัปเดตสถานะฟอร์ม
-
+  const options = [
+    { label: 'กรุณาเลือก', value: '' },
+    {
+      label:
+        'เข้าร่วมการแข่งขันทางวิชาการหรือศิลปกรรม ระดับอุดมศึกษา และได้รับราลวัลใดรางวัลหนึ่งจากการแข่งขัน',
+      value: 'UNIVERSITY_COMPETITION',
+    },
+    {
+      label:
+        'เข้าร่วมการแข่งขันทางวิชาการหรือศิลปกรรม ระดับชาติ และได้รับราลวัลใดรางวัลหนึ่งจากการแข่งขัน',
+      value: 'NATIONAL_COMPETITION',
+    },
+    {
+      label:
+        'เข้าร่วมการแข่งขันทางวิชาการหรือศิลปกรรม ระดับนานาชาติ และได้รับราลวัลใดรางวัลหนึ่งจากการแข่งขัน',
+      value: 'INTERNATIONAL_COMPETITION',
+    },
+    {
+      label: 'ดำรงตำแหน่งนายกองค์การบริหาร องค์การนิสิต ประธานสภาผู้แทนนิสิตหรือนายกสโมสรนิสิต',
+      value: 'POSITION',
+    },
+    {
+      label:
+        'เป็นนิสิตที่ดำเนินกิจกรรมและต้องแสดงให้เห็นว่าเมื่อดำเนินกิจกรรมแล้ว ชาวบ้าน ชุมชนในท้องถิ่นหรือผู้เข้าร่วมกิจกรรมได้รับประโยชน์อย่างไรจากการดำเนินกิจกรรมที่่ก่อให้เกิดประโยชน์ต่อส่วนรวมและเป็นการสร้างเกียรติคุณต่อคณะหรือมหาวิทยาลัยหรือไม่',
+      value: 'SOCIAL',
+    },
+  ];
+  const selectedOptionLabel = formDetail?.extracurricular
+    ? (options.find((opt) => opt.value === formDetail.extracurricular?.extracurricularType)
+        ?.label ?? '')
+    : '';
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -428,6 +458,17 @@ export default function ShowRequestFormPage() {
                   type="text"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                   placeholder={formDetail.address}
+                  readOnly
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="mb-2 block text-sm font-medium text-gray-900">
+                  ประเภทการสมัคร
+                </label>
+                <input
+                  type="text"
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                  placeholder={selectedOptionLabel}
                   readOnly
                 />
               </div>

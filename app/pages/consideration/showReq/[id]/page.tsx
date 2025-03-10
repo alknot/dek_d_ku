@@ -1,5 +1,6 @@
 'use client';
 
+import Modal from '@/components/Modal';
 import Footer from '@/components/footer';
 import Header from '@/components/header';
 import Sidebar from '@/components/sidebar';
@@ -38,11 +39,15 @@ interface FormType {
   activityImageUrl?: string | null;
   sumPrice: number;
   newSumPrice: number;
+  comment: string;
+  commentedBy: string;
   // สามารถเพิ่ม field อื่น ๆ ที่ต้องการแสดงได้
 }
 
 export default function CommitteeViewPage() {
   const { data: session } = useSession();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedForm, setSelectedForm] = useState<FormType | null>(null);
 
   const token = session?.account.access_token as string | undefined;
   console.log('token:', token);
@@ -159,6 +164,17 @@ export default function CommitteeViewPage() {
     // อาจมีการ set state ของ filter ต่าง ๆ ก่อนเรียก fetchForms
     fetchForms();
     setCurrentPage(1);
+  };
+
+  const handleOpenModal = (form: FormType) => {
+    setSelectedForm(form);
+    setIsModalOpen(true);
+  };
+
+  // ปิด modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedForm(null);
   };
 
   // คำนวณ Pagination
@@ -342,7 +358,9 @@ export default function CommitteeViewPage() {
                         </td>
 
                         <td className="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-900">
-                          <button className="rounded-lg bg-green-600 px-6 py-2 text-white hover:bg-green-500">
+                          <button
+                            className="rounded-lg bg-green-600 px-6 py-2 text-white hover:bg-green-500"
+                            onClick={() => handleOpenModal(form)}>
                             comment
                           </button>
                         </td>
@@ -368,6 +386,29 @@ export default function CommitteeViewPage() {
           )}
         </div>
       </main>
+      {/* Modal */}
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+        {selectedForm && (
+          <div>
+            <h2 className="mb-4 text-xl font-bold">ความคิดเห็น</h2>
+
+            <p>
+              <strong>ความคิดเห็น</strong>
+            </p>
+            <textarea className="w-full border p-2" value={selectedForm.comment} readOnly />
+            <p>
+              <strong>ผู้ให้ความเห็น</strong>
+            </p>
+            <input
+              type="text"
+              className="w-full border p-2"
+              value={selectedForm.commentedBy}
+              readOnly
+            />
+          </div>
+        )}
+      </Modal>
+
       <Footer />
     </div>
   );

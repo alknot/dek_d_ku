@@ -2,9 +2,11 @@
 
 import Footer from '@/components/footer';
 import Header from '@/components/header';
+import Modal from '@/components/Modal';
 import Sidebar from '@/components/sidebar';
 import { format, parseISO } from 'date-fns';
 import { th } from 'date-fns/locale';
+import { useSession } from 'next-auth/react';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
@@ -87,11 +89,21 @@ interface TermPriceData {
 }
 
 export default function ShowRequestFormPage() {
+
+
+   const { data: session } = useSession();
+  
+    const token = session?.account.access_token;
+    
   const router = useRouter();
   const params = useParams();
   const id = params.id; // รับ id จาก URL
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isApproved, setIsApproved] = useState<boolean | null>(null);
+    const [comment, setComment] = useState<string>('');
 
   const [formDetail, setFormDetail] = useState<FormType | null>(null);
   const [termPriceData, setTermPriceData] = useState<TermPriceData | null>(null);
@@ -201,7 +213,7 @@ export default function ShowRequestFormPage() {
       }
       const updatedForm = await res.json();
       setFormDetail(updatedForm);
-      alert(`อัปเดตสถานะสำเร็จ: ${status}`);
+      alert(`ท่านพิจารณาเรียบร้อยแล้ว`);
       window.history.back();
     } catch (error: any) {
       console.error(error);
@@ -219,6 +231,47 @@ export default function ShowRequestFormPage() {
   const newFacultyPrice = formDetail?.newFacultyPrice || 0;
   const newCreditPrice = formDetail?.newCreditPrice || 0;
   const newSumPrice = formDetail?.newSumPrice || 0;
+
+
+  const updateApvStatus = async (isApproved: boolean, comment: string) => {
+    if (!formDetail) return;
+    try {
+      // console.log('token', token);
+      console.log('isApproved', isApproved);
+      console.log('comment', comment);
+
+      const res = await fetch(`/api/request/approve/${formDetail.id}`, {
+        method: 'PUT',
+        headers: token ? { Authorization: token } : {},
+        body: JSON.stringify({ approveStatus: isApproved, comment: comment }),
+      });
+      console.log('res', res);
+
+      if (!res.ok) {
+        throw new Error(`Update failed, status: ${res.status}`);
+      }
+      const updatedForm = await res.json();
+      setFormDetail(updatedForm);
+      alert(`อัปเดตสถานะสำเร็จ: ${status}`);
+      // ปิด modal แล้วกลับหน้าก่อนหน้า
+      setIsModalOpen(false);
+      window.history.back();
+    } catch (error: any) {
+      console.error(error);
+      alert('เกิดข้อผิดพลาดในการอัปเดตสถานะ');
+    }
+  };
+
+  const handleReject = () => {
+    setIsApproved(false);
+    setIsModalOpen(true);
+  };
+
+  // ฟังก์ชันเมื่อกดปุ่ม ผ่านการตัดสิน
+  const handleApprove = () => {
+    setIsApproved(true);
+    setIsModalOpen(true);
+  };
 
   if (loading) {
     return (
@@ -633,7 +686,7 @@ export default function ShowRequestFormPage() {
                   type="text"
                   id="schName"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder={formDetail.newSumPrice.toString()}
+                  placeholder={newSumPrice.toString()}
                   readOnly
                 />
               </div>
@@ -648,19 +701,22 @@ export default function ShowRequestFormPage() {
                 ย้อนกลับ
               </button>
               <div className="flex space-x-3">
-                <button type="button" className="rounded-lg bg-blue-500 px-4 py-2 text-white">
+                {/* <button
+                  type="button"
+                  className="rounded-lg bg-blue-500 px-4 py-2 text-white"
+                  onClick={() => alert('comment feature not implemented')}>
                   comment
-                </button>
+                </button> */}
                 <button
                   type="button"
                   className="rounded-lg bg-red-500 px-4 py-2 text-white"
-                  onClick={() => updateFormStatus('REJECTED')}>
+                  onClick={handleReject}>
                   ไม่ผ่านการตัดสิน
                 </button>
                 <button
                   type="button"
                   className="rounded-lg bg-green-500 px-4 py-2 text-white"
-                  onClick={() => updateFormStatus('PENDING_DEAN')}>
+                  onClick={handleApprove}>
                   ผ่านการตัดสิน
                 </button>
               </div>
@@ -668,7 +724,45 @@ export default function ShowRequestFormPage() {
           </form>
         </div>
       </main>
-
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        {isApproved === false && (
+          <div>
+            <h2 className="mb-4 text-lg font-bold">Comment สำหรับ ไม่ผ่านการตัดสิน</h2>
+            <textarea
+              required
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="กรอก comment ของคุณที่นี่"
+              className="w-full rounded-lg border p-2"
+            />
+            <div className="mt-4 flex justify-end">
+              <button
+                className="rounded-lg bg-red-500 px-4 py-2 text-black"
+                onClick={() => updateApvStatus(false, comment)}>
+                ส่ง
+              </button>
+            </div>
+          </div>
+        )}
+        {isApproved === true && (
+          <div>
+            <h2 className="mb-4 text-lg font-bold">Comment สำหรับ ผ่านการตัดสิน</h2>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="กรอก comment ของคุณที่นี่"
+              className="w-full rounded-lg border p-2"
+            />
+            <div className="mt-4 flex justify-end">
+              <button
+                className="rounded-lg bg-green-500 px-4 py-2 text-black"
+                onClick={() => updateApvStatus(true, comment)}>
+                ส่ง
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
       {/* Footer Section */}
       <Footer />
     </div>

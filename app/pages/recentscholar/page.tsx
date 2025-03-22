@@ -241,7 +241,7 @@ export default function Home() {
                 className="rounded-lg border-gray-300 p-2"
                 value={schType}
                 onChange={(e) => setSchType(e.target.value)}>
-                <option value="">ประเภทโครงการ</option>
+                <option value="">โครงการทั้งหมด</option>
                 <option value="WELL_BEHAVIOR">ประพฤติดี</option>
                 <option value="EXTRACURRICULAR">กิจกรรมนอกหลักสูตร</option>
                 <option value="INNOVATION">ความคิดสร้างสรรค์และนวัตกรรม</option>

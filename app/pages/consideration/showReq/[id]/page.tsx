@@ -50,7 +50,7 @@ export default function CommitteeViewPage() {
   const [selectedForm, setSelectedForm] = useState<FormType | null>(null);
 
   const token = session?.account.access_token as string | undefined;
-  console.log('token:', token);
+  // console.log('token:', token);
 
   // State สำหรับฟอร์มทั้งหมด
   const [forms, setForms] = useState<FormType[]>([]);
@@ -114,7 +114,7 @@ export default function CommitteeViewPage() {
 
       const normalizedTerm =
         termParam === '1' ? 'เทอมต้น' : termParam === '2' ? 'เทอมปลาย' : termParam;
-      console.log('tokenBF', token);
+      // console.log('tokenBF', token);
       const response = await axios.get('/api/request', {
         headers: { Authorization: token },
         params: {

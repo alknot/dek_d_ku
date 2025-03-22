@@ -126,7 +126,7 @@ export default function ShowRequestFormPage() {
   const updateApvStatus = async (isApproved: boolean, comment: string) => {
     if (!formDetail) return;
     try {
-      console.log('token', token);
+      // console.log('token', token);
       console.log('isApproved', isApproved);
       console.log('comment', comment);
 
@@ -142,7 +142,7 @@ export default function ShowRequestFormPage() {
       }
       const updatedForm = await res.json();
       setFormDetail(updatedForm);
-      alert(`อัปเดตสถานะสำเร็จ: ${status}`);
+      alert(`ท่านพิจารณาเรียบร้อยแล้ว`);
       // ปิด modal แล้วกลับหน้าก่อนหน้า
       setIsModalOpen(false);
       window.history.back();

@@ -2,9 +2,11 @@
 
 import Footer from '@/components/footer';
 import Header from '@/components/header';
+import Modal from '@/components/Modal';
 import Sidebar from '@/components/sidebar';
 import { format, parseISO } from 'date-fns';
 import { th } from 'date-fns/locale';
+import { useSession } from 'next-auth/react';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
@@ -77,6 +79,11 @@ interface TermPriceData {
 }
 
 export default function ShowRequestFormPage() {
+
+     const { data: session } = useSession();
+    
+      const token = session?.account.access_token;
+      
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isApproved, setIsApproved] = useState<boolean | null>(null);
   const [comment, setComment] = useState<string>('');
@@ -199,6 +206,39 @@ export default function ShowRequestFormPage() {
   const newCreditPrice = formDetail?.newCreditPrice || 0;
   const newSumPrice = formDetail?.newSumPrice || 0;
 
+  const updateApvStatus = async (isApproved: boolean, comment: string) => {
+    if (!formDetail) return;
+    try {
+      // console.log('token', token);
+      console.log('isApproved', isApproved);
+      console.log('comment', comment);
+
+      const res = await fetch(`/api/request/approve/${formDetail.id}`, {
+        method: 'PUT',
+        headers: token ? { Authorization: token } : {},
+        body: JSON.stringify({ approveStatus: isApproved, comment: comment }),
+      });
+      console.log('res', res);
+
+      if (!res.ok) {
+        throw new Error(`Update failed, status: ${res.status}`);
+      }
+      const updatedForm = await res.json();
+      setFormDetail(updatedForm);
+      alert(`อัปเดตสถานะสำเร็จ: ${status}`);
+      // ปิด modal แล้วกลับหน้าก่อนหน้า
+      setIsModalOpen(false);
+      window.history.back();
+    } catch (error: any) {
+      console.error(error);
+      alert('เกิดข้อผิดพลาดในการอัปเดตสถานะ');
+    }
+  };
+
+
+  // ฟังก์ชันเมื่อกดปุ่ม ผ่านการตัดสิน
+ 
+
   const handleReject = () => {
     setIsApproved(false);
     setIsModalOpen(true);
@@ -209,6 +249,8 @@ export default function ShowRequestFormPage() {
     setIsApproved(true);
     setIsModalOpen(true);
   };
+
+  
 
   if (loading) {
     return (

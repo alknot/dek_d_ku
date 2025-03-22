@@ -79,6 +79,7 @@ async function createUserThroughAPI(userId: string, tokenData: any) {
         email: tokenData['google-mail'],
         typePerson: tokenData['type-person'],
       }),
+      
     });
     if (!res.ok) {
       console.error('Failed to create user via API');

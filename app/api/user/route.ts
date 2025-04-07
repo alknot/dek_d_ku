@@ -71,6 +71,7 @@ export async function POST(req: NextRequest) {
       role: typePerson === TypePerson.STUDENT ? Role.STUDENT : Role.NOT_ASSIGNED, // Pending admin approval
       faculty: body.faculty,
       email: body.email,
+      isAcceptPolicy: body.isAcceptPolicy,
 
       // Optional fields
       major: body.major,

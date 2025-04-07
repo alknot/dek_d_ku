@@ -41,25 +41,6 @@ declare module 'next-auth' {
 }
 
 async function createUserThroughAPI(userId: string, tokenData: any) {
-  // console.log('--------------CREATE USER VIA API---------------');
-  // console.log({ userId, tokenData });
-
-  // console.log({
-  //   resultBody: {
-  //     id: userId,
-  //     prenameTh: tokenData.thaiprename || '',
-  //     firstnameTh: tokenData['first-name'] || '',
-  //     lastnameTh: tokenData['last-name'] || '',
-  //     prenameEn: tokenData.prenameEn || '',
-  //     firstnameEn: tokenData.given_name || '',
-  //     lastnameEn: tokenData.family_name || '',
-  //     role: 'NOT_ASSIGNED',
-  //     faculty: tokenData.faculty,
-  //     email: tokenData['google-mail'],
-  //     typePerson: tokenData['type-person'],
-  //   },
-  // });
-
   const API_BASE_URL = process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
   try {
@@ -78,8 +59,8 @@ async function createUserThroughAPI(userId: string, tokenData: any) {
         faculty: tokenData.faculty,
         email: tokenData['google-mail'],
         typePerson: tokenData['type-person'],
+        isAcceptPolicy: false,
       }),
-      
     });
     if (!res.ok) {
       console.error('Failed to create user via API');
@@ -143,15 +124,12 @@ export const authOptions: NextAuthOptions = {
           const user = await db.user.findUnique({ where: { id: userId } });
           // console.log({ user });
           if (!user) {
-            // user does not exist, create user
             console.log('User not found, creating user');
             const newUser = await createUserThroughAPI(userId, tokenData);
             token.userProfile = newUser;
           } else {
             token.userProfile = user;
           }
-
-          // user exists
         }
       } catch (error) {
         handleError(error);

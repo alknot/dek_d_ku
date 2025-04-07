@@ -54,8 +54,8 @@ export async function GET(req: NextRequest) {
         ...(term && { term }),
       },
     });
-   console.log("scholarshipID",scholarshipID);
-   console.log("forms",forms);
+    console.log('scholarshipID', scholarshipID);
+    console.log('forms', forms);
 
     if (!user) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -83,8 +83,7 @@ export async function GET(req: NextRequest) {
           where: {
             approveStatus: 'PENDING_DEPUTY_DEAN',
             faculty: accessUser.faculty ?? undefined,
-            scholarshipID: scholarshipID ?? undefined ,
-
+            scholarshipID: scholarshipID ?? undefined,
 
             // nisitid: studentId ?? undefined,
             // nisitNameTh: nisitNameTH ?? undefined,
@@ -95,7 +94,7 @@ export async function GET(req: NextRequest) {
           where: {
             approveStatus: 'REJECTED',
             checkReject: 'REJECTED_DEPUTY_DEAN',
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // nisitid: studentId ?? undefined,
             // nisitNameTh: nisitNameTH ?? undefined,
@@ -106,7 +105,7 @@ export async function GET(req: NextRequest) {
         const pass = await db.form.findMany({
           where: {
             approveStatus: 'PENDING_DEAN',
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // nisitid: studentId ?? undefined,
             // nisitNameTh: nisitNameTH ?? undefined,
@@ -117,7 +116,7 @@ export async function GET(req: NextRequest) {
         const allFaculty = await db.form.findMany({
           where: {
             faculty: accessUser.faculty ?? undefined,
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // nisitid: studentId ?? undefined,
             // nisitNameTh: nisitNameTH ?? undefined,
@@ -139,7 +138,7 @@ export async function GET(req: NextRequest) {
           where: {
             approveStatus: 'PENDING_DEAN',
             faculty: accessUser.faculty ?? undefined,
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // nisitid: studentId ?? undefined,
             // nisitNameTh: nisitNameTH ?? undefined,
@@ -150,7 +149,7 @@ export async function GET(req: NextRequest) {
           where: {
             approveStatus: 'REJECTED',
             checkReject: 'REJECTED_DEAN',
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // nisitid: studentId ?? undefined,
             // nisitNameTh: nisitNameTH ?? undefined,
@@ -161,7 +160,7 @@ export async function GET(req: NextRequest) {
         const pass = await db.form.findMany({
           where: {
             approveStatus: 'PENDING_SA',
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // nisitid: studentId ?? undefined,
             // nisitNameTh: nisitNameTH ?? undefined,
@@ -172,7 +171,7 @@ export async function GET(req: NextRequest) {
         const allFaculty = await db.form.findMany({
           where: {
             faculty: accessUser.faculty ?? undefined,
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // nisitid: studentId ?? undefined,
             // nisitNameTh: nisitNameTH ?? undefined,
@@ -193,7 +192,7 @@ export async function GET(req: NextRequest) {
         const saRequests = await db.form.findMany({
           where: {
             approveStatus: 'PENDING_SA',
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // faculty: accessUser.faculty ?? undefined,
             // nisitid: studentId ?? undefined,
@@ -204,7 +203,7 @@ export async function GET(req: NextRequest) {
         const notPass = await db.form.findMany({
           where: {
             approveStatus: 'REJECTED',
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // faculty: accessUser.faculty ?? undefined,
             checkReject: 'REJECTED_SA',
@@ -216,7 +215,7 @@ export async function GET(req: NextRequest) {
         const pass = await db.form.findMany({
           where: {
             approveStatus: 'PENDING_BOARD',
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // nisitid: studentId ?? undefined,
             // nisitNameTh: nisitNameTH ?? undefined,
@@ -226,7 +225,7 @@ export async function GET(req: NextRequest) {
 
         const allFaculty = await db.form.findMany({
           where: {
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // nisitid: studentId ?? undefined,
             // nisitNameTh: nisitNameTH ?? undefined,
@@ -248,7 +247,7 @@ export async function GET(req: NextRequest) {
         const committeeRequest = await db.form.findMany({
           where: {
             approveStatus: 'PENDING_BOARD',
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // faculty: accessUser.faculty ?? undefined,
             // nisitid: studentId ?? undefined,
@@ -260,7 +259,7 @@ export async function GET(req: NextRequest) {
           where: {
             approveStatus: 'REJECTED',
             checkReject: 'REJECTED_BOARD',
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // nisitid: studentId ?? undefined,
             // nisitNameTh: nisitNameTH ?? undefined,
@@ -271,7 +270,7 @@ export async function GET(req: NextRequest) {
         const pass = await db.form.findMany({
           where: {
             approveStatus: 'PENDING_CHAIRMAN',
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // nisitid: studentId ?? undefined,
             // nisitNameTh: nisitNameTH ?? undefined,
@@ -281,7 +280,7 @@ export async function GET(req: NextRequest) {
 
         const allFaculty = await db.form.findMany({
           where: {
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // faculty: accessUser.faculty ?? undefined,
             // nisitid: studentId ?? undefined,
@@ -303,7 +302,7 @@ export async function GET(req: NextRequest) {
         const chaimanRequest = await db.form.findMany({
           where: {
             OR: [{ approveStatus: 'PENDING_CHAIRMAN' }, { checkReject: 'REJECTED_BOARD' }],
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // faculty: accessUser.faculty ?? undefined,
             // nisitid: studentId ?? undefined,
@@ -315,7 +314,7 @@ export async function GET(req: NextRequest) {
           where: {
             approveStatus: 'REJECTED',
             checkReject: 'REJECTED',
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // nisitid: studentId ?? undefined,
             // nisitNameTh: nisitNameTH ?? undefined,
@@ -326,7 +325,7 @@ export async function GET(req: NextRequest) {
         const pass = await db.form.findMany({
           where: {
             approveStatus: 'APPROVED',
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // nisitid: studentId ?? undefined,
             // nisitNameTh: nisitNameTH ?? undefined,
@@ -336,7 +335,7 @@ export async function GET(req: NextRequest) {
 
         const allFaculty = await db.form.findMany({
           where: {
-            scholarshipID: scholarshipID ?? undefined ,
+            scholarshipID: scholarshipID ?? undefined,
 
             // faculty: accessUser.faculty ?? undefined,
             // nisitid: studentId ?? undefined,
@@ -418,7 +417,6 @@ export async function POST(req: NextRequest) {
     if (!scholarship) {
       return NextResponse.json({ message: 'Scholarship not found' }, { status: 404 });
     }
-    // สร้าง newFormData โดยแปลงค่าต่าง ๆ ให้ตรงกับ Prisma schema
     const newFormData: Form = {
       id: generateCuid(),
       scholarshipID: body.scholarshipID, // ใช้ scholarshipID

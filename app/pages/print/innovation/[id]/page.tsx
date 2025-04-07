@@ -305,8 +305,8 @@ export default function PrintEx() {
 
       <Page size="A4" orientation="landscape" style={styles.page}>
         <Text style={styles.subtitle}>
-          รายชื่อนิสิตที่มีผลงานดีเด่นด้านความประพฤติดี ประจำ{schDetail.term} ปีการศึกษา{' '}
-          {schDetail.academiYear}
+          รายชื่อนิสิตที่มีผลงานดีเด่นด้านความคิดสร้างสรรค์และนวัตกรรม ประจำ{schDetail.term}{' '}
+          ปีการศึกษา {schDetail.academiYear}
         </Text>
         <Text style={styles.subtitle}>
           นิสิตที่ได้รับการยกเว้นธรรมเนียมการศึกษา ประจำ{schDetail.term} ปีการศึกษา{' '}

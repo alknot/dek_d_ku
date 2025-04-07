@@ -120,7 +120,7 @@ export default function DynamicQuestionPage() {
       if (!res.ok) {
         throw new Error(`Update failed. status=${res.status}`);
       }
-      alert('บันทึก Dynamic Questions สำเร็จ!');
+      alert('สร้างโครงการสำเร็จ!');
       // redirect หรือทำอย่างอื่น
       router.push('/pages/newscholar');
     } catch (error) {
@@ -234,7 +234,7 @@ export default function DynamicQuestionPage() {
             <button
               type="submit"
               className="mt-4 w-full rounded-lg bg-blue-500 px-4 py-2 text-white">
-              บันทึก Dynamic Questions
+              สร้างโครงการ
             </button>
           </form>
         </div>

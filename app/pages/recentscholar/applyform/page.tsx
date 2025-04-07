@@ -5,6 +5,7 @@ import Header from '@/components/header';
 import Sidebar from '@/components/sidebar';
 import { ActivityHour, CompetitiveLevel, ExtracurricularType, SchType } from '@prisma/client';
 import axios from 'axios';
+import { differenceInYears } from 'date-fns';
 import { useRouter } from 'next/compat/router';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
@@ -382,35 +383,24 @@ const Create = () => {
                   />
                 </div>
 
-                <div className="flex space-x-10 sm:col-span-2">
-                  <div className="relative max-w-sm">
-                    <label className="mb-2 block text-sm font-medium text-gray-900">
-                      เกิดวันที่
-                    </label>
-                    <DatePicker
-                      selected={dateofBirth}
-                      onChange={(date) => setDateofBirth(date)}
-                      placeholderText="เกิดวันที่"
-                      dateFormat="dd/MM/yyyy"
-                      className="focus:ring-primary-600 focus:border-primary-600 w-full rounded-lg border border-gray-300 px-3 py-2"
-                    />
-                  </div>
-                  <div className="relative max-w-sm">
-                    <label
-                      htmlFor="schName"
-                      className="mb-2 block text-sm font-medium text-gray-900">
-                      อายุ
-                    </label>
-                    <input
-                      type="text"
-                      id="schName"
-                      className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                      placeholder="อายุ (ปี)"
-                      value={age}
-                      onChange={(e) => setAge(Number(e.target.value))}
-                      required
-                    />
-                  </div>
+                <div className="relative max-w-sm">
+                  <label className="mb-2 block text-sm font-medium text-gray-900">เกิดวันที่</label>
+                  <DatePicker
+                    selected={dateofBirth}
+                    onChange={(date) => {
+                      setDateofBirth(date);
+                      if (date) {
+                        // คำนวณอายุจากวันเกิดจนถึงวันที่ปัจจุบัน
+                        const calculatedAge = differenceInYears(new Date(), date);
+                        setAge(calculatedAge);
+                      } else {
+                        setAge(0);
+                      }
+                    }}
+                    placeholderText="เกิดวันที่"
+                    dateFormat="dd/MM/yyyy"
+                    className="focus:ring-primary-600 focus:border-primary-600 w-full rounded-lg border border-gray-300 px-3 py-2"
+                  />
                 </div>
               </div>
               <div className="flex space-x-10 sm:col-span-2">

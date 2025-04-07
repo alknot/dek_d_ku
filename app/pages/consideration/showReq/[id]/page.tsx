@@ -354,7 +354,7 @@ export default function CommitteeViewPage() {
                         </td>
 
                         <td className="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-900">
-                          {form.approveStatus}
+                          <ApproveStatusButton form={form} />
                         </td>
 
                         <td className="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-900">
@@ -411,5 +411,64 @@ export default function CommitteeViewPage() {
 
       <Footer />
     </div>
+  );
+}
+
+function ApproveStatusButton({ form }: { form: FormType }) {
+  const { data: session } = useSession();
+
+  const token = session?.account.access_token;
+  const router = useRouter();
+  const [isHovered, setIsHovered] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const handleConfirmCancellation = async () => {
+    console.log('Confirmed cancellation for', form.id);
+    setShowConfirm(false);
+    const res = await fetch(`/api/request/cancleConsideration/${form.id}`, {
+      method: 'PUT',
+      headers: token ? { Authorization: token } : {},
+      body: JSON.stringify({
+        approveStatus: form.approveStatus,
+      }),
+    });
+    console.log('res', res);
+    router.refresh();
+  };
+
+  const handleCancelConfirmation = () => {
+    setShowConfirm(false);
+  };
+
+  return (
+    <>
+      <button
+        className="min-w-[230px] rounded-lg bg-gray-600 px-6 py-2 text-white transition-all duration-200 hover:bg-red-500 focus:outline-none"
+        onClick={() => setShowConfirm(true)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}>
+        {isHovered ? 'ยกเลิกการพิจารณา' : form.approveStatus}
+      </button>
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-96 rounded-lg bg-white p-6">
+            <h2 className="mb-4 text-center text-xl font-bold">ยืนยันการยกเลิกการพิจารณา</h2>
+            <p className="mb-4 text-center">คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการพิจารณานี้?</p>
+            <div className="flex justify-around">
+              <button
+                className="min-w-[100px] rounded-lg bg-blue-500 px-4 py-2 text-white transition-all duration-200 hover:bg-blue-400"
+                onClick={handleConfirmCancellation}>
+                ยืนยัน
+              </button>
+              <button
+                className="min-w-[100px] rounded-lg bg-gray-500 px-4 py-2 text-white transition-all duration-200 hover:bg-red-400"
+                onClick={handleCancelConfirmation}>
+                ยกเลิก
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

@@ -29,15 +29,15 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     const formId = (await params).id;
     const body = await req.json();
-    console.log(
-      '---------------------------------------------------body------------------------------------------'
-    );
-    console.log('body', body);
-    console.log('body.approveStatus', body.approveStatus);
-    console.log('body.comment', body.comment);
-    console.log(
-      '---------------------------------------------------body------------------------------------------'
-    );
+    // console.log(
+    //   '---------------------------------------------------body------------------------------------------'
+    // );
+    // console.log('body', body);
+    // console.log('body.approveStatus', body.approveStatus);
+    // console.log('body.comment', body.comment);
+    // console.log(
+    //   '---------------------------------------------------body------------------------------------------'
+    // );
 
     // const approveStatus = searchParams.get('approveStatus');
     // const comment = searchParams.get('comment');

@@ -113,7 +113,7 @@ model User {
   role              Role
   major             String? // คณะ (เฉพาะนิสิต)
   faculty           String? // สังกัด, คณะ
-
+  isAcceptPolicy     Boolean? // ยอมรับนโยบายการใช้งาน
   // birthdate DateTime?
   advisor String? // อาจารย์ที่ปรึกษา (เฉพาะนิสิต)
   gpa     Float? // เกรดเฉลี่ย (เฉพาะนิสิต)

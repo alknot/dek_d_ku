@@ -6,6 +6,7 @@ import Header from '@/components/header';
 import Sidebar from '@/components/sidebar';
 import axios from 'axios';
 import { log } from 'console';
+import { differenceInYears } from 'date-fns';
 import { useSession } from 'next-auth/react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -199,6 +200,21 @@ export default function ApplyScholarshipPage() {
       setPdfMimeType(event.target.files[0].type);
     }
   };
+
+  useEffect(() => {
+    if (staticData.nisitid.length >= 2) {
+      // ดึง 2 หลักแรกจากรหัสนิสิต เช่น "64"
+      const entryDigits = staticData.nisitid.slice(0, 2);
+      // สมมติว่าให้ปีเข้ามหาวิทยาลัย = 2500 + ตัวเลขที่ได้ (เช่น 64 -> 2564)
+      const entryYear = parseInt(entryDigits, 10) + 2500;
+      // คำนวณปีปัจจุบันในรูปแบบ พ.ศ. โดยบวก 543 กับปี ค.ศ.
+      const currentYearBE = new Date().getFullYear() + 543;
+      // คำนวณปีที่นิสิตศึกษาอยู่: (ปีปัจจุบัน - ปีเข้ามหาวิทยาลัย) + 1
+      const studyYear = Number(academicYearParam) - entryYear + 1;
+      // อัปเดต staticData.nisitAcademicyear ให้เป็นค่า studyYear (ในรูปแบบ string)
+      handleStaticChange('nisitAcademicyear', studyYear.toString());
+    }
+  }, [staticData.nisitid]);
 
   // ตัวอย่างการอัปโหลด PDF (ถ้าต้องการ)
   const handleUploadPdf = async (): Promise<string | null> => {
@@ -549,7 +565,7 @@ export default function ApplyScholarshipPage() {
               </div>
 
               <div className="flex space-x-10 sm:col-span-2">
-                <div className="relative max-w-sm">
+                {/* <div className="relative max-w-sm">
                   <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
                     นิสิตชั้นปีที่
                   </label>
@@ -561,49 +577,46 @@ export default function ApplyScholarshipPage() {
                     onChange={(e) => handleStaticChange('nisitAcademicyear', e.target.value)}
                     required
                   />
-                </div>
-                <div className="relative max-w-sm">
-                  <label htmlFor="schName" className="mb-2 block text-sm font-medium text-gray-900">
-                    รหัสนิสิต
-                  </label>
+                </div> */}
+                <div>
+                  <label className="block text-sm font-medium">รหัสนิสิต</label>
                   <input
                     type="text"
-                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="รหัสนิสิต"
                     value={staticData.nisitid}
-                    onChange={(e) => handleStaticChange('nisitid', e.target.value)}
+                    onChange={(e) => {
+                      // กรองเอาเฉพาะตัวเลขออกมา
+                      const value = e.target.value.replace(/\D/g, '');
+                      // ตรวจสอบว่าไม่เกิน 10 ตัวอักษร
+                      if (value.length <= 10) {
+                        handleStaticChange('nisitid', value);
+                      }
+                    }}
+                    maxLength={10} // จำกัดไม่ให้เกิน 10 ตัว
+                    pattern="^\d{10}$" // ตรวจสอบว่าต้องเป็นตัวเลข 10 ตัวเมื่อตรวจสอบ validation
+                    className="w-full border p-2"
                     required
                   />
                 </div>
 
-                <div className="flex space-x-10 sm:col-span-2">
-                  <div className="relative max-w-sm">
-                    <label className="mb-2 block text-sm font-medium text-gray-900">
-                      เกิดวันที่
-                    </label>
-                    <DatePicker
-                      selected={staticData.dateofBirth}
-                      onChange={(date) => handleStaticChange('dateofBirth', date)}
-                      placeholderText="เกิดวันที่"
-                      dateFormat="dd/MM/yyyy"
-                      className="focus:ring-primary-600 focus:border-primary-600 w-full rounded-lg border border-gray-300 px-3 py-2"
-                    />
-                  </div>
-                  <div className="relative max-w-sm">
-                    <label
-                      htmlFor="schName"
-                      className="mb-2 block text-sm font-medium text-gray-900">
-                      อายุ
-                    </label>
-                    <input
-                      type="text"
-                      className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                      placeholder="อายุ (ปี)"
-                      value={staticData.age}
-                      onChange={(e) => handleStaticChange('age', e.target.value)}
-                      required
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium">วันเกิด</label>
+                  <DatePicker
+                    selected={staticData.dateofBirth}
+                    onChange={(date) => {
+                      // อัปเดตวันเกิดใน staticData
+                      handleStaticChange('dateofBirth', date);
+                      // ถ้ามีการเลือกวันเกิด ให้คำนวณอายุจากวันที่ปัจจุบัน
+                      if (date) {
+                        const calculatedAge = differenceInYears(new Date(), date);
+                        // อัปเดตอายุใน staticData เป็น string (หรือคุณอาจแปลงเป็น number ตามที่ต้องการ)
+                        handleStaticChange('age', calculatedAge.toString());
+                      } else {
+                        handleStaticChange('age', '');
+                      }
+                    }}
+                    className="w-full border p-2"
+                    dateFormat="dd/MM/yyyy"
+                  />
                 </div>
               </div>
 

@@ -312,7 +312,7 @@ export default function PrintEx() {
 
       <Page size="A4" orientation="landscape" style={styles.page}>
         <Text style={styles.subtitle}>
-          รายชื่อนิสิตที่มีผลงานดีเด่นด้านความประพฤติดี ประจำ{schDetail.term} ปีการศึกษา{' '}
+          รายชื่อนิสิตที่มีผลงานดีเด่นด้านกิจกรรมนอกหลักสูตร ประจำ{schDetail.term} ปีการศึกษา{' '}
           {schDetail.academiYear}
         </Text>
         <Text style={styles.subtitle}>

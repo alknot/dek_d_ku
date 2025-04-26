@@ -1,10 +1,14 @@
 'use client';
 
 import { apiService } from '@/common/apiService';
+import { useSession } from 'next-auth/react';
 import Papa from 'papaparse';
 import React, { useState } from 'react';
 
 const CsvUploader = () => {
+  const { data: session } = useSession();
+  const token = session?.account.access_token as string | undefined;
+
   const [academicYear, setAcademicYear] = useState<string>('');
   const [term, setTerm] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -36,7 +40,11 @@ const CsvUploader = () => {
         const parsedData = result.data as Record<string, string>[];
         console.log('Parsed data:', parsedData);
 
-        await apiService.uploadTermPrice(parsedData, academicYear, term);
+        if (!token) {
+          alert('Token is missing. Please log in again.');
+          return;
+        }
+        await apiService.uploadTermPrice(parsedData, academicYear, term, token);
       },
     });
   };

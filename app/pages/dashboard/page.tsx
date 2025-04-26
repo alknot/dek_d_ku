@@ -1,13 +1,39 @@
 'use client';
 
+import { apiService } from '@/common/apiService';
+import ChartDisplay from '@/components/chartDisplay';
+import Footer from '@/components/footer';
+import Header from '@/components/header';
 import Sidebar from '@/components/sidebar';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
-export default function Home() {
+interface ChartItem {
+  project: string;
+  count: number;
+}
+
+export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const [academicYear, setAcademicYear] = useState<number | string>('');
+  const [term, setTerm] = useState<string>('');
+  const [data, setData] = useState<ChartItem[]>([]);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+  const fetchChart = async () => {
+    if (!academicYear || !term) return;
+    const res = await fetch(`/api/chart?academicYear=${academicYear}&term=${term}`);
+    const json: ChartItem[] = await res.json();
+    setData(json);
   };
 
   return (
@@ -15,51 +41,62 @@ export default function Home() {
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
-      {/* Header Section */}
-      <header
-        className="flex items-center justify-between shadow-md"
-        style={{ backgroundColor: 'rgb(0, 104, 95)' }}>
-        <div className="px-4 py-4">
-          {/* Sidebar Toggle Button */}
-          <button onClick={toggleSidebar} className="text-white focus:outline-none">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16m-7 6h7"
-              />
-            </svg>
-          </button>
-        </div>
-        <h1 className="flex-1 text-center text-3xl font-bold text-white">Dek-D KU</h1>
-        <div className="w-10"></div> {/* ใช้เพื่อเว้นช่องให้ Header ตรงกลาง */}
-      </header>
+      {/* Header */}
+      <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
-      {/* Main Section (Full Screen) */}
-      <main className="flex flex-1 items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <h2 className="text-4xl font-bold text-gray-800">Hello, World!</h2>
-          <p className="mt-4 text-lg text-gray-600">
-            This main section is now fully stretched to cover the page.
-          </p>
-          <button className="mt-6 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white shadow transition hover:bg-blue-500">
-            Get Started
-          </button>
+      {/* Main Section */}
+      <main className="flex flex-1 flex-col items-center bg-gray-100 p-4">
+        <div className="w-full max-w-7xl rounded-lg bg-white p-6 shadow-lg">
+          <header className="mb-6">
+            <h2 className="text-center text-4xl font-bold text-gray-800">Dashboard</h2>
+            <p className="mt-2 text-center text-lg text-gray-600">จำนวนผู้สมัครในแต่ละโครงการ</p>
+          </header>
+
+          {/* ฟอร์มกรอกปีการศึกษา + ภาคการศึกษา */}
+          <div className="mb-6 flex justify-center space-x-4">
+            <input
+              type="number"
+              placeholder="ปีการศึกษา (เช่น 2568)"
+              className="w-48 rounded-lg border border-gray-300 p-2"
+              value={academicYear}
+              onChange={(e) => setAcademicYear(Number(e.target.value))}
+            />
+            <select
+              className="rounded-lg border border-gray-300 p-2"
+              value={term}
+              onChange={(e) => setTerm(e.target.value)}>
+              <option value="">เลือกภาคการศึกษา</option>
+              <option value="เทอมต้น">เทอมต้น</option>
+              <option value="เทอมปลาย">เทอมปลาย</option>
+            </select>
+            <button
+              onClick={fetchChart}
+              className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-500">
+              ค้นหา
+            </button>
+          </div>
+
+          {/* แสดงกราฟเมื่อ data มี */}
+          {data.length > 0 && (
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="project"
+                  label={{ value: 'โครงการ', position: 'insideBottom', offset: -10 }}
+                />
+                <YAxis label={{ value: 'จำนวนผู้สมัคร', angle: -90, position: 'insideLeft' }} />
+                <Tooltip />
+                <Legend verticalAlign="bottom" height={36} wrapperStyle={{ paddingTop: 10 }} />
+                <Bar dataKey="count" name="จำนวนผู้สมัคร" fill="#3182CE" />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </main>
 
-      {/* Footer Section */}
-      <footer className="bg-gray-800 py-6 text-white">
-        <div className="container mx-auto text-center">
-          <p>&copy; นายกุลชัย </p>
-        </div>
-      </footer>
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

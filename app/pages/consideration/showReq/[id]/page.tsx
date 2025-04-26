@@ -86,7 +86,7 @@ export default function CommitteeViewPage() {
     setAcademicYear(initialYear);
     setTerm(initialTerm);
   }, [searchParams]);
-  // ดึงค่า query parameter เริ่มต้น (ถ้ามี)
+
   useEffect(() => {
     if (!scholarshipID) return;
     console.log('working009');
@@ -416,11 +416,21 @@ export default function CommitteeViewPage() {
 
 function ApproveStatusButton({ form }: { form: FormType }) {
   const { data: session } = useSession();
-
   const token = session?.account.access_token;
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  // 1. เพิ่ม mapping ของ approveStatus → ข้อความไทย
+  const statusLabels: Record<string, string> = {
+    PENDING_DEPUTY_DEAN: 'รอรองคณบดีพิจารณา',
+    PENDING_DEAN: 'รอคณบดีพิจารณา',
+    PENDING_SA: 'รอเจ้าหน้าที่กองพัฒนานิสิตตรวจสอบ',
+    PENDING_BOARD: 'รอคณะกรรมการพิจารณา',
+    PENDING_CHAIRMAN: 'รอประธานโครงการพิจารณา',
+    APPROVED: 'อนุมัติทุน',
+    REJECTED: 'ปฏิเสธทุน',
+  };
 
   const handleConfirmCancellation = async () => {
     console.log('Confirmed cancellation for', form.id);
@@ -428,9 +438,7 @@ function ApproveStatusButton({ form }: { form: FormType }) {
     const res = await fetch(`/api/request/cancleConsideration/${form.id}`, {
       method: 'PUT',
       headers: token ? { Authorization: token } : {},
-      body: JSON.stringify({
-        approveStatus: form.approveStatus,
-      }),
+      body: JSON.stringify({ approveStatus: form.approveStatus }),
     });
     console.log('res', res);
     router.refresh();
@@ -447,8 +455,9 @@ function ApproveStatusButton({ form }: { form: FormType }) {
         onClick={() => setShowConfirm(true)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}>
-        {isHovered ? 'ยกเลิกการพิจารณา' : form.approveStatus}
+        {isHovered ? 'ยกเลิกการพิจารณา' : (statusLabels[form.approveStatus] ?? form.approveStatus)}
       </button>
+
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="w-96 rounded-lg bg-white p-6">

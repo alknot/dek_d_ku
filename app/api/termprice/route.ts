@@ -3,6 +3,7 @@ import { generateCuid, handleError } from '@/app/libs/utils';
 import { PrismaClient, Role, Termprice } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import Papa from 'papaparse';
+import { decodeToken } from 'react-jwt';
 
 const db = new PrismaClient();
 
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    // const token = req.headers.get('Authorization');
+    const token = req.headers.get('Authorization');
 
     // const userId = '';
 
@@ -88,6 +89,26 @@ export async function POST(req: NextRequest) {
     // }
 
     // Validate the request body
+    if (!token) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+    const user = decodeToken(token) as any;
+
+    if (!user) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
+    // const saRequests = await db.form.findMany();
+    // return NextResponse.json(saRequests ?? [], { status: 200 });
+    const accessUser = await db.user.findUnique({
+      where: {
+        email: user['google-mail'],
+      },
+    });
+    if (!accessUser) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
     if (!body || typeof body !== 'object') {
       return NextResponse.json({ message: 'Invalid or missing request body' }, { status: 400 });
     }
@@ -116,31 +137,34 @@ export async function POST(req: NextRequest) {
         { message: 'Term or price details are incomplete' },
         { status: 400 }
       );
+    if (accessUser.role === Role.SA_STAFF || accessUser.role === Role.FINANCIAL) {
+      const termPriceData: Termprice = {
+        id: generateCuid(),
+        academicYear: body.academicYear,
+        term: body.term,
 
-    const termPriceData: Termprice = {
-      id: generateCuid(),
-      academicYear: body.academicYear,
-      term: body.term,
+        programType: body.programType,
+        study: body.study,
+        faculty: body.faculty,
+        department: body.department,
 
-      programType: body.programType,
-      study: body.study,
-      faculty: body.faculty,
-      department: body.department,
+        price1: body.price1,
+        price2: body.price2,
+        price3: body.price3,
 
-      price1: body.price1,
-      price2: body.price2,
-      price3: body.price3,
+        sumPrice: body.sumPrice,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
 
-      sumPrice: body.sumPrice,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+      const newTermPrice = await db.termprice.create({
+        data: termPriceData,
+      });
 
-    const newTermPrice = await db.termprice.create({
-      data: termPriceData,
-    });
-
-    return NextResponse.json(newTermPrice, { status: 201 });
+      return NextResponse.json(newTermPrice, { status: 201 });
+    } else {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
   } catch (e: any) {
     return handleError(e);
   }

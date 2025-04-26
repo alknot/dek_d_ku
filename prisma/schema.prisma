@@ -133,13 +133,14 @@ model User {
 
   // Relationships
   // Form        Form[] @relation("UserForm")
-  CommentUser Form[] @relation("CommentedUserForm")
+  // CommentUser Form[] @relation("CommentedUserForm")
 }
 
 model Form {
-  id            String        @id @map("_id")
+  id            String @id @map("_id")
   createdBy      String
-  scholarshipID String
+   scholarshipID      String
+  scholarship   Scholarship  @relation(fields: [scholarshipID], references: [id],onDelete: Cascade, onUpdate: Cascade)
   schType       SchType
   approveStatus RequestStatus
   checkReject CheckReject
@@ -190,9 +191,9 @@ model Form {
   
 
   // Relationships
-  commentedUser   User? @relation("CommentedUserForm", fields: [commentedBy], references: [id])
+  // commentedUser   User? @relation("CommentedUserForm", fields: [commentedBy], references: [id])
   // user            User        @relation("UserForm", fields: [createdBy], references: [id])
-  certificateFile File? @relation("FileForm", fields: [certificate], references: [id])
+  // certificateFile File? @relation("FileForm", fields: [certificate], references: [id])
 }
 
 type DynamicQuestionResponse {
@@ -212,7 +213,7 @@ type DynamicQuestionTemplate {
 }
 
 model Scholarship {
-  id               String                    @id @default(cuid()) @map("_id")
+  id               String   @id @default(cuid()) @map("_id")
   schName          String
   description      String
   academiYear      String
@@ -229,8 +230,10 @@ model Scholarship {
   dynamicQuestions DynamicQuestionTemplate[]
   pdfUrl           String
   // file      File?      @relation("ScholarshipFile", fields: [attachment], references: [id])
-  termprice Termprice? @relation("TermpriceScholarship", fields: [termpriceid], references: [id])
-  termpriceid String?
+  // termprice Termprice? @relation("TermpriceScholarship", fields: [termpriceid], references: [id], onDelete: Cascade)
+  // termpriceid String?
+
+  Form Form[]
 }
 
 model assignrole {
@@ -249,7 +252,7 @@ model File {
   data     String
 
   // Relationships
-  form Form[] @relation("FileForm")
+  // form Form[] @relation("FileForm")
   // scholarship Scholarship[] @relation("ScholarshipFile")
 }
 
@@ -267,7 +270,7 @@ model Termprice {
   sumPrice     Float // ค่าเทอมแบ่งเป็นส่วนย่อย 3 ส่วน
 
   // Relationships
-  scholarship Scholarship[] @relation("TermpriceScholarship")
+  // scholarship Scholarship[] @relation("TermpriceScholarship")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

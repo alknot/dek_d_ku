@@ -51,13 +51,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
               พิจารณาผล
             </a>
           </li>
-          <li>
+          {/* <li>
             <a
               href="../../../../pages/showresult"
               className="block rounded px-4 py-2 hover:bg-gray-700">
               ติดตามผลการพิจารณา
             </a>
-          </li>
+          </li> */}
           <li>
             <a
               href="../../../../pages/dashboard"

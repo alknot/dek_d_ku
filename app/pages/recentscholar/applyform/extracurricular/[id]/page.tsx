@@ -145,7 +145,7 @@ export default function ApplyScholarshipPage() {
   // สมมติว่า scholarship id อยู่ใน URL เช่น /apply/[id]
   const scholarshipId = params.id; // id: string
   // ดึง query parameters
-  const academicYearParam = searchParams.get('academiYear') || '';
+  const academicYearParam = searchParams.get('academicYear') || '';
   const termParam = searchParams.get('term') || '';
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

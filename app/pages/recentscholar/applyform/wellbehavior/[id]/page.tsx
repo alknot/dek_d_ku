@@ -122,7 +122,7 @@ export default function ApplyScholarshipPage() {
   // สมมติว่า scholarship id อยู่ใน URL เช่น /apply/[id]
   const scholarshipId = params.id; // id: string
   // ดึง query parameters
-  const academicYearParam = searchParams.get('academiYear') || '';
+  const academicYearParam = searchParams.get('academicYear') || '';
   const termParam = searchParams.get('term') || '';
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -170,13 +170,18 @@ export default function ApplyScholarshipPage() {
   };
 
   // ดึงข้อมูล termprice จาก API เมื่อ academicYearParam และ termParam เปลี่ยนแปลง
+
   useEffect(() => {
+    // console.log('academicYearParam', academicYearParam);
+    // console.log('termParam', termParam);
     if (!academicYearParam || !termParam) return;
+
     const normalizedTerm =
       termParam === '1' ? 'เทอมต้น' : termParam === '2' ? 'เทอมปลาย' : termParam;
     const fetchTermPriceOptions = async () => {
       try {
         const response = await apiService.fetchData(academicYearParam.toString(), normalizedTerm);
+
         const result = response as Termprice[];
         setData(result);
         // ตัวเลือกสำหรับหลักสูตร

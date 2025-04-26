@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { headers } from 'next/headers';
 
 class ApiService {
   constructor() {
@@ -9,7 +10,7 @@ class ApiService {
     await axios.post(`/request/approve/${id}`, { isApproved });
   }
 
-  async uploadTermPrice(parsedData: any[], academicYear: string, term: string) {
+  async uploadTermPrice(parsedData: any[], academicYear: string, term: string, token: string) {
     const dataWithMetadata = parsedData.map((row) => ({
       ...row,
       academicYear,
@@ -32,7 +33,13 @@ class ApiService {
     }));
     console.log('Mapped data:', mappedData);
     try {
-      await Promise.all(mappedData.map((mappedData) => axios.post('/termprice', mappedData)));
+      await Promise.all(
+        mappedData.map((mappedData) =>
+          axios.post('/termprice', mappedData, {
+            headers: { Authorization: token },
+          })
+        )
+      );
       alert('อัปโหลดข้อมูลสำเร็จ');
     } catch (error) {
       console.error('Error uploading data:', error);
@@ -54,6 +61,17 @@ class ApiService {
       }
     } else {
       throw new Error('academicYear and term are required');
+    }
+  }
+
+  async fetchTermpriceDataAll() {
+    try {
+      const response = await axios.get('/termprice/getAll', {});
+      console.log('Fetched all term prices:', response.data);
+      return response.data;
+    } catch (err) {
+      console.error('Failed to fetch data. Please try again.', err);
+      throw err;
     }
   }
 }

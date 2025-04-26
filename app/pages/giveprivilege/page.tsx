@@ -1,5 +1,6 @@
 'use client';
 
+import { apiService } from '@/common/apiService';
 import Modal from '@/components/Modal';
 import Footer from '@/components/footer';
 import Header from '@/components/header';
@@ -46,9 +47,23 @@ interface Termprice {
 }
 
 const AdminPage = () => {
+  const roleLabels: Record<Role, string> = {
+    NOT_ASSIGNED: 'ถอดถอนสิทธิ',
+    STUDENT: 'นิสิต',
+    DEPARTMENT_HEAD: 'หัวหน้าภาควิชา',
+    FACULTY_STAFF: 'เจ้าหน้าที่คณะ',
+    DEPUTY_DEAN: 'รองคณบดี',
+    DEAN: 'คณบดี',
+    SA_STAFF: 'เจ้าหน้าที่กองพัฒนากิจการนิสิต',
+    COMMITTEE: 'คณะกรรมการ',
+    CHAIRMAN: 'ประธานกรรมการ',
+    FINANCIAL: 'พนักงานการเงิน',
+  };
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const { data: session } = useSession();
+  const token = session?.account.access_token as string | undefined;
+
   const router = useRouter();
 
   // Users state
@@ -61,7 +76,10 @@ const AdminPage = () => {
   const pageSize = 5;
   const totalPages = Math.ceil(users.length / pageSize);
   const displayedUsers = users.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-
+  const [data, setData] = useState<Termprice[]>([]);
+  const [programTypeOptions, setProgramTypeOptions] = useState<string[]>([]);
+  const [facultyOptions, setFacultyOptions] = useState<string[]>([]);
+  const [departmentOptions, setDepartmentOptions] = useState<string[]>([]);
   // Modal state and role selection
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -72,32 +90,59 @@ const AdminPage = () => {
   const [selectedDepartment, setSelectedDepartment] = useState<string>('');
 
   // Fetch users from API
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get<{ users: User[] }>('/api/user', {
-        params: { email: searchEmail, name: searchName },
-      });
-      setUsers(response.data.users ?? []);
-      // Reset page to 1 when searching
-      setCurrentPage(1);
-    } catch (err) {
-      setError('Failed to fetch users');
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get<{ users: User[] }>('/user', {
+          params: { email: searchEmail, name: searchName },
+        });
+        setUsers(response.data.users ?? []);
+        setCurrentPage(1);
+      } catch {
+        setError('Failed to fetch users');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [searchEmail, searchName]);
+
+  // const handleSearch = () => {
+  //   fetchUsers();
+  // };
 
   useEffect(() => {
-    fetchUsers();
+    const fetchTermPriceOptions = async () => {
+      try {
+        const result = (await apiService.fetchTermpriceDataAll()) as Termprice[];
+        setData(result);
+        // สร้างตัวเลือกคณะ
+        const uniqueFacs = Array.from(new Set(result.map((i) => i.faculty)));
+        setFacultyOptions(uniqueFacs);
+        // เริ่มต้นไม่กำหนดภาควิชา
+        setDepartmentOptions([]);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchTermPriceOptions();
   }, []);
 
-  // Handle search button click
-  const handleSearch = () => {
-    fetchUsers();
-  };
+  // เมื่อเลือก faculty → filter departmentOptions
+  useEffect(() => {
+    if (!selectedFaculty) {
+      setDepartmentOptions([]);
+      setSelectedDepartment('');
+      return;
+    }
+    const filtered = data.filter((i) => i.faculty === selectedFaculty);
+    const uniqueDeps = Array.from(new Set(filtered.map((i) => i.department)));
+    setDepartmentOptions(uniqueDeps);
+    setSelectedDepartment('');
+  }, [selectedFaculty, data]);
 
-  // Handle selecting/unselecting a user in the table
   const toggleSelectUser = (user: User) => {
     if (selectedUser && selectedUser.id === user.id) {
       setSelectedUser(null);
@@ -106,13 +151,15 @@ const AdminPage = () => {
     }
   };
 
-  // Open modal to assign role (we use the selected user from the table)
   const handleOpenModal = (user: User) => {
     setSelectedUser(user);
     setIsModalOpen(true);
+    // reset selections
+    setSelectedRole(user.role);
+    setSelectedFaculty(user.faculty ?? '');
+    setSelectedDepartment(user.department ?? '');
   };
 
-  // Close modal
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedUser(null);
@@ -127,14 +174,19 @@ const AdminPage = () => {
     try {
       setError(null);
       setLoading(true);
-      await axios.put(`/api/user/${selectedUser.id}`, {
-        role: selectedRole,
-        faculty: selectedFaculty,
-        department: selectedDepartment,
-      });
+      await axios.put(
+        `/user/${selectedUser.id}`,
+        {
+          role: selectedRole,
+          faculty: selectedFaculty,
+          department: selectedDepartment,
+        },
+        {
+          headers: { Authorization: token },
+        }
+      );
       alert('Role assigned successfully!');
       // Refresh the user list
-      fetchUsers();
       handleCloseModal();
     } catch (err) {
       setError('Failed to assign role.');
@@ -143,7 +195,6 @@ const AdminPage = () => {
     }
   };
 
-  // Pagination handler
   const goToPage = (page: number) => setCurrentPage(page);
 
   return (
@@ -178,7 +229,7 @@ const AdminPage = () => {
             </div>
             <div className="text-center">
               <button
-                onClick={handleSearch}
+                // onClick={handleSearch}
                 className="rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-500">
                 Search
               </button>
@@ -208,7 +259,7 @@ const AdminPage = () => {
                     <td className="px-4 py-2 text-center">
                       {user.firstnameTh} {user.lastnameTh}
                     </td>
-                    <td className="px-4 py-2 text-center">{user.role}</td>
+                    <td className="px-4 py-2 text-center">{roleLabels[user.role]}</td>
                     <td className="px-4 py-2 text-center">{user.faculty || '-'}</td>
                     <td className="px-4 py-2 text-center">{user.department || '-'}</td>
                     <td className="px-4 py-2 text-center">
@@ -259,32 +310,44 @@ const AdminPage = () => {
               <option value="FACULTY_STAFF">เจ้าหน้าที่คณะ</option>
               <option value="DEPUTY_DEAN">รองคณบดี</option>
               <option value="DEAN">คณบดี</option>
-              <option value="SA_STAFF">SA Staff</option>
+              <option value="SA_STAFF">เจ้าหน้าที่กองพัฒนากิจการนิสิต</option>
               <option value="COMMITTEE">คณะกรรมการ</option>
               <option value="CHAIRMAN">ประธานกรรมการ</option>
               <option value="FINANCIAL">พนักงานการเงิน</option>
             </select>
 
-            <p className="mb-2">เลือกคณะ</p>
-            <input
-              type="text"
-              value={selectedFaculty}
-              onChange={(e) => setSelectedFaculty(e.target.value)}
-              className="mb-4 w-full rounded-lg border px-4 py-2"
-            />
+            <div className="space-y-4">
+              {/* Faculty */}
+              <select
+                value={selectedFaculty}
+                onChange={(e) => setSelectedFaculty(e.target.value)}
+                className="w-full rounded border p-2">
+                <option value="">-- เลือกคณะ --</option>
+                {facultyOptions.map((f) => (
+                  <option key={f} value={f}>
+                    {f}
+                  </option>
+                ))}
+              </select>
 
-            {/* ส่วนของภาควิชา */}
-            <p className="mb-2">เลือกภาควิชา</p>
-            <input
-              type="text"
-              value={selectedDepartment}
-              onChange={(e) => setSelectedDepartment(e.target.value)}
-              className="mb-4 w-full rounded-lg border px-4 py-2"
-            />
+              {/* Department */}
+              <select
+                value={selectedDepartment}
+                onChange={(e) => setSelectedDepartment(e.target.value)}
+                className="w-full rounded border p-2"
+                disabled={!selectedFaculty}>
+                <option value="">-- เลือกภาควิชา --</option>
+                {departmentOptions.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             <button
               onClick={handleAssignRole}
-              className="w-full rounded-lg bg-green-500 px-4 py-2 text-white">
+              className="mt-4 w-full rounded-lg bg-green-500 px-4 py-2 text-white">
               Assign Role
             </button>
           </div>

@@ -1,8 +1,8 @@
 'use client';
 
+import Modal from '@/components/Modal';
 import Footer from '@/components/footer';
 import Header from '@/components/header';
-import Modal from '@/components/Modal';
 import Sidebar from '@/components/sidebar';
 import { format, parseISO } from 'date-fns';
 import { th } from 'date-fns/locale';
@@ -79,11 +79,10 @@ interface TermPriceData {
 }
 
 export default function ShowRequestFormPage() {
+  const { data: session } = useSession();
 
-     const { data: session } = useSession();
-    
-      const token = session?.account.access_token;
-      
+  const token = session?.account.access_token;
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isApproved, setIsApproved] = useState<boolean | null>(null);
   const [comment, setComment] = useState<string>('');
@@ -136,7 +135,6 @@ export default function ShowRequestFormPage() {
 
     const fetchTermPriceData = async () => {
       try {
-        // สร้าง URLSearchParams เพื่อรวม query parameters
         const params = new URLSearchParams({
           academicYear,
           term,
@@ -155,7 +153,7 @@ export default function ShowRequestFormPage() {
           throw new Error(`Error fetching termprice: ${response.status}`);
         }
         const data = await response.json();
-        setTermPriceData(data[0]); // สมมติว่าเราเก็บข้อมูลไว้ใน state ชื่อ termpriceData
+        setTermPriceData(data[0]);
         console.log(data);
       } catch (err) {
         console.error(err);
@@ -235,9 +233,7 @@ export default function ShowRequestFormPage() {
     }
   };
 
-
   // ฟังก์ชันเมื่อกดปุ่ม ผ่านการตัดสิน
- 
 
   const handleReject = () => {
     setIsApproved(false);
@@ -249,8 +245,6 @@ export default function ShowRequestFormPage() {
     setIsApproved(true);
     setIsModalOpen(true);
   };
-
-  
 
   if (loading) {
     return (

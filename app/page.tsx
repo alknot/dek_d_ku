@@ -18,6 +18,7 @@ interface UserData {
 
 export default function Home() {
   const { data: session } = useSession();
+  console.log(session?.userProfile);
 
   // สมมติว่า session มี property userProfile ที่เก็บ email ไว้
   const email = session?.userProfile?.email;

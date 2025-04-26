@@ -68,7 +68,7 @@ const SearchCSV = () => {
           <div className="relative max-w-sm">
             <label className="mb-2 block text-sm font-medium text-gray-900">ปีการศึกษา</label>
             <input
-              className="bg-white-50 block rounded-lg border border-gray-300 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 "
+              className="bg-white-50 block rounded-lg border border-gray-300 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
               type="number"
               value={academicYear}
               onChange={(e) => setAcademicYear(Number(e.target.value))}

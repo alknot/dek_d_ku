@@ -74,6 +74,7 @@ async function createUserThroughAPI(userId: string, tokenData: any) {
 }
 
 export const authOptions: NextAuthOptions = {
+  debug: true,
   providers: [
     KeycloakProvider({
       wellKnown: 'https://sso-dev.ku.ac.th/realms/KU-Alllogin/.well-known/openid-configuration',

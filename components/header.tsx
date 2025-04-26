@@ -50,9 +50,8 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen }) => {
         )}
         {session && (
           <div className="flex items-center space-x-4">
-            
             <span className="text-white">
-              Hello! {session.userProfile.firstnameTh} {session.userProfile.lastnameTh} 
+              Hello! {session.userProfile.firstnameTh} {session.userProfile.lastnameTh}
             </span>
             <button
               className="rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-400 focus:outline-none"
